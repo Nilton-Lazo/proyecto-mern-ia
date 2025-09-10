@@ -44,6 +44,25 @@ Este proyecto forma parte del curso **Taller de Proyectos 2 – Ingeniería de S
 
 ---
 
+## ⚙️ Instrucciones de Instalación  
+
+1. **Instalar Docker**  
+   - Seguir la guía en video: [Cómo instalar Docker](https://www.youtube.com/watch?v=wMioaU5yk_w).  
+
+2. **Clonar el repositorio**  
+   ```bash
+   git clone https://github.com/Nilton-Lazo/tutor-virtual.git
+   cd tutor-virtual
+   
+3. **Levantar los servicios con Docker Compose**
+   ```bash
+   docker-compose up --build
+
+4. **Acceder al sistema**
+   - Una vez completados los pasos, navegar a: [Sistema local](http://localhost:5173/).
+     
+---
+
 ## 📌 Historias de Usuario (Épicas)
 - Como **estudiante**, quiero que el tutor virtual me haga preguntas sobre el texto leído para mejorar mi análisis crítico.  
 - Como **docente**, quiero asignar textos con actividades automáticas para evaluar el progreso.  
