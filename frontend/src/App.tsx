@@ -1,8 +1,12 @@
-import Home from './pages/Home.tsx';
+import { Routes, Route, Navigate } from 'react-router-dom'
+import Home from './pages/Homei';
 
 function App() {
-  return <Home />;
+  return (
+    <Routes>
+      <Route path="/" element={<Home />} />
+    </Routes>
+  )
 }
 
-export default App;
-
+export default App
