@@ -1,4 +1,3 @@
-import "./home.css";
 
 function Home() {
   return (
