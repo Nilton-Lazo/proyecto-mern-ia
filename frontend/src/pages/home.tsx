@@ -1,5 +1,4 @@
-import "./home.css";
-//usando tailwind para los diseños
+
 function Home() {
   return (
     <div className="home-container">
