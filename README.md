@@ -12,7 +12,7 @@ Este proyecto forma parte del curso **Taller de Proyectos 2 – Ingeniería de S
 
 ## 👥 Integrantes del Equipo
 - Huaccho Mancilla Steven José  
-- Lazo Maraví Nilton Joel  
+- Lazo Maravi Nilton Joel  
 - Poma Goche Abigail Karim  
 - Ramirez Basualdo Lenin Sebastian  
 - Robles Sanchez Britney Sheyla  
