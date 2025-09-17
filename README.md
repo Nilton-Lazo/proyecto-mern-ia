@@ -14,7 +14,7 @@ Este proyecto forma parte del curso **Taller de Proyectos 2 – Ingeniería de S
 - Huaccho Mancilla Steven José  
 - Lazo Maravi Nilton Joel  
 - Poma Goche Abigail Karim  
-- Ramirez Basualdo Lenin Sebastian  
+- Ramirez Basualdo Lenin Sebasthian  
 - Robles Sanchez Britney Sheyla  
 - Rojas Mellado Andrea Mirella  
 
