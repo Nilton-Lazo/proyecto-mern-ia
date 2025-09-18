@@ -23,7 +23,7 @@ pids
 *.pid.lock
 
 # =========================
-# Coverage (tests)
+# Coverage
 # =========================
 coverage/
 *.lcov
