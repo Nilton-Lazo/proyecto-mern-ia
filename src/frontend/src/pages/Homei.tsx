@@ -11,7 +11,7 @@ function Home() {
             <a className="hover:text-slate-900 transition-colors" href="/">
               Inicio
             </a>
-            <a className="hover:text-slate-900 transition-colors" href="#">
+            <a className="hover:text-slate-900 transition-colors" href="/prueba">
               Documentos
             </a>
             <a className="hover:text-slate-900 transition-colors" href="#">
