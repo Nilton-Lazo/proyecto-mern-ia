@@ -51,8 +51,8 @@ Este proyecto forma parte del curso **Taller de Proyectos 2 – Ingeniería de S
 
 2. **Clonar el repositorio**  
    ```bash
-   git clone https://github.com/Nilton-Lazo/tutor-virtual.git
-   cd tutor-virtual
+   git clone https://github.com/Nilton-Lazo/proyecto-mern-ia.git
+   cd proyecto-mern-ia
    
 3. **Levantar los servicios con Docker Compose**
    ```bash
