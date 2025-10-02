@@ -44,6 +44,23 @@ Este proyecto forma parte del curso **Taller de Proyectos 2 – Ingeniería de S
 
 ---
 
+## 🏗️ Arquitectura del Sistema  
+
+```mermaid 
+flowchart TD
+  UI[React - Navegador UI] --> Backend[Node.js + Express API]
+
+  Backend --> Ollama[Ollama API]
+  Backend --> Sesgos[Microservicios IA - Sesgos]
+  Backend --> n8n[n8n Automatización]
+  Backend --> MongoDB[(MongoDB Atlas)]
+
+  n8n --> MongoDB
+  Sesgos --> MongoDB
+  Ollama --> Backend 
+```
+---
+
 ## ⚙️ Instrucciones de Instalación  
 
 1. **Instalar Docker**  
