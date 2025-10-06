@@ -1,3 +1,14 @@
+<p align="center">
+  <img src="https://img.shields.io/badge/React-18.2.0-61DAFB?style=for-the-badge&logo=react&logoColor=white" />
+  <img src="https://img.shields.io/badge/Node.js-20.x-339933?style=for-the-badge&logo=node.js&logoColor=white" />
+  <img src="https://img.shields.io/badge/Express.js-4.x-000000?style=for-the-badge&logo=express&logoColor=white" />
+  <img src="https://img.shields.io/badge/MongoDB-7.x-47A248?style=for-the-badge&logo=mongodb&logoColor=white" />
+  <img src="https://img.shields.io/badge/Docker-Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white" />
+  <img src="https://img.shields.io/badge/Estado-En%20Desarrollo-yellow?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Licencia-Académica-blue?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Universidad-Continental-002C77?style=for-the-badge" />
+</p>
+
 # 📚 Tutor Virtual de Lectura Crítica  
 
 ## 📖 Descripción del Proyecto  
