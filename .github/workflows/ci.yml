@@ -2,12 +2,9 @@ name: CI
 
 on:
   push:
-    branches:
-      - '**'          # ejecuta en cualquier rama
+    branches: [ main ]
   pull_request:
-    branches:
-      - '**'
-  workflow_dispatch:    # permite lanzarlo manualmente
+    branches: [ main ]
 
 permissions:
   contents: read
@@ -15,31 +12,47 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        node: [20]     # Node 20 va bien con React 19 / Jest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node ${{ matrix.node }}
+      # 1) Instala Node
+      - name: Setup Node 20
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node }}
-          cache: 'pnpm'
+          node-version: 20
+          # ⚠️ No uses cache: 'pnpm' aquí porque aún no tenemos pnpm instalado
 
+      # 2) Habilita e instala PNPM (vía Corepack o la action oficial)
+      # Opción A (Corepack puro)
       - name: Enable Corepack (pnpm)
-        run: corepack enable
+        run: |
+          corepack enable
+          corepack prepare pnpm@9 --activate
 
+      # 3) Cachea el store de pnpm
+      - name: Get pnpm store path
+        id: pnpm-cache
+        run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      # 4) Instala dependencias (root)
       - name: Install deps
         run: pnpm install --frozen-lockfile
 
-      # Corre exactamente lo que tienes en package.json
+      # 5) Ejecuta pruebas
       - name: Run tests (root)
         run: pnpm test
 
+      # (Opcional) Ejecuciones explícitas si quieres separar
       - name: Run frontend tests (explicit)
         run: pnpm test:frontend
 
