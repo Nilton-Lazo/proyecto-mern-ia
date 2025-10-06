@@ -1,11 +1,13 @@
 const mongoose = require('mongoose');
 
-const answerSchema = new mongoose.Schema({
-  text: { type: String, required: true },      // Texto base
-  question: { type: String, required: true },  // Pregunta generada
-  answer: { type: String, required: true },    // Respuesta del usuario
-  feedback: { type: String, required: true },  // Retroalimentación
-  createdAt: { type: Date, default: Date.now } // Fecha
-});
+const AnswerSchema = new mongoose.Schema(
+    {
+        text: { type: String, required: true },        // texto base
+        question: { type: String, required: true },    // pregunta hecha al usuario
+        answer: { type: String, required: true },      // respuesta del usuario
+        feedback: { type: String, required: true }     // retroalimentación de la IA
+    },
+    { timestamps: true }
+);
 
-module.exports = mongoose.model('Answer', answerSchema);
+module.exports = mongoose.models.Answer || mongoose.model('Answer', AnswerSchema);
