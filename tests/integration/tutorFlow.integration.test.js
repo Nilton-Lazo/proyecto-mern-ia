@@ -117,10 +117,18 @@ describe('🔗 Flujo completo Tutor Virtual', () => {
     expect(report.body).toHaveProperty('correctas');
     expect(report.body).toHaveProperty('incorrectas');
   });
-  
+
   test('Debe retornar error 400 si falta el texto en la solicitud de preguntas', async () => {
     const res = await request(app).post('/api/ai/questions').send({});
     expect(res.status).toBe(400);
     expect(res.body).toHaveProperty('error');
   });  
+
+  test('Debe retornar error 400 si falta el texto o respuesta en /feedback', async () => {
+    const res = await request(app)
+      .post('/api/ai/feedback')
+      .send({ question: '¿Qué es la IA?' });
+    expect(res.status).toBe(400);
+    expect(res.body).toHaveProperty('error');
+  });
 });
