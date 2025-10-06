@@ -1,3 +1,4 @@
+# .github/workflows/ci.yml
 name: CI
 
 on:
@@ -12,35 +13,39 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # 1) pnpm primero, binario standalone en PATH
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9
-          standalone: true
-          run_install: false
-
-      # 2) Node ahora sí puede usar cache: 'pnpm'
       - name: Setup Node 20
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'pnpm'
 
-      # 3) Instalar dependencias
+      - name: Enable Corepack (pnpm)
+        run: |
+          corepack enable
+          corepack prepare pnpm@9 --activate
+
+      - name: Get pnpm store path
+        id: pnpm-cache
+        run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
       - name: Install deps
         run: pnpm install --frozen-lockfile
 
-      # 4) Ejecutar tests
-      - name: Run tests (root)
-        run: pnpm test
-
-      - name: Run frontend tests (explicit)
-        run: pnpm test:frontend
-
-      - name: Run backend tests (explicit)
+      # 👇 Ejecuta suites por separado (evita el jest “root”)
+      - name: Run backend tests
         run: pnpm test:backend
+
+      - name: Run frontend tests
+        run: pnpm test:frontend
