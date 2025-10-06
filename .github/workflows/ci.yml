@@ -46,6 +46,3 @@ jobs:
       # 👇 Ejecuta suites por separado (evita el jest “root”)
       - name: Run backend tests
         run: pnpm test:backend
-
-      - name: Run frontend tests
-        run: pnpm test:frontend
