@@ -2,9 +2,12 @@ name: CI
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - '**'          # ejecuta en cualquier rama
   pull_request:
-    branches: [ main ]
+    branches:
+      - '**'
+  workflow_dispatch:    # permite lanzarlo manualmente
 
 permissions:
   contents: read
@@ -12,71 +15,33 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
-
     strategy:
       fail-fast: false
       matrix:
-        node: [20]   # Node 20 es estable para React 19 / Jest
+        node: [20]     # Node 20 va bien con React 19 / Jest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10
-
       - name: Setup Node ${{ matrix.node }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node }}
-          cache: pnpm
+          cache: 'pnpm'
 
-      # Instala deps del root (backend, tests, etc.)
-      - name: Install (root)
-        run: pnpm install --frozen-lockfile=false
+      - name: Enable Corepack (pnpm)
+        run: corepack enable
 
-      # Instala deps del frontend (usa su propio package.json)
-      - name: Install (frontend)
-        working-directory: src/frontend
-        run: pnpm install --frozen-lockfile=false
+      - name: Install deps
+        run: pnpm install --frozen-lockfile
 
-      # Opcional: muestra versiones para debug
-      - name: Show versions
-        run: |
-          node -v
-          pnpm -v
-          echo "root deps:"
-          pnpm list --depth 0 || true
-          echo "frontend deps:"
-          cd src/frontend && pnpm list --depth 0 || true
-
-      # Ejecuta todas las pruebas (tu script ya tiene cobertura y flags)
-      - name: Run tests (all)
-        env:
-          CI: true
+      # Corre exactamente lo que tienes en package.json
+      - name: Run tests (root)
         run: pnpm test
 
-      # También puedes separarlas si prefieres logs por bloque:
-      # - name: Run backend tests
-      #   run: pnpm test:backend
-      # - name: Run frontend tests
-      #   run: pnpm test:frontend
+      - name: Run frontend tests (explicit)
+        run: pnpm test:frontend
 
-      # Sube los reportes de cobertura como artefactos
-      - name: Upload coverage (root)
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-root
-          path: coverage
-          if-no-files-found: ignore
-
-      - name: Upload coverage (frontend)
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-frontend
-          path: coverage/frontend
-          if-no-files-found: ignore
+      - name: Run backend tests (explicit)
+        run: pnpm test:backend
