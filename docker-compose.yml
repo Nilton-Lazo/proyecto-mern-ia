@@ -22,9 +22,8 @@ services:
     volumes:
       - ./src/backend:/app
       - backend_node_modules:/app/node_modules
-    environment:
-      - NODE_ENV=development
-      - MONGODB_URI=mongodb://mongo:27017/tutor
+    env_file:
+      - ./src/backend/.env
     depends_on:
       mongo:
         condition: service_healthy
