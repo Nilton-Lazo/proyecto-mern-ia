@@ -12,47 +12,33 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # 1) Instala Node
+      # 1) pnpm primero, binario standalone en PATH
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+          standalone: true
+          run_install: false
+
+      # 2) Node ahora sí puede usar cache: 'pnpm'
       - name: Setup Node 20
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          # ⚠️ No uses cache: 'pnpm' aquí porque aún no tenemos pnpm instalado
+          cache: 'pnpm'
 
-      # 2) Habilita e instala PNPM (vía Corepack o la action oficial)
-      # Opción A (Corepack puro)
-      - name: Enable Corepack (pnpm)
-        run: |
-          corepack enable
-          corepack prepare pnpm@9 --activate
-
-      # 3) Cachea el store de pnpm
-      - name: Get pnpm store path
-        id: pnpm-cache
-        run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
-
-      - name: Cache pnpm store
-        uses: actions/cache@v4
-        with:
-          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
-
-      # 4) Instala dependencias (root)
+      # 3) Instalar dependencias
       - name: Install deps
         run: pnpm install --frozen-lockfile
 
-      # 5) Ejecuta pruebas
+      # 4) Ejecutar tests
       - name: Run tests (root)
         run: pnpm test
 
-      # (Opcional) Ejecuciones explícitas si quieres separar
       - name: Run frontend tests (explicit)
         run: pnpm test:frontend
 
