@@ -51,7 +51,7 @@ jest.mock('pdfkit', () => jest.fn().mockImplementation(() => ({
 })));
 
 // === APP ===
-const aiRouter = require('../../src/backend/routes/ai');
+const aiRouter = require('../../src/backend/routes/ia');
 const app = express();
 app.use(express.json());
 app.use('/api/ai', aiRouter);

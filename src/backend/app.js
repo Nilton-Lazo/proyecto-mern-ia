@@ -1,6 +1,6 @@
 const express = require('express');
 const usersRouter = require('./routes/users.routes');
-const aiRouter = require('./routes/ai');
+const aiRouter = require('./routes/ia');
 const questionRouter = require('./routes/questionRoutes');
 
 const app = express();
