@@ -131,4 +131,38 @@ describe('🔗 Flujo completo Tutor Virtual', () => {
     expect(res.status).toBe(400);
     expect(res.body).toHaveProperty('error');
   });
+  
+  test('Debe generar un informe PDF simulado en modo test', async () => {
+    const res = await request(app).get('/api/ai/informe');
+  
+    expect(res.status).toBe(200);
+    expect(res.headers['content-type']).toContain('application/pdf');
+    expect(res.text || res.body).toBeDefined();
+  });
+
+  test('Debe manejar error al generar preguntas (simulación)', async () => {
+    jest.resetModules(); 
+    jest.spyOn(console, 'error').mockImplementation(() => {});
+
+    jest.doMock('ollama', () => ({
+      Ollama: jest.fn().mockImplementation(() => ({
+        generate: jest.fn().mockRejectedValue(new Error('Falla simulada')),
+      })),
+    }));
+
+    const brokenRouter = require('../../src/backend/routes/ia');
+    const brokenApp = express();
+    brokenApp.use(express.json());
+    brokenApp.use('/api/ai', brokenRouter);
+  
+    const res = await request(brokenApp)
+      .post('/api/ai/questions')
+      .send({ text: 'Texto para fallo' });
+  
+    expect(res.status).toBe(500);
+    expect(res.body).toHaveProperty('error');
+  
+    jest.restoreAllMocks();
+  });
+  
 });
