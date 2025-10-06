@@ -4,8 +4,6 @@ jest.mock('ollama', () => ({
     }))
 }), { virtual: true });
 
-// ===== MOCK ROBUSTO DE PDFKIT =====
-// Garantiza que la respuesta HTTP se cierre y Supertest termine el request.
 jest.mock('pdfkit', () => {
   return jest.fn().mockImplementation(() => {
     let resRef = null;
