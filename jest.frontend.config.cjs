@@ -1,4 +1,27 @@
 /** jest.frontend.config.cjs */
+const path = require('path');
+
+// Resuelve la CARPETA del paquete desde el node_modules del frontend
+const resolvePkgDirFromFrontend = (pkg) => {
+  // localiza package.json del paquete, luego quita 'package.json' para obtener la carpeta
+  const pkgJsonPath = require.resolve(`${pkg}/package.json`, {
+    paths: [path.resolve(__dirname, 'src/frontend')],
+  });
+  return path.dirname(pkgJsonPath);
+};
+
+// 👇 NUEVO: resuelve la ENTRADA del paquete (no la carpeta)
+const resolvePkgEntryFromFrontend = (pkg) =>
+  require.resolve(pkg, { paths: [path.resolve(__dirname, 'src/frontend')] });
+
+const reactDir   = resolvePkgDirFromFrontend('react');
+const reactDomDir= resolvePkgDirFromFrontend('react-dom');
+const rrDir      = resolvePkgDirFromFrontend('react-router');
+
+// 👇 ENTRADAS (lo importante)
+const rrEntry    = resolvePkgEntryFromFrontend('react-router');
+const rrdEntry   = resolvePkgEntryFromFrontend('react-router-dom');
+
 module.exports = {
   displayName: 'frontend',
   testEnvironment: 'jest-environment-jsdom',
@@ -6,47 +29,46 @@ module.exports = {
   setupFilesAfterEnv: ['<rootDir>/tests/jest.setup.js'],
 
   transform: {
-    '^.+\\.(t|j)sx?$': [
-      'babel-jest',
-      {
+    '^.+\\.(mjs|cjs|js|jsx|ts|tsx)$': [
+    'babel-jest',
+    {
         presets: [
-          ['@babel/preset-env', { targets: { node: 'current' } }],
-          ['@babel/preset-react', { runtime: 'automatic' }],
-          '@babel/preset-typescript',
+            ['@babel/preset-env', { targets: { node: 'current' } }],
+            ['@babel/preset-react', { runtime: 'automatic' }],
+            '@babel/preset-typescript',
         ],
         plugins: [
-          ['babel-plugin-transform-vite-meta-env', { VITE_API_URL: 'http://localhost:4000' }],
-          ['babel-plugin-transform-import-meta', { module: 'CommonJS' }],
+            ['babel-plugin-transform-vite-meta-env', { VITE_API_URL: 'http://localhost:4000' }],
+            ['babel-plugin-transform-import-meta', { module: 'CommonJS' }],
         ],
-      },
-    ],
-  },
+    },
+  ],
+},
 
-  // Deja que Jest transpile ESM de RRv7
-  transformIgnorePatterns: ['/node_modules/(?!(react-router|react-router-dom)/)'],
+  // Permite transpilar ESM de react-router v7
+  transformIgnorePatterns: ['/node_modules/(?!((\\.pnpm/)?(react-router|react-router-dom)(@|/)))'],
 
-  // MUY IMPORTANTE: forzar una ÚNICA copia (la del root)
+  // 🔑 Forzamos a que TODAS estas libs salgan del node_modules del frontend
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/frontend/src/$1',
     '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
     '\\.(png|jpg|jpeg|svg)$': '<rootDir>/tests/frontend/__mocks__/fileMock.js',
     '^recharts$': '<rootDir>/tests/frontend/__mocks__/rechartsMock.tsx',
 
-    // <-- TODAS desde src/frontend/node_modules
-    '^react$': '<rootDir>/src/frontend/node_modules/react',
-    '^react/(.*)$': '<rootDir>/src/frontend/node_modules/react/$1',
-    '^react-dom$': '<rootDir>/src/frontend/node_modules/react-dom',
-    '^react-dom/(.*)$': '<rootDir>/src/frontend/node_modules/react-dom/$1',
-    '^react-router$': '<rootDir>/src/frontend/node_modules/react-router',
-    '^react-router/(.*)$': '<rootDir>/src/frontend/node_modules/react-router/$1',
-    '^react-router-dom$': '<rootDir>/src/frontend/node_modules/react-router-dom',
-    '^react-router-dom/(.*)$':
-        '<rootDir>/src/frontend/node_modules/react-router-dom/$1',
+    // react / react-dom puede seguir al directorio
+    '^react$': reactDir,
+    '^react/(.*)$': `${reactDir}/$1`,
+    '^react-dom$': reactDomDir,
+    '^react-dom/(.*)$': `${reactDomDir}/$1`,
+
+    // ⬇️ CLAVE: Paquetes de router -> ENTRADA del paquete
+    '^react-router$': rrEntry,
+    '^react-router/(.*)$': `${rrDir}/$1`,
+    '^react-router-dom$': rrdEntry,
   },
 
-  // Ayuda al resolver a mirar también el node_modules del frontend si hace falta
-  moduleDirectories: ['node_modules', '<rootDir>/src/frontend/node_modules'],
-  transformIgnorePatterns: ['/node_modules/(?!(react-router|react-router-dom)/)'],
+  // Prioriza el node_modules del frontend y luego el del root
+  moduleDirectories: ['<rootDir>/src/frontend/node_modules', 'node_modules'],
 
   collectCoverageFrom: [
     'src/frontend/src/**/*.{ts,tsx}',
