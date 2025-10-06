@@ -17,9 +17,13 @@
 		"ts-jest": "^29.4.4",
 		"whatwg-url": "^15.1.0"
 	},
+	"jest":{
+		"testEnvironment": "node",
+		"setupFiles": ["<rootDir>/tests/jest.setup.js"]
+	},
 	"scripts": {
-		"test": "jest",
-		"test:backend": "jest tests/backend --env=node"
+		"test": "jest --coverage",
+		"test:backend": "jest tests/backend --env=node --coverage"
 	},
 	"dependencies": {
 		"express": "^5.1.0"
