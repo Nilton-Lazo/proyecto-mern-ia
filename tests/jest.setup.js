@@ -1,3 +1,5 @@
+require('@testing-library/jest-dom');
+
 jest.mock('ollama', () => ({
         Ollama: jest.fn().mockImplementation(() => ({
         generate: jest.fn(async () => ({ response: 'mock' }))
@@ -49,3 +51,10 @@ jest.mock('mongoose', () => ({
   connect: jest.fn(),
   connection: { on: jest.fn() }
 }), { virtual: true });
+
+
+
+// Polyfills para react-router-dom v7
+const { TextEncoder, TextDecoder } = require('util');
+global.TextEncoder = TextEncoder;
+global.TextDecoder = TextDecoder;
