@@ -53,11 +53,10 @@ flowchart TD
   Backend --> Ollama[Ollama API]
   Backend --> Sesgos[Microservicios IA - Sesgos]
   Backend --> n8n[n8n Automatización]
-  Backend --> MongoDB[(MongoDB Atlas)]
 
   n8n --> MongoDB
   Sesgos --> MongoDB
-  Ollama --> Backend 
+  Ollama --> MongoDB
 ```
 ---
 
