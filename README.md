@@ -71,6 +71,144 @@ flowchart TD
 ```
 ---
 
+## 🧠 Ejemplos de Uso de la API (Backend)
+
+A continuación se muestran ejemplos reales para interactuar con el **backend del Tutor Virtual**.  
+Todas las rutas están disponibles en `http://localhost:3000/api/ia`.
+
+### 1. Generar preguntas (HU01)
+Genera 5 preguntas de comprensión lectora a partir de un texto.
+
+**Ruta:** `POST /api/ia/questions`  
+**Ejemplo:**
+```bash
+curl -X POST http://localhost:3000/api/ia/questions \
+  -H "Content-Type: application/json" \
+  -d '{"text": "La contaminación ambiental afecta la salud y el equilibrio ecológico."}'
+Respuesta esperada:
+
+json
+Copiar código
+{
+  "message": "Texto y preguntas guardados en Mongo correctamente",
+  "data": {
+    "questions": [
+      "¿Qué consecuencias tiene la contaminación ambiental?",
+      "¿Cómo afecta la contaminación al equilibrio ecológico?",
+      "¿Qué relación existe entre contaminación y salud?",
+      "¿Por qué es importante reducir la contaminación?",
+      "¿Qué acciones se pueden tomar para mitigarla?"
+    ]
+  }
+}
+```
+### 2. Obtener retroalimentación (HU02)
+Analiza una respuesta y devuelve una retroalimentación corta.
+
+Ruta: POST /api/ia/feedback
+Ejemplo:
+
+Copiar código
+```bash
+curl -X POST http://localhost:3000/api/ia/feedback \
+  -H "Content-Type: application/json" \
+  -d '{
+    "text": "La contaminación ambiental afecta la salud y el equilibrio ecológico.",
+    "question": "¿Qué consecuencias tiene la contaminación ambiental?",
+    "answer": "Provoca enfermedades respiratorias y daña los ecosistemas."
+  }'
+Respuesta esperada:
+
+json
+Copiar código
+{
+  "feedback": "Correcta, mencionas efectos reales pero podrías profundizar en el daño ecológico.",
+  "saved": { ... }
+}
+```
+### 3. Generar reporte general (HU05)
+Devuelve un resumen estadístico de todas las respuestas.
+
+Ruta: GET /api/ia/reports
+Ejemplo:
+
+Copiar código
+```bash
+curl http://localhost:3000/api/ia/reports
+Respuesta esperada:
+
+json
+Copiar código
+{
+  "total": 12,
+  "correctas": 7,
+  "incorrectas": 3,
+  "parciales": 2,
+  "ultimas": [ ... ]
+}
+```
+### 4. Generar informe PDF (HU06)
+Descarga un informe con las respuestas y retroalimentaciones.
+
+Ruta: GET /api/ia/informe
+Ejemplo:
+
+Copiar código
+```bash
+curl -o informe.pdf http://localhost:3000/api/ia/informe
+📄 El archivo informe.pdf se descarga automáticamente con el resumen de resultados.
+```
+### 5. Chat con IA
+Ruta: POST /api/ia/chat
+Ejemplo:
+
+```bash
+Copiar código
+curl -X POST http://localhost:3000/api/ia/chat \
+  -H "Content-Type: application/json" \
+  -d '{"prompt": "Explica brevemente qué es el pensamiento crítico."}'
+Respuesta esperada:
+
+json
+Copiar código
+{
+  "ok": true,
+  "answer": "El pensamiento crítico consiste en analizar, cuestionar y evaluar la información antes de aceptarla."
+}
+```
+### 🧪 Ejecución de Pruebas Automatizadas
+El proyecto utiliza Jest con pnpm para las pruebas unitarias e integradas.
+
+Comando para ejecutar todas las pruebas:
+
+Copiar código
+```bash
+pnpm test
+```
+Comando para ver la cobertura:
+
+Copiar código
+```bash
+pnpm jest --coverage
+```
+La meta es alcanzar al menos 70% de cobertura, con objetivo ideal de 90%.
+
+### 💡 Notas Técnicas
+Todos los endpoints se encuentran en src/backend/routes/ia.js.
+
+El modelo usado por defecto es llama3:8b, configurable desde el archivo .env con:
+
+env
+Copiar código
+```bash
+OLLAMA_MODEL=llama3:8b
+OLLAMA_HOST=http://<tu_ip_local>:11434
+La base de datos se ejecuta en MongoDB (local o Atlas).
+```
+El servicio de pruebas usa mocks definidos en jest.setup.js.
+
+---
+
 ## ⚙️ Instrucciones de Instalación  
 
 1. **Instalar Docker**  
