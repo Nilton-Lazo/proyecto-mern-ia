@@ -7,7 +7,7 @@ const PDFDocument = require("pdfkit");
 const router = express.Router()
 
 const ollama = new Ollama({
-  host: process.env.OLLAMA_HOST || 'http://172.23.165.233:11434'
+  host: process.env.OLLAMA_HOST || 'http://127.0.0.1:11434'
 })
 
 const MODEL = process.env.OLLAMA_MODEL || 'llama3:8b'
