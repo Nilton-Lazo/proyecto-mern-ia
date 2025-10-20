@@ -8,7 +8,6 @@ import Reports from "./pages/Reports";
 function App() {
   return (
     <Routes>
-      {}
       <Route path="/" element={<Layout />}>
         <Route index element={<Home />} />
         <Route path="prueba" element={<Prueba />} />
