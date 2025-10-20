@@ -1,0 +1,41 @@
+{
+  "info": {
+    "name": "GET Obtener Perfil",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "GET Obtener Perfil",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/users/me",
+          "host": ["{{base_url}}"],
+          "path": ["api", "users", "me"]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('200 OK', () => pm.response.to.have.status(200));",
+              "const json = pm.response.json();",
+              "pm.expect(json).to.have.property('email');",
+              "pm.environment.set('user_id', json.id);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    }
+  ]
+}
