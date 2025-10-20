@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const aiRouter = require('./routes/ai');
+const authRouter = require('./routes/auth'); //inicio de sesion
 const cors = require('cors');
 require('dotenv').config(); 
 
@@ -10,6 +11,7 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 app.use('/api/ai', aiRouter);
+app.use('/api/auth', authRouter);
 
 const mongoUri = process.env.MONGODB_URI;
 console.log('Conectando a MongoDB en:', mongoUri);
