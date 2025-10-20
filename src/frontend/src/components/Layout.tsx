@@ -1,8 +1,10 @@
 import { NavLink, Link, Outlet } from "react-router-dom";
 import { useState } from "react";
+import { useAuth } from "../context/AuthContext";
 
 export default function Layout() {
   const [open, setOpen] = useState(false);
+  const { user, logout } = useAuth();
 
   const linkBase =
     "px-3 py-2 rounded-lg text-sm font-medium transition-colors";
@@ -18,7 +20,6 @@ export default function Layout() {
           <div className="flex h-16 items-center justify-between">
             {/* Branding */}
             <Link to="/" className="flex items-center gap-3">
-              {/* logotipo simple (SVG) */}
               <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-blue-600 text-white shadow-sm">
                 {/* mortarboard icon */}
                 <svg
@@ -67,14 +68,48 @@ export default function Layout() {
               >
                 Reportes
               </NavLink>
-              <NavLink
-                to="/prueba"
-                className={({ isActive }) =>
-                  `${linkBase} ${isActive ? "bg-slate-900 text-white hover:bg-black" : "text-slate-700 hover:text-white hover:bg-slate-900"}`
-                }
-              >
-                Acceder
-              </NavLink>
+
+              {/* ---- Auth area (desktop) ---- */}
+              {!user ? (
+                <>
+                  <NavLink
+                    to="/login"
+                    className={({ isActive }) =>
+                      `${linkBase} ${
+                        isActive
+                          ? "bg-slate-900 text-white hover:bg-black"
+                          : "text-slate-700 hover:text-white hover:bg-slate-900"
+                      }`
+                    }
+                  >
+                    Acceder
+                  </NavLink>
+                  <NavLink
+                    to="/register"
+                    className={({ isActive }) =>
+                      `${linkBase} ${
+                        isActive
+                          ? "bg-blue-600 text-white hover:bg-blue-700"
+                          : "text-blue-700 hover:bg-blue-50"
+                      }`
+                    }
+                  >
+                    Registrarse
+                  </NavLink>
+                </>
+              ) : (
+                <div className="flex items-center gap-3 pl-2 ml-2 border-l">
+                  <span className="hidden sm:inline text-sm text-slate-700">
+                    Hola, {user.nombres?.split(" ")[0] || "Usuario"}
+                  </span>
+                  <button
+                    onClick={logout}
+                    className="px-3 py-2 rounded-lg text-sm font-medium bg-slate-900 text-white hover:bg-black"
+                  >
+                    Salir
+                  </button>
+                </div>
+              )}
             </nav>
 
             {/* Mobile toggle */}
@@ -92,9 +127,17 @@ export default function Layout() {
                 strokeWidth={2}
               >
                 {open ? (
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 ) : (
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
                 )}
               </svg>
             </button>
@@ -131,15 +174,53 @@ export default function Layout() {
               >
                 Reportes
               </NavLink>
-              <NavLink
-                to="/prueba"
-                onClick={() => setOpen(false)}
-                className={({ isActive }) =>
-                  `${linkBase} ${isActive ? "bg-slate-900 text-white hover:bg-black" : "text-slate-700 hover:text-white hover:bg-slate-900"}`
-                }
-              >
-                Acceder
-              </NavLink>
+
+              {/* ---- Auth area (mobile) ---- */}
+              {!user ? (
+                <>
+                  <NavLink
+                    to="/login"
+                    onClick={() => setOpen(false)}
+                    className={({ isActive }) =>
+                      `${linkBase} ${
+                        isActive
+                          ? "bg-slate-900 text-white hover:bg-black"
+                          : "text-slate-700 hover:text-white hover:bg-slate-900"
+                      }`
+                    }
+                  >
+                    Acceder
+                  </NavLink>
+                  <NavLink
+                    to="/register"
+                    onClick={() => setOpen(false)}
+                    className={({ isActive }) =>
+                      `${linkBase} ${
+                        isActive
+                          ? "bg-blue-600 text-white hover:bg-blue-700"
+                          : "text-blue-700 hover:bg-blue-50"
+                      }`
+                    }
+                  >
+                    Registrarse
+                  </NavLink>
+                </>
+              ) : (
+                <div className="flex flex-col gap-2">
+                  <span className="px-2 text-sm text-slate-700">
+                    Hola, {user.nombres?.split(" ")[0] || "Usuario"}
+                  </span>
+                  <button
+                    onClick={() => {
+                      logout();
+                      setOpen(false);
+                    }}
+                    className="px-3 py-2 rounded-lg text-sm font-medium bg-slate-900 text-white hover:bg-black"
+                  >
+                    Salir
+                  </button>
+                </div>
+              )}
             </nav>
           )}
         </div>
@@ -154,9 +235,7 @@ export default function Layout() {
       <footer className="border-t bg-white">
         <div className="mx-auto max-w-6xl px-4 py-8 grid gap-6 md:grid-cols-3">
           <div>
-            <p className="text-sm font-semibold text-slate-900">
-              Tutor Virtual
-            </p>
+            <p className="text-sm font-semibold text-slate-900">Tutor Virtual</p>
             <p className="mt-2 text-sm text-slate-600">
               Plataforma para fortalecer la comprensión lectora con apoyo de IA.
             </p>
@@ -191,7 +270,6 @@ export default function Layout() {
           <div className="text-sm">
             <p className="font-semibold text-slate-900">Contacto</p>
             <div className="mt-2 flex items-center gap-3">
-              {/* GitHub */}
               <a
                 href="https://github.com/"
                 target="_blank"
@@ -203,7 +281,6 @@ export default function Layout() {
                   <path d="M12 .5a12 12 0 0 0-3.79 23.4c.6.11.82-.26.82-.58v-2.02c-3.34.73-4.04-1.61-4.04-1.61-.55-1.41-1.34-1.79-1.34-1.79-1.09-.75.08-.74.08-.74 1.2.08 1.83 1.23 1.83 1.23 1.07 1.83 2.81 1.3 3.5.99.11-.77.42-1.3.76-1.6-2.66-.3-5.47-1.33-5.47-5.9 0-1.3.47-2.36 1.23-3.19-.12-.3-.54-1.52.12-3.17 0 0 1.01-.32 3.3 1.22a11.4 11.4 0 0 1 6 0c2.28-1.54 3.29-1.22 3.29-1.22.66 1.65.24 2.87.12 3.17.77.83 1.23 1.9 1.23 3.19 0 4.59-2.81 5.59-5.49 5.89.43.37.81 1.1.81 2.22v3.3c0 .32.22.7.83.58A12 12 0 0 0 12 .5Z" />
                 </svg>
               </a>
-              {/* LinkedIn */}
               <a
                 href="https://www.linkedin.com/"
                 target="_blank"
@@ -215,7 +292,6 @@ export default function Layout() {
                   <path d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM.5 8.5h4V23h-4V8.5zM8.5 8.5h3.8v2h.05c.53-1 1.82-2.06 3.75-2.06 4.01 0 4.75 2.64 4.75 6.06V23h-4v-5.5c0-1.31-.02-3-1.83-3-1.83 0-2.12 1.43-2.12 2.9V23h-4V8.5z" />
                 </svg>
               </a>
-              {/* X/Twitter */}
               <a
                 href="https://twitter.com/"
                 target="_blank"

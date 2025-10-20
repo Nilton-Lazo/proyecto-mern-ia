@@ -1,6 +1,10 @@
 import { useState } from "react";
+import { useAuth } from "../context/AuthContext";
+import { Link } from "react-router-dom";
 
 export default function Questions() {
+  const { token } = useAuth();
+
   const [text, setText] = useState<string>("");
   const [questions, setQuestions] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -10,8 +14,19 @@ export default function Questions() {
   const [savedMessages, setSavedMessages] = useState<string[]>([]);
   const [loadingFeedback, setLoadingFeedback] = useState<number | null>(null);
 
+  const [needLogin, setNeedLogin] = useState(false);
+
+  const API = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // 🔒 Si no hay sesión, mostramos modal y no llamamos al backend
+    if (!token) {
+      setNeedLogin(true);
+      return;
+    }
+
     setLoading(true);
     setQuestions([]);
     setAnswers([]);
@@ -19,9 +34,13 @@ export default function Questions() {
     setSavedMessages([]);
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/ai/questions`, {
+      const res = await fetch(`${API}/api/ai/questions`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          // listo para cuando protejas la ruta en backend:
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({ text }),
       });
 
@@ -48,9 +67,13 @@ export default function Questions() {
   const handleFeedback = async (index: number) => {
     setLoadingFeedback(index);
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/ai/feedback`, {
+      const res = await fetch(`${API}/api/ai/feedback`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          // opcional (igual que arriba)
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify({
           text,
           question: questions[index],
@@ -67,7 +90,6 @@ export default function Questions() {
       const updatedMessages = [...savedMessages];
       updatedMessages[index] = "Respuesta guardada correctamente";
       setSavedMessages(updatedMessages);
-
     } catch (err) {
       console.error("Error:", err);
     } finally {
@@ -98,6 +120,42 @@ export default function Questions() {
           {loading ? "Generando preguntas..." : "Generar Preguntas"}
         </button>
       </form>
+
+      {/* Modal: requiere login */}
+      {needLogin && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+            <h3 className="text-lg font-semibold text-slate-900">
+              Necesitas iniciar sesión
+            </h3>
+            <p className="mt-2 text-sm text-slate-600">
+              Para generar preguntas debes iniciar sesión o crear una cuenta.
+            </p>
+            <div className="mt-4 flex gap-3">
+              <Link
+                to="/login"
+                className="flex-1 rounded-lg bg-slate-900 px-4 py-2 text-white text-center hover:bg-black"
+                onClick={() => setNeedLogin(false)}
+              >
+                Iniciar sesión
+              </Link>
+              <Link
+                to="/register"
+                className="flex-1 rounded-lg bg-blue-600 px-4 py-2 text-white text-center hover:bg-blue-700"
+                onClick={() => setNeedLogin(false)}
+              >
+                Registrarme
+              </Link>
+            </div>
+            <button
+              className="mt-4 text-sm text-slate-500 hover:text-slate-700"
+              onClick={() => setNeedLogin(false)}
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
+      )}
 
       <div className="mt-6">
         {questions.length > 0 && (
