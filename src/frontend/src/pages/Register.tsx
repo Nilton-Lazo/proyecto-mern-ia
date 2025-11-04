@@ -5,14 +5,24 @@ import { Link, useNavigate } from 'react-router-dom';
 export default function Register() {
   const { register } = useAuth();
   const nav = useNavigate();
-  const [f, setF] = useState({ nombres:'', apellidos:'', centroEstudios:'', email:'', password:'' });
+  const [f, setF] = useState({ 
+    nombres:'', 
+    apellidos:'', 
+    centroEstudios:'', 
+    email:'', 
+    password:'', 
+    role:'student' 
+  });
   const [err, setErr] = useState<string|null>(null);
   const [loading, setLoading] = useState(false);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErr(null); setLoading(true);
-    try { await register(f); nav('/questions'); }
+    try { 
+      await register(f); 
+      nav(f.role === 'teacher' ? '/teacher/dashboard' : '/questions');
+    }
     catch (e:any) { setErr(e.message); }
     finally { setLoading(false); }
   };
@@ -26,6 +36,17 @@ export default function Register() {
         <input className="w-full rounded-lg border p-3" placeholder="Centro de estudios (opcional)" value={f.centroEstudios} onChange={e=>setF({...f, centroEstudios:e.target.value})}/>
         <input className="w-full rounded-lg border p-3" placeholder="Correo" value={f.email} onChange={e=>setF({...f, email:e.target.value})}/>
         <input className="w-full rounded-lg border p-3" placeholder="Contraseña" type="password" value={f.password} onChange={e=>setF({...f, password:e.target.value})}/>
+        
+        {/* Selector de rol */}
+        <select
+          className="w-full rounded-lg border p-3"
+          value={f.role}
+          onChange={e=>setF({...f, role:e.target.value})}
+        >
+          <option value="student">Soy estudiante</option>
+          <option value="teacher">Soy docente</option>
+        </select>
+
         {err && <p className="text-red-600 text-sm">{err}</p>}
         <button className="w-full rounded-lg bg-blue-600 text-white py-2 font-semibold disabled:opacity-50" disabled={loading}>
           {loading ? 'Creando...' : 'Registrarme'}

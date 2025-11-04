@@ -6,6 +6,9 @@ import Reports from "./pages/Reports";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 
+import TeacherDashboard from "./pages/TeacherDashboard";
+import RoleRoute from "./components/RoleRoute";
+
 function App() {
   return (
     <Routes>
@@ -15,6 +18,12 @@ function App() {
         <Route path="reports" element={<Reports />} />
         <Route path="login" element={<Login />} />
         <Route path="register" element={<Register />} />
+        <Route path="teacher/dashboard"
+          element={
+            <RoleRoute allowed={['teacher', 'admin']}>
+              <TeacherDashboard />
+            </RoleRoute>
+          } />
       </Route>
     </Routes>
   );

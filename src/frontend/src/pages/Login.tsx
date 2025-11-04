@@ -13,7 +13,14 @@ export default function Login() {
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErr(null); setLoading(true);
-    try { await login(email, password); nav('/questions'); }
+    try { 
+      const user = await login(email, password);
+      if (user.role === 'teacher') {
+        nav('/teacher/dashboard');
+      } else {
+        nav('/questions');
+      }
+    } 
     catch (e:any) { setErr(e.message); }
     finally { setLoading(false); }
   };
