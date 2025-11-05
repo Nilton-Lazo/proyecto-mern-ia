@@ -8,6 +8,7 @@ import Register from "./pages/Register";
 
 import TeacherDashboard from "./pages/TeacherDashboard";
 import RoleRoute from "./components/RoleRoute";
+import AssignActivity from "./pages/AssignActivity";
 
 function App() {
   return (
@@ -22,6 +23,12 @@ function App() {
           element={
             <RoleRoute allowed={['teacher', 'admin']}>
               <TeacherDashboard />
+            </RoleRoute>
+          } />
+        <Route path="teacher/assign"
+          element={
+            <RoleRoute allowed={['teacher', 'admin']}>
+              <AssignActivity />
             </RoleRoute>
           } />
       </Route>
