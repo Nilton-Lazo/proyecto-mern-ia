@@ -1,0 +1,14 @@
+{
+  "teacher": {
+    "id": "u-teach-1",
+    "email": "profe@demo.com",
+    "nombres": "Luis Docente",
+    "role": "teacher"
+  },
+  "student": {
+    "id": "u-stu-1",
+    "email": "alumno@demo.com",
+    "nombres": "Andrea Estudiante",
+    "role": "student"
+  }
+}
