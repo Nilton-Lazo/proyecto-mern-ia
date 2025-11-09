@@ -2,6 +2,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 const aiRouter = require('./routes/ai');
 const authRouter = require('./routes/auth'); //inicio de sesion
+const teacherRoutes = require('./routes/teacher');
+const studentRoutes = require('./routes/student');
 const cors = require('cors');
 require('dotenv').config(); 
 
@@ -12,6 +14,8 @@ app.use(cors());
 app.use(express.json());
 app.use('/api/ai', aiRouter);
 app.use('/api/auth', authRouter);
+app.use('/api/teacher', teacherRoutes);
+app.use('/api/student', studentRoutes);
 
 const mongoUri = process.env.MONGODB_URI;
 console.log('Conectando a MongoDB en:', mongoUri);
