@@ -9,6 +9,7 @@ export default function Layout() {
   const { user, logout } = useAuth();
 
   const isTeacher = user?.role === "teacher";
+  const isStudent = user?.role === "student";
 
   const linkBase =
     "px-3 py-2 rounded-lg text-sm font-medium transition-colors";
@@ -42,7 +43,7 @@ export default function Layout() {
               </div>
             </Link>
 
-            {/* Desktop nav */}
+            {/* NAV DESKTOP */}
             <nav className="hidden md:flex items-center gap-2">
               <NavLink
                 to="/"
@@ -83,7 +84,6 @@ export default function Layout() {
                   >
                     Panel docente
                   </NavLink>
-                  {/* Lo activamos cuando entremos a HU04 */}
                   <NavLink
                     to="/teacher/assign"
                     className={({ isActive }) =>
@@ -95,7 +95,21 @@ export default function Layout() {
                 </>
               )}
 
-              {/* ---- Auth area (desktop) ---- */}
+              {/* ---- Ítems exclusivos del estudiante ---- */}
+              {isStudent && (
+                <>
+                  <NavLink
+                    to="/student/activities"
+                    className={({ isActive }) =>
+                      `${linkBase} ${isActive ? linkActive : linkInactive}`
+                    }
+                  >
+                    Mis actividades
+                  </NavLink>
+                </>
+              )}
+
+              {/* ---- Auth (desktop) ---- */}
               {!user ? (
                 <>
                   <NavLink
@@ -132,6 +146,11 @@ export default function Layout() {
                         Docente
                       </span>
                     )}
+                    {isStudent && (
+                      <span className="ml-2 inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-700 border border-emerald-200">
+                        Estudiante
+                      </span>
+                    )}
                   </span>
                   <button
                     onClick={logout}
@@ -143,7 +162,7 @@ export default function Layout() {
               )}
             </nav>
 
-            {/* Mobile toggle */}
+            {/* MOBILE TOGGLE */}
             <button
               className="md:hidden inline-flex items-center justify-center rounded-lg p-2 text-slate-600 hover:bg-slate-100"
               onClick={() => setOpen((v) => !v)}
@@ -166,7 +185,7 @@ export default function Layout() {
             </button>
           </div>
 
-          {/* Mobile menu */}
+          {/* MOBILE MENU */}
           {open && (
             <nav className="md:hidden pb-3 flex flex-col gap-2">
               <NavLink
@@ -200,7 +219,7 @@ export default function Layout() {
                 Reportes
               </NavLink>
 
-              {/* Mismo menú pero móvil para docentes */}
+              {/* Menú móvil docente */}
               {isTeacher && (
                 <>
                   <NavLink
@@ -224,7 +243,20 @@ export default function Layout() {
                 </>
               )}
 
-              {/* ---- Auth area (mobile) ---- */}
+              {/* Menú móvil estudiante */}
+              {isStudent && (
+                <NavLink
+                  to="/student/activities"
+                  onClick={() => setOpen(false)}
+                  className={({ isActive }) =>
+                    `${linkBase} ${isActive ? linkActive : linkInactive}`
+                  }
+                >
+                  Mis actividades
+                </NavLink>
+              )}
+
+              {/* Auth (móvil) */}
               {!user ? (
                 <>
                   <NavLink
@@ -258,11 +290,6 @@ export default function Layout() {
                 <div className="flex flex-col gap-2">
                   <span className="px-2 text-sm text-slate-700">
                     Hola, {user.nombres?.split(" ")[0] || "Usuario"}
-                    {isTeacher && (
-                      <span className="ml-2 inline-flex items-center rounded-full bg-blue-50 px-2 py-0.5 text-[11px] font-semibold text-blue-700 border border-blue-200">
-                        Docente
-                      </span>
-                    )}
                   </span>
                   <button
                     onClick={() => {
@@ -324,7 +351,6 @@ export default function Layout() {
           <div className="text-sm">
             <p className="font-semibold text-slate-900">Contacto</p>
             <div className="mt-2 flex items-center gap-3">
-              {/* icons iguales a tu versión */}
               <a href="https://github.com/" target="_blank" rel="noreferrer" className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 hover:border-slate-300 hover:bg-slate-50" aria-label="GitHub">
                 <svg viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor"><path d="M12 .5a12 12 0 0 0-3.79 23.4c.6.11.82-.26.82-.58v-2.02c-3.34.73-4.04-1.61-4.04-1.61-.55-1.41-1.34-1.79-1.34-1.79-1.09-.75.08-.74.08-.74 1.2.08 1.83 1.23 1.83 1.23 1.07 1.83 2.81 1.3 3.5.99.11-.77.42-1.3.76-1.6-2.66-.3-5.47-1.33-5.47-5.9 0-1.3.47-2.36 1.23-3.19-.12-.3-.54-1.52.12-3.17 0 0 1.01-.32 3.3 1.22a11.4 11.4 0 0 1 6 0c2.28-1.54 3.29-1.22 3.29-1.22.66 1.65.24 2.87.12 3.17.77.83 1.23 1.9 1.23 3.19 0 4.59-2.81 5.59-5.49 5.89.43.37.81 1.1.81 2.22v3.3c0 .32.22.7.83.58A12 12 0 0 0 12 .5Z"/></svg>
               </a>

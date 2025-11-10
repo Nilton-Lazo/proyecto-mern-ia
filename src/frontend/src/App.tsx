@@ -10,6 +10,9 @@ import TeacherDashboard from "./pages/TeacherDashboard";
 import RoleRoute from "./components/RoleRoute";
 import AssignActivity from "./pages/AssignActivity";
 
+import StudentActivities from './pages/StudentActivities';
+import StudentActivityDetail from './pages/StudentActivityDetail';
+
 function App() {
   return (
     <Routes>
@@ -31,6 +34,16 @@ function App() {
               <AssignActivity />
             </RoleRoute>
           } />
+        <Route path="student/activities" element={
+          <RoleRoute allowed={['student', 'admin']}>
+            <StudentActivities />
+          </RoleRoute>
+        } />
+        <Route path="student/activities/:id" element={
+          <RoleRoute allowed={['student', 'admin']}>
+            <StudentActivityDetail />
+          </RoleRoute>
+        } />
       </Route>
     </Routes>
   );

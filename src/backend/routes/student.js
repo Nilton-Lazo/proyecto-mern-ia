@@ -1,8 +1,8 @@
 const express = require('express');
 const Activity = require('../models/Activity');
 const Submission = require('../models/Submission');
-const { authRequired } = require('../middlewares/auth');
-const { requireRole }   = require('../middlewares/roles');
+const authRequired = require('../middlewares/auth');
+const requireRole = require('../middlewares/roles');
 
 const router = express.Router();
 

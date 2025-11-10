@@ -2,8 +2,8 @@ const express = require('express');
 const Activity = require('../models/Activity');
 const Submission = require('../models/Submission');
 const User = require('../models/User');
-const { authRequired } = require('../middlewares/auth');   // tu JWT middleware
-const { requireRole }   = require('../middlewares/roles');
+const authRequired = require('../middlewares/auth');   // tu JWT middleware
+const requireRole = require('../middlewares/roles');
 
 const router = express.Router();
 
