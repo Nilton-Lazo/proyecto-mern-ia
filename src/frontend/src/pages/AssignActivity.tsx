@@ -23,7 +23,6 @@ export default function AssignActivity() {
   const [students, setStudents] = useState<Student[]>([]);
 
   useEffect(() => {
-    // Si aún no existe el endpoint, el UI sigue funcionando con lista vacía.
     const fetchStudents = async () => {
       try {
         const res = await fetch(`${API}/api/teacher/students`, {
@@ -77,7 +76,6 @@ export default function AssignActivity() {
         assignees: selected, // array de _id de estudiantes
       };
 
-      // Este endpoint lo conectamos en el backend en el siguiente paso de HU04:
       // POST /api/teacher/activities
       const res = await fetch(`${API}/api/teacher/activities`, {
         method: "POST",
@@ -107,147 +105,262 @@ export default function AssignActivity() {
     }
   };
 
+  const selectedCount = selected.length;
+
   return (
-    <div className="mx-auto max-w-5xl">
+    <div className="mx-auto max-w-6xl px-4 py-6 lg:py-8">
       {/* Migas */}
-      <nav className="mb-2 text-xs text-slate-500">
-        <span>Inicio</span>
+      <nav className="mb-3 text-xs text-slate-500">
+        <span className="hover:text-slate-700">Inicio</span>
         <span className="mx-2">/</span>
-        <span>Panel docente</span>
+        <span className="hover:text-slate-700">Panel docente</span>
         <span className="mx-2">/</span>
-        <span className="text-slate-700">Asignar actividad</span>
+        <span className="font-medium text-slate-700">Asignar actividad</span>
       </nav>
 
-      <h1 className="text-2xl font-bold text-slate-900">Asignar actividad</h1>
-      <p className="mt-1 text-sm text-slate-600">
-        Crea una lectura, define instrucciones y asígnala a tus estudiantes.
-      </p>
+      {/* Encabezado */}
+      <header className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+        <div>
+          <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight text-slate-900">
+            <span className="inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-blue-600 text-white shadow-sm">
+              <svg
+                viewBox="0 0 24 24"
+                className="h-5 w-5"
+                aria-hidden="true"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M4 4h16v4H4zm2 6h12v10H6z"
+                />
+              </svg>
+            </span>
+            Asignar actividad
+          </h1>
+          <p className="mt-1 text-sm text-slate-600">
+            Crea una lectura, define instrucciones y asígnala a tus estudiantes.
+          </p>
+        </div>
+
+        {user && (
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-slate-500">Sesión:</span>
+            <div className="inline-flex items-center rounded-full bg-slate-900 px-3 py-1 text-xs font-medium text-white">
+              {user.nombres?.split(" ")[0] || "Docente"}
+              <span className="ml-2 rounded-full bg-blue-500/10 px-2 py-0.5 text-[11px] font-semibold text-blue-200">
+                Docente
+              </span>
+            </div>
+          </div>
+        )}
+      </header>
 
       {/* Aviso de rol */}
       {user?.role !== "teacher" && (
-        <p className="mt-3 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-800 border border-amber-200">
-          Estás viendo una página de docente.
+        <p className="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+          Estás viendo una página pensada para docentes. Algunas acciones pueden
+          requerir permisos adicionales.
         </p>
       )}
 
-      <form onSubmit={onSubmit} className="mt-6 grid gap-6 md:grid-cols-[1.3fr_1fr]">
+      {/* Mensajes globales */}
+      <div className="mt-4 space-y-2">
+        {err && (
+          <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {err}
+          </div>
+        )}
+        {okMsg && (
+          <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+            {okMsg}
+          </div>
+        )}
+      </div>
+
+      {/* Formulario principal */}
+      <form
+        onSubmit={onSubmit}
+        className="mt-6 grid gap-6 lg:grid-cols-[1.5fr_1fr]"
+      >
         {/* Columna izquierda */}
-        <section className="rounded-2xl border bg-white p-5 shadow-sm space-y-4">
+        <section className="space-y-4 rounded-3xl border border-slate-100 bg-white/90 p-5 shadow-sm">
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+              1. Detalles de la actividad
+            </p>
+            <span className="rounded-full bg-slate-50 px-2.5 py-0.5 text-[11px] text-slate-500">
+              Campos obligatorios marcados con *
+            </span>
+          </div>
+
           <div>
-            <label className="block text-sm font-medium text-slate-700">
+            <label className="block text-sm font-medium text-slate-800">
               Título *
             </label>
             <input
-              className="mt-1 w-full rounded-lg border p-2 outline-none focus:border-blue-400"
+              className="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50/60 px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-blue-400 focus:bg-white"
               placeholder='Ej.: "Energía y cambio climático"'
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
+            <p className="mt-1 text-xs text-slate-500">
+              Usa un título claro y específico para que el estudiante reconozca la
+              lectura fácilmente.
+            </p>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700">
+            <label className="block text-sm font-medium text-slate-800">
               Instrucciones (opcional)
             </label>
             <textarea
-              className="mt-1 w-full rounded-lg border p-2 outline-none focus:border-blue-400"
-              rows={2}
-              placeholder="Describe qué esperas que haga el estudiante…"
+              className="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50/60 px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-blue-400 focus:bg-white"
+              rows={3}
+              placeholder="Describe qué esperas que haga el estudiante (por ejemplo, responder todas las preguntas en una sola sesión)…"
               value={instructions}
               onChange={(e) => setInstructions(e.target.value)}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700">
-              Texto de la lectura *
-            </label>
+            <div className="flex items-center justify-between">
+              <label className="block text-sm font-medium text-slate-800">
+                Texto de la lectura *
+              </label>
+              <span className="text-xs text-slate-500">
+                Recomendado: entre 2 y 5 párrafos.
+              </span>
+            </div>
             <textarea
-              className="mt-1 w-full rounded-lg border p-2 outline-none focus:border-blue-400"
+              className="mt-1 w-full rounded-2xl border border-slate-200 bg-slate-50/60 px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-blue-400 focus:bg-white"
               rows={10}
-              placeholder="Pega aquí el texto a analizar…"
+              placeholder="Pega aquí el texto que será utilizado para generar preguntas…"
               value={textBody}
               onChange={(e) => setTextBody(e.target.value)}
             />
-            <div className="mt-2 flex items-center gap-3">
-              <label className="inline-flex cursor-pointer items-center rounded-lg border px-3 py-2 text-sm hover:bg-slate-50">
+
+            <div className="mt-3 flex items-start gap-3">
+              <label className="group inline-flex cursor-pointer items-center gap-2 rounded-2xl border border-dashed border-slate-300 bg-slate-50/60 px-3 py-2 text-xs font-medium text-slate-700 transition hover:border-blue-400 hover:bg-blue-50/60">
                 <input
                   type="file"
                   accept=".txt,.md,.markdown"
                   className="hidden"
                   onChange={(e) => onFile(e.target.files?.[0] || null)}
                 />
-                Subir archivo .txt / .md
+                <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-blue-600 text-[11px] text-white">
+                  ↑
+                </span>
+                Subir archivo <span className="font-semibold">.txt</span> /{" "}
+                <span className="font-semibold">.md</span>
               </label>
-              <span className="text-xs text-slate-500">
-                Si necesitas PDF/Word, lo integramos en la siguiente iteración.
-              </span>
+              <p className="text-xs text-slate-500">
+                Si necesitas PDF o Word, podemos integrarlo en una siguiente
+                iteración. Por ahora, usa texto plano o archivos Markdown.
+              </p>
             </div>
           </div>
         </section>
 
         {/* Columna derecha */}
         <aside className="space-y-4">
-          <div className="rounded-2xl border bg-white p-5 shadow-sm">
-            <label className="block text-sm font-medium text-slate-700">
-              Fecha límite (opcional)
-            </label>
-            <input
-              type="date"
-              className="mt-1 w-full rounded-lg border p-2 outline-none focus:border-blue-400"
-              value={dueAt}
-              onChange={(e) => setDueAt(e.target.value)}
-            />
-            <p className="mt-1 text-xs text-slate-500">
-              Los estudiantes verán el progreso hasta esta fecha.
+          {/* Configuración de fecha */}
+          <div className="rounded-3xl border border-slate-100 bg-white/90 p-5 shadow-sm">
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+              2. Configuración
             </p>
+
+            <div className="mt-3">
+              <label className="block text-sm font-medium text-slate-800">
+                Fecha límite (opcional)
+              </label>
+              <input
+                type="date"
+                className="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50/60 px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-blue-400 focus:bg-white"
+                value={dueAt}
+                onChange={(e) => setDueAt(e.target.value)}
+              />
+              <p className="mt-1 text-xs text-slate-500">
+                Los estudiantes verán esta fecha como referencia para completar la
+                actividad.
+              </p>
+            </div>
+
+            <div className="mt-4 rounded-2xl bg-slate-50 px-3 py-3 text-xs text-slate-600">
+              <p className="font-medium text-slate-700">Sugerencia rápida</p>
+              <p className="mt-1">
+                Puedes usar esta actividad como diagnóstico inicial o como refuerzo
+                después de una clase de lectura crítica.
+              </p>
+            </div>
           </div>
 
-          <div className="rounded-2xl border bg-white p-5 shadow-sm">
-            <p className="text-sm font-semibold text-slate-900">
-              Selecciona estudiantes *
-            </p>
+          {/* Selección de estudiantes */}
+          <div className="rounded-3xl border border-slate-100 bg-white/90 p-5 shadow-sm">
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-sm font-semibold text-slate-900">
+                Selecciona estudiantes *
+              </p>
+              <span className="rounded-full bg-slate-50 px-2 py-0.5 text-[11px] text-slate-600">
+                {selectedCount} seleccionados
+                {students.length > 0 && ` / ${students.length}`}
+              </span>
+            </div>
+
             {!students.length && (
-              <p className="mt-2 text-sm text-slate-500">
+              <p className="mt-3 text-sm text-slate-500">
                 Aún no hay estudiantes cargados o no se pudo obtener la lista.
+                Cuando estén disponibles, podrás asignar la lectura desde aquí.
               </p>
             )}
-            <ul className="mt-3 max-h-64 overflow-auto space-y-2">
-              {students.map((s) => (
-                <li key={s._id} className="flex items-center gap-2">
-                  <input
-                    id={s._id}
-                    type="checkbox"
-                    className="h-4 w-4"
-                    checked={selected.includes(s._id)}
-                    onChange={() => onPick(s._id)}
-                  />
-                  <label htmlFor={s._id} className="text-sm text-slate-700">
-                    {s.nombres} {s.apellidos} — {s.email}
-                  </label>
-                </li>
-              ))}
-            </ul>
+
+            {students.length > 0 && (
+              <ul className="mt-3 max-h-72 space-y-2 overflow-auto rounded-2xl border border-slate-100 bg-slate-50/60 p-2">
+                {students.map((s) => (
+                  <li
+                    key={s._id}
+                    className="flex items-start gap-2 rounded-xl px-2 py-1.5 hover:bg-white"
+                  >
+                    <input
+                      id={s._id}
+                      type="checkbox"
+                      className="mt-1 h-4 w-4 accent-blue-600"
+                      checked={selected.includes(s._id)}
+                      onChange={() => onPick(s._id)}
+                    />
+                    <label
+                      htmlFor={s._id}
+                      className="flex-1 text-xs text-slate-800 sm:text-sm"
+                    >
+                      <span className="font-medium">
+                        {s.nombres} {s.apellidos}
+                      </span>
+                      <span className="block text-[11px] text-slate-500">
+                        {s.email}
+                      </span>
+                    </label>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
 
-          {err && (
-            <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
-              {err}
-            </p>
-          )}
-          {okMsg && (
-            <p className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
-              {okMsg}
-            </p>
-          )}
-
+          {/* Botón principal */}
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-xl bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-60"
+            className="mt-2 w-full rounded-2xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {loading ? "Asignando…" : "Asignar actividad"}
+            {loading ? "Asignando actividad…" : "Asignar actividad"}
           </button>
+
+          <p className="text-xs text-slate-500">
+            La actividad aparecerá en el panel de{" "}
+            <span className="font-semibold">“Mis actividades”</span> de cada
+            estudiante seleccionado.
+          </p>
         </aside>
       </form>
     </div>

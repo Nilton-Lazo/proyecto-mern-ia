@@ -1,18 +1,18 @@
-import { useEffect, useState } from 'react';
-import { useAuth } from '../context/AuthContext';
+import { useEffect, useMemo, useState } from "react";
+import { useAuth } from "../context/AuthContext";
 
 type Activity = {
   _id: string;
   titulo: string;
   estudiantesAsignados: number;
-  entregas: number;           // cuántos enviaron respuesta
-  progresoPromedio: number;   // 0..100
+  entregas: number; // cuántos enviaron respuesta
+  progresoPromedio: number; // 0..100
   creadaEn: string;
 };
 
 export default function TeacherDashboard() {
   const { token, user } = useAuth();
-  const API = import.meta.env.VITE_API_URL ?? 'http://localhost:3000';
+  const API = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
 
   const [loading, setLoading] = useState(true);
   const [rows, setRows] = useState<Activity[]>([]);
@@ -21,12 +21,12 @@ export default function TeacherDashboard() {
     estudiantes: 0,
     progreso: 0,
   });
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     let cancel = false;
     (async () => {
       try {
-        // Si aún no tienes backend, esto dejará valores demo visibles.
         const res = await fetch(`${API}/api/teacher/activities/summary`, {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         }).catch(() => null);
@@ -40,23 +40,23 @@ export default function TeacherDashboard() {
             progreso: data.avgProgress ?? 0,
           });
         } else if (!cancel) {
-          // DEMO: datos de muestra para que se vea algo
+          // Datos demo si el backend no responde
           setRows([
             {
-              _id: 'a1',
-              titulo: 'Lectura: “Energía y cambio climático”',
+              _id: "a1",
+              titulo: "Lectura: “Energía y cambio climático”",
               estudiantesAsignados: 24,
               entregas: 18,
               progresoPromedio: 72,
-              creadaEn: '2025-10-15',
+              creadaEn: "2025-10-15",
             },
             {
-              _id: 'a2',
-              titulo: 'Análisis crítico: “El papel de la IA en la educación”',
+              _id: "a2",
+              titulo: "Análisis crítico: “El papel de la IA en la educación”",
               estudiantesAsignados: 24,
               entregas: 11,
               progresoPromedio: 46,
-              creadaEn: '2025-10-27',
+              creadaEn: "2025-10-27",
             },
           ]);
           setKpi({ actividades: 2, estudiantes: 24, progreso: 59 });
@@ -65,8 +65,43 @@ export default function TeacherDashboard() {
         if (!cancel) setLoading(false);
       }
     })();
-    return () => { cancel = true; };
+
+    return () => {
+      cancel = true;
+    };
   }, [API, token]);
+
+  // Derivados para mostrar en UI
+  const totalEntregas = useMemo(
+    () => rows.reduce((acc, a) => acc + (a.entregas || 0), 0),
+    [rows]
+  );
+  const promedioPorActividad = useMemo(
+    () =>
+      kpi.actividades > 0
+        ? Math.round((kpi.estudiantes / kpi.actividades) * 10) / 10
+        : 0,
+    [kpi.actividades, kpi.estudiantes]
+  );
+
+  const filteredRows = useMemo(() => {
+    if (!search.trim()) return rows;
+    const q = search.toLowerCase();
+    return rows.filter((a) => a.titulo.toLowerCase().includes(q));
+  }, [rows, search]);
+
+  const progresoLabel = (value: number) => {
+    if (value >= 70) return "Alto";
+    if (value >= 40) return "Medio";
+    return "Bajo";
+  };
+
+  const progresoBadgeClasses = (value: number) => {
+    if (value >= 70)
+      return "bg-emerald-50 text-emerald-700 border-emerald-200";
+    if (value >= 40) return "bg-amber-50 text-amber-700 border-amber-200";
+    return "bg-rose-50 text-rose-700 border-rose-200";
+  };
 
   return (
     <div className="mx-auto max-w-6xl p-6">
@@ -77,37 +112,113 @@ export default function TeacherDashboard() {
         <span className="text-slate-700">Panel docente</span>
       </nav>
 
-      <h1 className="text-2xl font-bold text-slate-900">
-        Hola{user?.nombres ? `, ${user.nombres}` : ''} — Panel docente
-      </h1>
-      <p className="mt-1 text-sm text-slate-600">
-        Gestiona actividades, revisa avances y asigna nuevas lecturas.
-      </p>
+      {/* Header */}
+      <header className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+            Hola{user?.nombres ? `, ${user.nombres.split(" ")[0]}` : ""} — Panel
+            docente
+          </h1>
+          <p className="mt-1 text-sm text-slate-600">
+            Gestiona actividades, revisa avances y asigna nuevas lecturas.
+          </p>
+        </div>
+
+        <div className="flex items-center gap-2 rounded-full border bg-white px-3 py-1 text-xs text-slate-500 shadow-sm">
+          <span className="inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+          Datos actualizados en tiempo real
+        </div>
+      </header>
 
       {/* KPIs */}
       <section className="mt-6 grid gap-4 sm:grid-cols-3">
-        <div className="rounded-2xl border bg-white p-5 shadow-sm">
-          <p className="text-xs text-slate-500">Actividades</p>
-          <p className="mt-1 text-3xl font-semibold text-slate-900">
-            {kpi.actividades}
-          </p>
+        {/* Actividades */}
+        <div className="relative overflow-hidden rounded-2xl border bg-white p-5 shadow-sm">
+          <div className="absolute -right-6 -top-6 h-20 w-20 rounded-full bg-blue-50" />
+          <div className="relative flex items-start justify-between gap-3">
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
+                Actividades
+              </p>
+              <p className="mt-1 text-3xl font-semibold text-slate-900">
+                {kpi.actividades}
+              </p>
+              <p className="mt-1 text-xs text-slate-500">
+                Promedio de {promedioPorActividad || 0} estudiantes por lectura
+              </p>
+            </div>
+            <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+              <svg
+                className="h-5 w-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={1.7}
+              >
+                <path
+                  d="M4 5h9l1 2h6v11H4V5Z"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </div>
+          </div>
         </div>
-        <div className="rounded-2xl border bg-white p-5 shadow-sm">
-          <p className="text-xs text-slate-500">Estudiantes</p>
-          <p className="mt-1 text-3xl font-semibold text-slate-900">
-            {kpi.estudiantes}
-          </p>
+
+        {/* Estudiantes */}
+        <div className="relative overflow-hidden rounded-2xl border bg-white p-5 shadow-sm">
+          <div className="absolute -right-8 -bottom-8 h-24 w-24 rounded-full bg-sky-50" />
+          <div className="relative flex items-start justify-between gap-3">
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
+                Estudiantes
+              </p>
+              <p className="mt-1 text-3xl font-semibold text-slate-900">
+                {kpi.estudiantes}
+              </p>
+              <p className="mt-1 text-xs text-slate-500">
+                {totalEntregas} entregas recibidas
+              </p>
+            </div>
+            <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-sky-50 text-sky-600">
+              <svg
+                className="h-5 w-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={1.7}
+              >
+                <path
+                  d="M5 20v-1a4 4 0 0 1 4-4h6a4 4 0 0 1 4 4v1"
+                  strokeLinecap="round"
+                />
+                <circle cx="12" cy="8" r="3" />
+              </svg>
+            </div>
+          </div>
         </div>
-        <div className="rounded-2xl border bg-white p-5 shadow-sm">
-          <p className="text-xs text-slate-500">Progreso promedio</p>
-          <div className="mt-2 flex items-end gap-2">
-            <p className="text-3xl font-semibold text-slate-900">
-              {Math.round(kpi.progreso)}%
+
+        {/* Progreso promedio */}
+        <div className="relative overflow-hidden rounded-2xl border bg-gradient-to-br from-blue-600 to-indigo-600 p-5 text-white shadow-sm">
+          <div className="absolute -right-10 -bottom-10 h-28 w-28 rounded-full bg-white/10" />
+          <div className="relative">
+            <p className="text-xs font-medium uppercase tracking-wide text-blue-100">
+              Progreso promedio
             </p>
-            <div className="h-2 flex-1 rounded-full bg-slate-100">
+            <div className="mt-2 flex items-end gap-3">
+              <p className="text-3xl font-semibold">
+                {Math.round(kpi.progreso)}%
+              </p>
+              <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-blue-100">
+                {progresoLabel(kpi.progreso)}
+              </span>
+            </div>
+            <div className="mt-3 h-2 w-full rounded-full bg-blue-500/40">
               <div
-                className="h-2 rounded-full bg-blue-600"
-                style={{ width: `${Math.min(100, Math.max(0, kpi.progreso))}%` }}
+                className="h-2 rounded-full bg-white"
+                style={{
+                  width: `${Math.min(100, Math.max(0, kpi.progreso))}%`,
+                }}
               />
             </div>
           </div>
@@ -115,57 +226,111 @@ export default function TeacherDashboard() {
       </section>
 
       {/* Acciones rápidas */}
-      <div className="mt-6 flex flex-wrap gap-3">
+      <div className="mt-7 flex flex-wrap gap-3">
         <a
           href="/teacher/assign"
-          className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+          className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700"
         >
-          + Asignar nueva actividad
+          <span className="text-lg leading-none">＋</span>
+          Asignar nueva actividad
         </a>
         <a
           href="/reports"
-          className="inline-flex items-center gap-2 rounded-xl border px-4 py-2 text-slate-700 hover:bg-slate-50"
+          className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50"
         >
-          Ver reportes
+          📊 Ver reportes
         </a>
       </div>
 
       {/* Tabla actividades */}
-      <section className="mt-6 rounded-2xl border bg-white p-5 shadow-sm">
-        <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-slate-900">Actividades asignadas</h2>
-          <span className="text-xs text-slate-500">
-            {loading ? 'Cargando…' : rows.length ? `${rows.length} items` : 'Sin datos disponibles'}
-          </span>
+      <section className="mt-7 rounded-2xl border bg-white p-5 shadow-sm">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 className="text-lg font-semibold text-slate-900">
+              Actividades asignadas
+            </h2>
+            <p className="text-xs text-slate-500">
+              Revisa el avance de tus lecturas y entregas por grupo.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className="relative">
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Buscar actividad…"
+                className="w-48 rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 pr-8 text-xs text-slate-700 outline-none placeholder:text-slate-400 focus:border-blue-400 focus:bg-white"
+              />
+              <span className="pointer-events-none absolute right-2 top-1.5 text-slate-400">
+                🔍
+              </span>
+            </div>
+            <span className="text-xs text-slate-500">
+              {loading
+                ? "Cargando…"
+                : filteredRows.length
+                ? `${filteredRows.length} ítems`
+                : "Sin datos disponibles"}
+            </span>
+          </div>
         </div>
 
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto rounded-xl border border-slate-100">
           <table className="w-full text-left text-sm">
-            <thead>
-              <tr className="border-b text-slate-500">
-                <th className="py-2 pr-4">Actividad</th>
-                <th className="py-2 pr-4">Asignados</th>
-                <th className="py-2 pr-4">Entregas</th>
-                <th className="py-2 pr-4">Progreso</th>
-                <th className="py-2">Creada</th>
+            <thead className="bg-slate-50/80 text-xs uppercase tracking-wide text-slate-500">
+              <tr>
+                <th className="px-4 py-3">Actividad</th>
+                <th className="px-4 py-3 text-center">Asignados</th>
+                <th className="px-4 py-3 text-center">Entregas</th>
+                <th className="px-4 py-3">Progreso</th>
+                <th className="px-4 py-3 text-center">Estado</th>
+                <th className="px-4 py-3">Creada</th>
               </tr>
             </thead>
             <tbody>
-              {rows.length === 0 && !loading && (
+              {loading && rows.length === 0 && (
+                <>
+                  {Array.from({ length: 3 }).map((_, i) => (
+                    <tr key={i} className="border-t border-slate-100">
+                      <td className="px-4 py-4" colSpan={6}>
+                        <div className="h-3 w-full animate-pulse rounded bg-slate-100" />
+                      </td>
+                    </tr>
+                  ))}
+                </>
+              )}
+
+              {!loading && filteredRows.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="py-6 text-center text-slate-500">
-                    Sin datos disponibles
+                  <td
+                    colSpan={6}
+                    className="px-4 py-8 text-center text-sm text-slate-500"
+                  >
+                    No se encontraron actividades que coincidan con la búsqueda.
                   </td>
                 </tr>
               )}
-              {rows.map((a) => (
-                <tr key={a._id} className="border-b last:border-0">
-                  <td className="py-3 pr-4">
+
+              {filteredRows.map((a, idx) => (
+                <tr
+                  key={a._id}
+                  className={`border-t border-slate-100 ${
+                    idx % 2 === 0 ? "bg-white" : "bg-slate-50/30"
+                  }`}
+                >
+                  <td className="px-4 py-3">
                     <p className="font-medium text-slate-900">{a.titulo}</p>
+                    <p className="mt-0.5 text-xs text-slate-500">
+                      ID: {a._id.slice(0, 6)}…
+                    </p>
                   </td>
-                  <td className="py-3 pr-4">{a.estudiantesAsignados}</td>
-                  <td className="py-3 pr-4">{a.entregas}</td>
-                  <td className="py-3 pr-4">
+                  <td className="px-4 py-3 text-center">
+                    {a.estudiantesAsignados}
+                  </td>
+                  <td className="px-4 py-3 text-center">{a.entregas}</td>
+                  <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
                       <div className="h-2 w-28 rounded-full bg-slate-100">
                         <div
@@ -178,7 +343,18 @@ export default function TeacherDashboard() {
                       </span>
                     </div>
                   </td>
-                  <td className="py-3">{new Date(a.creadaEn).toLocaleDateString()}</td>
+                  <td className="px-4 py-3 text-center">
+                    <span
+                      className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-[11px] font-medium ${progresoBadgeClasses(
+                        a.progresoPromedio
+                      )}`}
+                    >
+                      {progresoLabel(a.progresoPromedio)}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-sm text-slate-600">
+                    {new Date(a.creadaEn).toLocaleDateString()}
+                  </td>
                 </tr>
               ))}
             </tbody>

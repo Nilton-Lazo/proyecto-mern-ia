@@ -11,25 +11,40 @@ export default function Layout() {
   const isTeacher = user?.role === "teacher";
   const isStudent = user?.role === "student";
 
+  const firstName = user?.nombres?.split(" ")[0] || "Usuario";
+  const initials =
+    (user?.nombres || user?.email || "U")
+      .split(" ")
+      .map((p) => p[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase();
+
   const linkBase =
-    "px-3 py-2 rounded-lg text-sm font-medium transition-colors";
+    "relative px-3 py-2 rounded-xl text-sm font-medium transition-colors";
   const linkInactive =
-    "text-slate-600 hover:text-slate-900 hover:bg-slate-100";
-  const linkActive = "text-white bg-blue-600 hover:bg-blue-700";
+    "text-slate-600 hover:text-slate-900 hover:bg-slate-100/80";
+  const linkActive =
+    "text-slate-900 bg-slate-100 font-semibold";
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 flex flex-col">
+    <div className="min-h-screen bg-slate-50/80 flex flex-col">
       {/* Barra de retorno para docentes fuera de /teacher */}
       <TeacherReturnBar />
 
       {/* HEADER */}
-      <header className="sticky top-0 z-50 border-b bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/60">
+      <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/60">
         <div className="mx-auto max-w-6xl px-4">
-          <div className="flex h-16 items-center justify-between">
+          <div className="flex h-16 items-center justify-between gap-4">
             {/* Branding */}
             <Link to="/" className="flex items-center gap-3">
-              <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-blue-600 text-white shadow-sm">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5">
+              <span className="inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-sky-500 text-white shadow-sm">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  className="h-5 w-5"
+                >
                   <path d="M12 3 1 8l11 5 9-4.09V17h2V8L12 3Zm0 12L4.5 11.2V14c0 2.53 3.58 4.5 7.5 4.5s7.5-1.97 7.5-4.5v-2.27L12 15Z" />
                 </svg>
               </span>
@@ -97,16 +112,14 @@ export default function Layout() {
 
               {/* ---- Ítems exclusivos del estudiante ---- */}
               {isStudent && (
-                <>
-                  <NavLink
-                    to="/student/activities"
-                    className={({ isActive }) =>
-                      `${linkBase} ${isActive ? linkActive : linkInactive}`
-                    }
-                  >
-                    Mis actividades
-                  </NavLink>
-                </>
+                <NavLink
+                  to="/student/activities"
+                  className={({ isActive }) =>
+                    `${linkBase} ${isActive ? linkActive : linkInactive}`
+                  }
+                >
+                  Mis actividades
+                </NavLink>
               )}
 
               {/* ---- Auth (desktop) ---- */}
@@ -115,7 +128,7 @@ export default function Layout() {
                   <NavLink
                     to="/login"
                     className={({ isActive }) =>
-                      `${linkBase} ${
+                      `px-3 py-2 rounded-xl text-sm font-medium transition-colors ${
                         isActive
                           ? "bg-slate-900 text-white hover:bg-black"
                           : "text-slate-700 hover:text-white hover:bg-slate-900"
@@ -127,7 +140,7 @@ export default function Layout() {
                   <NavLink
                     to="/register"
                     className={({ isActive }) =>
-                      `${linkBase} ${
+                      `px-3 py-2 rounded-xl text-sm font-medium transition-colors ${
                         isActive
                           ? "bg-blue-600 text-white hover:bg-blue-700"
                           : "text-blue-700 hover:bg-blue-50"
@@ -138,23 +151,37 @@ export default function Layout() {
                   </NavLink>
                 </>
               ) : (
-                <div className="flex items-center gap-3 pl-2 ml-2 border-l">
-                  <span className="hidden sm:inline text-sm text-slate-700">
-                    Hola, {user.nombres?.split(" ")[0] || "Usuario"}
-                    {isTeacher && (
-                      <span className="ml-2 inline-flex items-center rounded-full bg-blue-50 px-2 py-0.5 text-[11px] font-semibold text-blue-700 border border-blue-200">
-                        Docente
+                <div className="flex items-center gap-3 pl-4 ml-2 border-l border-slate-200">
+                  <div className="hidden sm:flex items-center gap-2">
+                    <div className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-slate-900 text-xs font-semibold text-slate-50">
+                      {initials}
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-xs font-medium text-slate-800">
+                        Hola, {firstName}
                       </span>
-                    )}
-                    {isStudent && (
-                      <span className="ml-2 inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-700 border border-emerald-200">
-                        Estudiante
+                      <span className="text-[11px] text-slate-500 flex items-center gap-1">
+                        {isTeacher && (
+                          <span className="inline-flex items-center rounded-full bg-blue-50 px-2 py-0.5 text-[11px] font-semibold text-blue-700 border border-blue-200">
+                            Docente
+                          </span>
+                        )}
+                        {isStudent && (
+                          <span className="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-700 border border-emerald-200">
+                            Estudiante
+                          </span>
+                        )}
+                        {!isTeacher && !isStudent && (
+                          <span className="text-[11px] text-slate-500">
+                            Usuario
+                          </span>
+                        )}
                       </span>
-                    )}
-                  </span>
+                    </div>
+                  </div>
                   <button
                     onClick={logout}
-                    className="px-3 py-2 rounded-lg text-sm font-medium bg-slate-900 text-white hover:bg-black"
+                    className="px-3 py-2 rounded-xl text-xs font-semibold bg-slate-900 text-white hover:bg-black"
                   >
                     Salir
                   </button>
@@ -164,7 +191,7 @@ export default function Layout() {
 
             {/* MOBILE TOGGLE */}
             <button
-              className="md:hidden inline-flex items-center justify-center rounded-lg p-2 text-slate-600 hover:bg-slate-100"
+              className="md:hidden inline-flex items-center justify-center rounded-xl p-2 text-slate-600 hover:bg-slate-100"
               onClick={() => setOpen((v) => !v)}
               aria-label="Abrir menú"
               aria-expanded={open}
@@ -177,9 +204,17 @@ export default function Layout() {
                 strokeWidth={2}
               >
                 {open ? (
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 ) : (
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
                 )}
               </svg>
             </button>
@@ -187,7 +222,7 @@ export default function Layout() {
 
           {/* MOBILE MENU */}
           {open && (
-            <nav className="md:hidden pb-3 flex flex-col gap-2">
+            <nav className="md:hidden pb-4 flex flex-col gap-2 border-t border-slate-100 pt-3">
               <NavLink
                 to="/"
                 end
@@ -263,7 +298,7 @@ export default function Layout() {
                     to="/login"
                     onClick={() => setOpen(false)}
                     className={({ isActive }) =>
-                      `${linkBase} ${
+                      `px-3 py-2 rounded-xl text-sm font-medium transition-colors ${
                         isActive
                           ? "bg-slate-900 text-white hover:bg-black"
                           : "text-slate-700 hover:text-white hover:bg-slate-900"
@@ -276,7 +311,7 @@ export default function Layout() {
                     to="/register"
                     onClick={() => setOpen(false)}
                     className={({ isActive }) =>
-                      `${linkBase} ${
+                      `px-3 py-2 rounded-xl text-sm font-medium transition-colors ${
                         isActive
                           ? "bg-blue-600 text-white hover:bg-blue-700"
                           : "text-blue-700 hover:bg-blue-50"
@@ -287,16 +322,30 @@ export default function Layout() {
                   </NavLink>
                 </>
               ) : (
-                <div className="flex flex-col gap-2">
-                  <span className="px-2 text-sm text-slate-700">
-                    Hola, {user.nombres?.split(" ")[0] || "Usuario"}
-                  </span>
+                <div className="mt-1 flex flex-col gap-2 rounded-2xl bg-slate-50/80 p-3">
+                  <div className="flex items-center gap-2">
+                    <div className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-slate-900 text-xs font-semibold text-slate-50">
+                      {initials}
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-xs font-medium text-slate-800">
+                        Hola, {firstName}
+                      </span>
+                      <span className="text-[11px] text-slate-500">
+                        {isTeacher
+                          ? "Docente"
+                          : isStudent
+                          ? "Estudiante"
+                          : "Usuario"}
+                      </span>
+                    </div>
+                  </div>
                   <button
                     onClick={() => {
                       logout();
                       setOpen(false);
                     }}
-                    className="px-3 py-2 rounded-lg text-sm font-medium bg-slate-900 text-white hover:bg-black"
+                    className="mt-1 px-3 py-2 rounded-xl text-xs font-semibold bg-slate-900 text-white hover:bg-black"
                   >
                     Salir
                   </button>
@@ -313,12 +362,13 @@ export default function Layout() {
       </main>
 
       {/* FOOTER */}
-      <footer className="border-t bg-white">
+      <footer className="mt-4 border-t border-slate-200 bg-white/90">
         <div className="mx-auto max-w-6xl px-4 py-8 grid gap-6 md:grid-cols-3">
           <div>
             <p className="text-sm font-semibold text-slate-900">Tutor Virtual</p>
             <p className="mt-2 text-sm text-slate-600">
-              Plataforma para fortalecer la comprensión lectora con apoyo de IA.
+              Plataforma para fortalecer la comprensión lectora con apoyo de IA,
+              diseñada para docentes y estudiantes de Educación Superior.
             </p>
           </div>
 
@@ -336,12 +386,18 @@ export default function Layout() {
                 </a>
               </li>
               <li>
-                <Link to="/reports" className="text-slate-600 hover:text-slate-900">
+                <Link
+                  to="/reports"
+                  className="text-slate-600 hover:text-slate-900"
+                >
                   Reportes
                 </Link>
               </li>
               <li>
-                <Link to="/questions" className="text-slate-600 hover:text-slate-900">
+                <Link
+                  to="/questions"
+                  className="text-slate-600 hover:text-slate-900"
+                >
                   Generar preguntas
                 </Link>
               </li>
@@ -350,24 +406,62 @@ export default function Layout() {
 
           <div className="text-sm">
             <p className="font-semibold text-slate-900">Contacto</p>
-            <div className="mt-2 flex items-center gap-3">
-              <a href="https://github.com/" target="_blank" rel="noreferrer" className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 hover:border-slate-300 hover:bg-slate-50" aria-label="GitHub">
-                <svg viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor"><path d="M12 .5a12 12 0 0 0-3.79 23.4c.6.11.82-.26.82-.58v-2.02c-3.34.73-4.04-1.61-4.04-1.61-.55-1.41-1.34-1.79-1.34-1.79-1.09-.75.08-.74.08-.74 1.2.08 1.83 1.23 1.83 1.23 1.07 1.83 2.81 1.3 3.5.99.11-.77.42-1.3.76-1.6-2.66-.3-5.47-1.33-5.47-5.9 0-1.3.47-2.36 1.23-3.19-.12-.3-.54-1.52.12-3.17 0 0 1.01-.32 3.3 1.22a11.4 11.4 0 0 1 6 0c2.28-1.54 3.29-1.22 3.29-1.22.66 1.65.24 2.87.12 3.17.77.83 1.23 1.9 1.23 3.19 0 4.59-2.81 5.59-5.49 5.89.43.37.81 1.1.81 2.22v3.3c0 .32.22.7.83.58A12 12 0 0 0 12 .5Z"/></svg>
+            <div className="mt-3 flex items-center gap-3">
+              <a
+                href="https://github.com/"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 hover:border-slate-300 hover:bg-slate-50"
+                aria-label="GitHub"
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  className="h-5 w-5"
+                  fill="currentColor"
+                >
+                  <path d="M12 .5a12 12 0 0 0-3.79 23.4c.6.11.82-.26.82-.58v-2.02c-3.34.73-4.04-1.61-4.04-1.61-.55-1.41-1.34-1.79-1.34-1.79-1.09-.75.08-.74.08-.74 1.2.08 1.83 1.23 1.83 1.23 1.07 1.83 2.81 1.3 3.5.99.11-.77.42-1.3.76-1.6-2.66-.3-5.47-1.33-5.47-5.9 0-1.3.47-2.36 1.23-3.19-.12-.3-.54-1.52.12-3.17 0 0 1.01-.32 3.3 1.22a11.4 11.4 0 0 1 6 0c2.28-1.54 3.29-1.22 3.29-1.22.66 1.65.24 2.87.12 3.17.77.83 1.23 1.9 1.23 3.19 0 4.59-2.81 5.59-5.49 5.89.43.37.81 1.1.81 2.22v3.3c0 .32.22.7.83.58A12 12 0 0 0 12 .5Z" />
+                </svg>
               </a>
-              <a href="https://www.linkedin.com/" target="_blank" rel="noreferrer" className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 hover:border-slate-300 hover:bg-slate-50" aria-label="LinkedIn">
-                <svg viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor"><path d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM.5 8.5h4V23h-4V8.5zM8.5 8.5h3.8v2h.05c.53-1 1.82-2.06 3.75-2.06 4.01 0 4.75 2.64 4.75 6.06V23h-4v-5.5c0-1.31-.02-3-1.83-3-1.83 0-2.12 1.43-2.12 2.9V23h-4V8.5z"/></svg>
+              <a
+                href="https://www.linkedin.com/"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 hover:border-slate-300 hover:bg-slate-50"
+                aria-label="LinkedIn"
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  className="h-5 w-5"
+                  fill="currentColor"
+                >
+                  <path d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM.5 8.5h4V23h-4V8.5zM8.5 8.5h3.8v2h.05c.53-1 1.82-2.06 3.75-2.06 4.01 0 4.75 2.64 4.75 6.06V23h-4v-5.5c0-1.31-.02-3-1.83-3-1.83 0-2.12 1.43-2.12 2.9V23h-4V8.5z" />
+                </svg>
               </a>
-              <a href="https://twitter.com/" target="_blank" rel="noreferrer" className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 hover:border-slate-300 hover:bg-slate-50" aria-label="Twitter">
-                <svg viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor"><path d="M18.244 2H21l-6.5 7.43L22.5 22H15.5l-5-6.96L4.5 22H2l7-8L2 2h6.5l4.6 6.39L18.244 2Z"/></svg>
+              <a
+                href="https://twitter.com/"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 hover:border-slate-300 hover:bg-slate-50"
+                aria-label="Twitter"
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  className="h-5 w-5"
+                  fill="currentColor"
+                >
+                  <path d="M18.244 2H21l-6.5 7.43L22.5 22H15.5l-5-6.96L4.5 22H2l7-8L2 2h6.5l4.6 6.39L18.244 2Z" />
+                </svg>
               </a>
             </div>
           </div>
         </div>
 
-        <div className="border-t">
-          <div className="mx-auto max-w-6xl px-4 py-4 text-xs text-slate-500 flex items-center justify-between">
-            <span>© {new Date().getFullYear()} Tutor Virtual de Lectura Crítica</span>
-            <span className="hidden sm:inline">Hecho con React + TypeScript + Tailwind + Node</span>
+        <div className="border-t border-slate-200 bg-slate-900 text-slate-200">
+          <div className="mx-auto max-w-6xl px-4 py-3 text-[11px] flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+            <span>
+              © {new Date().getFullYear()} Tutor Virtual de Lectura Crítica
+            </span>
+            <span>Hecho con React + TypeScript + Tailwind + Node</span>
           </div>
         </div>
       </footer>
