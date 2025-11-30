@@ -1,0 +1,64 @@
+{
+  "name": "Detect Biases Backend",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "6313c7db-de07-4b8f-9e17-82abd0cdb455",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:3000/api/ai/biases",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "text",
+              "value": "Todos los jóvenes son irresponsables porque vi uno en las noticias comportándose mal."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        208,
+        0
+      ],
+      "id": "4b7abfd7-0d18-45be-90b0-0730f17a03c4",
+      "name": "HTTP Request"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "44ffe2c9-5bb6-4bb7-a77e-a2ed26d884ec",
+  "meta": {
+    "instanceId": "351f3f1c76300f6081f638b97e71d3120fc1dd930a3a374e7638637ba9ca74b9"
+  },
+  "id": "tOlVBlaC6v2yJBMv",
+  "tags": []
+}
