@@ -1,3 +1,5 @@
+//tutor-virtual/tests/jest.setup.js
+
 jest.mock('ollama', () => ({
         Ollama: jest.fn().mockImplementation(() => ({
         generate: jest.fn(async () => ({ response: 'mock' }))

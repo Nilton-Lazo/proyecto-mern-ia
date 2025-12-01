@@ -39,12 +39,14 @@
 		]
 	},
 	"scripts": {
-		"test": "jest --coverage --runInBand --forceExit --detectOpenHandles",
-		"test:backend": "jest tests/backend --env=node --coverage",
+		"test": "pnpm run test:backend",
+		"test:backend": "jest -c jest.backend.config.cjs --coverage",
 		"test:frontend": "jest -c jest.frontend.config.cjs --coverage",
 		"cy:open": "cypress open"
 	},
 	"dependencies": {
-		"express": "^5.1.0"
+		"bcryptjs": "^3.0.3",
+		"express": "^5.1.0",
+		"jsonwebtoken": "^9.0.2"
 	}
 }
