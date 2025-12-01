@@ -39,7 +39,7 @@
 		]
 	},
 	"scripts": {
-		"test": "pnpm run test:backend",
+		"test": "pnpm run test:backend && pnpm run test:frontend",
 		"test:backend": "jest -c jest.backend.config.cjs --coverage",
 		"test:frontend": "jest -c jest.frontend.config.cjs --coverage",
 		"cy:open": "cypress open"

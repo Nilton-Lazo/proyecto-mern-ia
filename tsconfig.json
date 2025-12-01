@@ -1,13 +1,16 @@
 {
   "compilerOptions": {
     "target": "ES2020",
-    "module": "ESNext",
-    "moduleResolution": "Node",
+    "module": "es2020",                 // cambiado a un valor permitido (minúsculas)
+    "moduleResolution": "node",
     "jsx": "react-jsx",
+    "lib": ["ES2020", "DOM"],
     "strict": true,
     "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "types": ["node", "jest", "vite/client"]
   },
   "include": [
     "src/**/*"

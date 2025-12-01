@@ -1,5 +1,5 @@
 // tests/frontend/StudentActivities.test.tsx
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 
 // Mock directo del AuthContext
@@ -52,15 +52,31 @@ describe('StudentActivities page', () => {
       </MemoryRouter>
     );
 
+    // Items renderizados
     expect(await screen.findByText('Lectura 1')).toBeInTheDocument();
     expect(screen.getByText('Lectura 2')).toBeInTheDocument();
 
-    // KPI → (60 + 100) / 2 = 80
+    // KPI: (60+100)/2 = 80
     expect(screen.getByText('80%')).toBeInTheDocument();
 
-    // 1 actividad entregada
-    expect(screen.getByText('1')).toBeInTheDocument();
+    // --- KPI Completadas ---
+    const completadasCard = screen.getByText('Completadas').closest('div');
+    expect(completadasCard).not.toBeNull();
+    expect(
+      within(completadasCard as HTMLElement).getByText('1')
+    ).toBeInTheDocument();
 
+    // --- KPI En progreso ---
+    // Hay dos textos "En progreso". Tomamos el PRIMERO (la tarjeta KPI)
+    const [kpiEnProgresoLabel] = screen.getAllByText('En progreso');
+    const enProgresoCard = kpiEnProgresoLabel.closest('div');
+
+    expect(enProgresoCard).not.toBeNull();
+    expect(
+      within(enProgresoCard as HTMLElement).getByText('1')
+    ).toBeInTheDocument();
+
+    // Verificar llamada a fetch
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledWith(
         'http://localhost:3000/api/student/activities',

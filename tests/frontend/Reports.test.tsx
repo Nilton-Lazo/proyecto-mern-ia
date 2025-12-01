@@ -43,9 +43,9 @@ describe('Reports page', () => {
     expect(screen.getByText('3')).toBeInTheDocument();
 
     // Alguna de las etiquetas de KPIs
-    expect(screen.getByText(/Correctas/)).toBeInTheDocument();
-    expect(screen.getByText(/Parciales/)).toBeInTheDocument();
-    expect(screen.getByText(/Incorrectas/)).toBeInTheDocument();
+    expect(screen.getByText('Correctas')).toBeInTheDocument();
+    expect(screen.getByText('Parciales')).toBeInTheDocument();
+    expect(screen.getByText('Incorrectas')).toBeInTheDocument();
 
     // Última respuesta en la tabla
     expect(screen.getByText('¿Qué es IA?')).toBeInTheDocument();

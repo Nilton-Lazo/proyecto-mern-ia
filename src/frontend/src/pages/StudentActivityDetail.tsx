@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { API_URL } from "../config/env";
 
 export default function StudentActivityDetail() {
   const { id } = useParams();
   const { token } = useAuth();
-  const API = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
+  const API = API_URL ?? "http://localhost:3000";
 
   const [data, setData] = useState<any>(null);
   const [answer, setAnswer] = useState("");

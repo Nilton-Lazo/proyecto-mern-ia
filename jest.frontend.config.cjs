@@ -1,6 +1,8 @@
 /** @type {import('jest').Config} */
 module.exports = {
-  preset: 'ts-jest',
+  // 👉 preset pensado para ESM
+  preset: 'ts-jest/presets/default-esm',
+
   testEnvironment: 'jsdom',
   rootDir: '.',
 
@@ -10,19 +12,29 @@ module.exports = {
   // Setup para jest-dom, ResizeObserver, etc.
   setupFilesAfterEnv: ['<rootDir>/tests/jest.frontend.setup.js'],
 
-  // IMPORTANTe: sólo transformamos .ts / .tsx con ts-jest
+  // Tratamos .ts y .tsx como módulos ESM
+  extensionsToTreatAsEsm: ['.ts', '.tsx'],
+
+  // ts-jest en modo ESM con nuestro tsconfig
   transform: {
-    '^.+\\.tsx?$': [
+    '^.+\\.[tj]sx?$': [
       'ts-jest',
       {
-        tsconfig: '<rootDir>/tsconfig.jest.frontend.json'
+        useESM: true,
+        tsconfig: '<rootDir>/tsconfig.jest.frontend.json',
+        diagnostics: false // opcional: no frenar por warnings de TS
       }
     ]
   },
 
-  // Para evitar doble React (usa el React del frontend)
+  // Mapeo típico recomendado por ts-jest para ESM
   moduleNameMapper: {
-    '^react$': '<rootDir>/src/frontend/node_modules/react',
-    '^react-dom$': '<rootDir>/src/frontend/node_modules/react-dom'
+    // Corrige imports relativos que terminan en .js
+    '^(\\.{1,2}/.*)\\.js$': '$1',
+
+    '^react$': '<rootDir>/node_modules/react',
+    '^react-dom$': '<rootDir>/node_modules/react-dom',
+
+    '^\\.\\./config/env$': '<rootDir>/tests/frontend/env.jest.ts'
   }
 };

@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { Link } from "react-router-dom";
 
+import { API_URL } from "../config/env";
+
 type Row = {
   _id: string;
   titulo: string;
@@ -13,7 +15,7 @@ type Row = {
 
 export default function StudentActivities() {
   const { token } = useAuth();
-  const API = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
+  const API = API_URL ?? "http://localhost:3000";
 
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
