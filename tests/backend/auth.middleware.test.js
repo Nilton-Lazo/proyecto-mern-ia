@@ -1,5 +1,13 @@
-const { authMiddleware } = require('../../src/backend/middlewares/auth');
+// tests/backend/auth.middleware.test.js
 
+jest.mock('jsonwebtoken', () => ({
+  verify: jest.fn(),
+}));
+
+const jwt = require('jsonwebtoken');
+const auth = require('../../src/backend/middlewares/auth');
+
+// helper de respuesta mock
 function mockRes() {
   const res = {};
   res.status = jest.fn().mockReturnValue(res);
@@ -7,25 +15,44 @@ function mockRes() {
   return res;
 }
 
-describe('authMiddleware', () => {
-  it('401 sin Authorization', () => {
+describe('middleware auth', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    process.env.JWT_SECRET = 'secreto-test';
+  });
+
+  test('responde 401 si no hay Authorization', async () => {
     const req = { headers: {} };
     const res = mockRes();
     const next = jest.fn();
 
-    authMiddleware(req, res, next);
+    await auth(req, res, next);
 
     expect(res.status).toHaveBeenCalledWith(401);
-    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ error: expect.any(String) }));
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({ error: 'No autorizado' }),
+    );
     expect(next).not.toHaveBeenCalled();
   });
 
-  it('pasa con Bearer token', () => {
-    const req = { headers: { authorization: 'Bearer token123' } };
+  test('responde 401 si el token es inválido (jwt.verify lanza error)', async () => {
+    const req = {
+      headers: { authorization: 'Bearer token-malo' },
+    };
     const res = mockRes();
     const next = jest.fn();
 
-    authMiddleware(req, res, next);
-    expect(next).toHaveBeenCalled();
+    // simulamos que jwt.verify falla
+    jwt.verify.mockImplementation(() => {
+      throw new Error('invalid token');
+    });
+
+    await auth(req, res, next);
+
+    expect(res.status).toHaveBeenCalledWith(401);
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({ error: 'Token inválido' }),
+    );
+    expect(next).not.toHaveBeenCalled();
   });
 });
