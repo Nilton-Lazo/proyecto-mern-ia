@@ -59,17 +59,166 @@ Este proyecto forma parte del curso **Taller de Proyectos 2 – Ingeniería de S
 
 ```mermaid 
 flowchart TD
-  UI[React - Navegador UI] --> Backend[Node.js + Express API]
+    A[Usuario] --> B[Frontend React]
+    B --> C[Backend Express.js]
+    C --> D[Base de Datos MongoDB]
+    C --> E[Servicio IA - Ollama]
+    C --> F[n8n - Automatización]
+    F --> G[Notificaciones por Email]
+    F --> D
+    E --> D
+    
+    subgraph "Contenedores Docker"
+        B
+        C
+        D
+        F
+    end
+```
+```mermaid 
+flowchart TD
+    A[Usuario ingresa texto] --> B[Enviar texto al Backend]
+    B --> C[Backend llama a IA - Ollama]
+    C --> D[IA genera las 5 preguntas]
+    D --> E[Guardar preguntas en MongoDB]
+    E --> F[Retornar preguntas al Frontend]
+    F --> G[Mostrar preguntas al usuario]
+```
+```mermaid 
+usecaseDiagram
+    actor Usuario
+    actor Docente
+    actor Administrador
 
-  Backend --> Ollama[Ollama API]
-  Backend --> Sesgos[Microservicios IA - Sesgos]
-  Backend --> n8n[n8n Automatización]
+    Usuario --> (Generar preguntas)
+    Usuario --> (Responder preguntas)
+    Usuario --> (Recibir retroalimentación)
+    Usuario --> (Descargar informe PDF)
 
-  n8n --> MongoDB
-  Sesgos --> MongoDB
-  Ollama --> MongoDB
+    Docente --> (Asignar textos)
+    Docente --> (Ver progreso de estudiantes)
+
+    Administrador --> (Gestionar métricas globales)
+```
+```mermaid 
+graph TD
+    A[Frontend React] -->|REST API| B[Backend Express]
+    B --> C[(MongoDB)]
+    B --> D[Ollama - IA]
+    B --> E[n8n Automatización]
+
+    subgraph Backend
+        B
+        C
+        D
+        E
+    end
 ```
 ---
+
+## 🏗️ Metodología de Desarrollo 
+
+```mermaid 
+gitGraph
+    commit id: "Initial commit"
+    branch develop
+    checkout develop
+    commit id: "Setup project structure"
+    branch feature/hu01-question-generation
+    checkout feature/hu01-question-generation
+    commit id: "Add question generation API"
+    commit id: "Integrate Ollama API"
+    checkout develop
+    merge feature/hu01-question-generation
+    branch feature/hu02-feedback-system
+    commit id: "Implement feedback logic"
+    commit id: "Add feedback UI components"
+    checkout develop
+    merge feature/hu02-feedback-system
+    checkout main
+    merge develop tag: "v1.0.0"
+```
+---
+
+## 📂 Estructura del Proyecto
+
+A continuación se presenta la estructura general del proyecto **MERN + IA + n8n**, organizada por carpetas y módulos principales.
+
+```bash
+tutor-virtual-lectura-critica/
+├── frontend/                     # Aplicación React (Vite)
+│   ├── src/
+│   │   ├── components/           # Componentes reutilizables
+│   │   ├── pages/                # Vistas principales (Home, Lectura, Reportes)
+│   │   ├── hooks/                # Hooks personalizados
+│   │   ├── services/             # Peticiones API hacia el backend
+│   │   ├── context/              # Contexto global (auth, sesiones)
+│   │   ├── styles/               # Estilos globales / Tailwind
+│   │   └── main.jsx
+│   ├── public/
+│   ├── package.json
+│   └── vite.config.js
+
+├── backend/                      # API con Node.js + Express
+│   ├── src/
+│   │   ├── controllers/          # Lógica de cada endpoint
+│   │   ├── routes/               # /api/ia (preguntas, feedback, reportes, etc.)
+│   │   ├── models/               # Modelos de MongoDB (Text, Questions, Reports)
+│   │   ├── services/             # Servicios IA (Ollama, sesgos, PDF)
+│   │   ├── middleware/           # Autenticación, logs, validaciones
+│   │   └── utils/                # Helpers, manejo de errores
+│   ├── tests/                    # Pruebas con Jest
+│   ├── package.json
+│   └── server.js                 # Punto de inicio del backend
+
+├── n8n/                          # Flujos automatizados n8n
+│   └── workflows.json            # Recordatorios, registro de avance, emails
+
+├── docker-compose.yml            # Orquestación de contenedores
+├── .env.example                  # Variables de entorno modelo
+├── README.md
+└── docs/                         # Documentación adicional
+    ├── arquitectura.png
+    ├── uml/
+    └── informe-final.pdf
+
+---
+
+## 🔀 Git Flow del Proyecto
+
+Para garantizar orden, control de versiones y trabajo colaborativo, el proyecto utiliza la estrategia **Git Flow**.  
+Este flujo permite desarrollar nuevas funciones sin afectar la rama principal y mantener un historial limpio.
+
+### 🌲 Estructura de ramas
+
+El proyecto utiliza las siguientes ramas principales:
+
+| Rama | Función |
+|------|---------|
+| **main** | Versión estable lista para producción. |
+| **develop** | Integración de nuevas funcionalidades antes de pasar a main. |
+| **feature/** | Desarrollo de nuevas funcionalidades (una rama por HU). |
+| **hotfix/** | Correcciones urgentes en producción. |
+| **release/** | Preparación de versiones finales. |
+
+### 🧩 Convención de ramas "feature/HU"
+
+Para cada Historia de Usuario (HU), se crea una rama:
+feature/hu01-generar-preguntas
+feature/hu02-feedback
+feature/hu05-reportes
+feature/hu06-informe-pdf
+
+## 🛠 Comandos del Flujo de Trabajo
+
+### 1️⃣ Crear una nueva HU
+```bash
+git checkout develop
+git pull
+git checkout -b feature/hu01-generar-preguntas
+```
+---
+
 
 ## 🧠 Ejemplos de Uso de la API (Backend)
 
@@ -273,6 +422,42 @@ El servicio de pruebas usa mocks definidos en jest.setup.js.
 
 ---
 
+## 🧭 Guía de Usuario
+
+Esta guía explica el uso básico del sistema **Tutor Virtual de Lectura Crítica**.
+
+### ✔ 1. Registro e Inicio de Sesión
+1. Ingrese su correo electrónico.
+2. Cree una contraseña segura.
+3. Acceda al sistema para visualizar el panel principal.
+
+### ✔ 2. Crear una Sesión de Lectura
+1. Ir a la sección **“Nuevo Texto”**.
+2. Pegar o escribir el texto que desea analizar.
+3. Hacer clic en **“Generar Preguntas”**.
+4. El sistema generará automáticamente 5 preguntas críticas.
+
+### ✔ 3. Responder Preguntas
+1. Seleccionar una pregunta del listado.
+2. Escribir la respuesta en el cuadro correspondiente.
+3. El sistema mostrará retroalimentación en tiempo real basada en IA.
+
+### ✔ 4. Ver Historial y Reportes
+- En la sección **“Reportes”**, podrá visualizar:
+  - Respuestas correctas, incorrectas y parciales.
+  - Últimas actividades registradas.
+  - Historial de sesiones.
+
+### ✔ 5. Descargar Informe PDF
+1. Ir a **“Reportes”** → “Generar PDF”.
+2. Descargar informe con:
+   - Preguntas
+   - Respuestas
+   - Retroalimentación
+   - Métricas de rendimiento
+
+---
+
 ## 📽️ Demostración
 Se incluirá un video demostrativo mostrando:  
 🎥 Funcionalidades principales.  
@@ -283,3 +468,6 @@ Se incluirá un video demostrativo mostrando:
 
 ## 📜 Licencia
 Este proyecto es de uso académico para el curso **Taller de Proyectos 2** – **Universidad Continental** (2025).  
+
+---
+
