@@ -84,21 +84,33 @@ flowchart TD
     E --> F[Retornar preguntas al Frontend]
     F --> G[Mostrar preguntas al usuario]
 ```
-```mermaid 
-usecaseDiagram
-    actor Usuario
-    actor Docente
-    actor Administrador
+```mermaid
+flowchart LR
+    subgraph Actores
+        A1([Usuario])
+        A2([Docente])
+        A3([Administrador])
+    end
 
-    Usuario --> (Generar preguntas)
-    Usuario --> (Responder preguntas)
-    Usuario --> (Recibir retroalimentación)
-    Usuario --> (Descargar informe PDF)
+    subgraph Casos_de_Uso
+        U1[(Generar preguntas)]
+        U2[(Responder preguntas)]
+        U3[(Recibir retroalimentación)]
+        U4[(Descargar informe PDF)]
+        D1[(Asignar textos)]
+        D2[(Ver progreso de estudiantes)]
+        AD1[(Gestionar métricas globales)]
+    end
 
-    Docente --> (Asignar textos)
-    Docente --> (Ver progreso de estudiantes)
+    A1 --> U1
+    A1 --> U2
+    A1 --> U3
+    A1 --> U4
 
-    Administrador --> (Gestionar métricas globales)
+    A2 --> D1
+    A2 --> D2
+
+    A3 --> AD1
 ```
 ```mermaid 
 graph TD
