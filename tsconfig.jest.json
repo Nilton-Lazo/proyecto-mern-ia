@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "target": "ES2019",
+    "module": "commonjs",
+    "jsx": "react-jsx",
+
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+
+    "verbatimModuleSyntax": false,
+
+    "types": ["jest", "node", "jsdom"],
+    "noEmit": true,
+    "skipLibCheck": true
+  },
+  "include": [
+    "tests/frontend/**/*",
+    "src/frontend/src/**/*"
+  ]
+}
