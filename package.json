@@ -13,7 +13,6 @@
 		"@types/react": "^19.2.0",
 		"@types/react-dom": "^19.2.0",
 		"@types/react-router-dom": "^5.3.3",
-		"@types/testing-library__jest-dom": "^6.0.0",
 		"babel-jest": "^30.2.0",
 		"babel-plugin-transform-import-meta": "^2.3.3",
 		"babel-plugin-transform-vite-meta-env": "^1.0.3",
@@ -39,6 +38,10 @@
 		]
 	},
 	"scripts": {
+		"dev": "pnpm --parallel -r --filter backend --filter frontend run dev",
+		"dev:backend": "pnpm --filter backend run dev",
+		"dev:frontend": "pnpm --filter frontend run dev",
+		"build:frontend": "pnpm --filter frontend run build",
 		"test": "pnpm run test:backend && pnpm run test:frontend",
 		"test:backend": "jest -c jest.backend.config.cjs --coverage",
 		"test:frontend": "jest -c jest.frontend.config.cjs --coverage",

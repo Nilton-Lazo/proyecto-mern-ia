@@ -41,6 +41,7 @@ dist-ssr/
 # =========================
 .env
 .env.*
+!.env.example
 
 # =========================
 # Editor / OS files

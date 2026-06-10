@@ -15,16 +15,33 @@ router.post('/register', async (req, res) => {
 
     const passwordHash = await bcrypt.hash(password, 10);
 
+    const userRole = role || 'student';
     const user = await User.create({
       nombres,
       apellidos,
       centroEstudios,
       email,
       passwordHash,
-      role: role || 'student' // permite registrar docentes también
+      role: userRole // permite registrar docentes también
     });
 
-    res.json({ ok: true, user: { id: user._id, nombres, role: user.role } });
+    const token = jwt.sign(
+      { id: user._id, role: userRole },
+      process.env.JWT_SECRET || 'secreto',
+      { expiresIn: '7d' }
+    );
+
+    res.json({
+      ok: true,
+      token,
+      user: {
+        id: user._id,
+        nombres,
+        apellidos: user.apellidos,
+        email: user.email,
+        role: userRole,
+      },
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Error al registrar usuario' });
