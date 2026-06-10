@@ -115,6 +115,37 @@ function sanitizeTags(arr) {
   return Array.from(set);
 }
 
+const aiService = require('../services/aiService');
+
+// Práctica libre con IA (estudiante)
+router.post('/practice', async (req, res) => {
+  try {
+    const { text } = req.body || {};
+    if (!text?.trim()) {
+      return res.status(400).json({ ok: false, error: 'Falta el texto' });
+    }
+
+    const [questions, analysis] = await Promise.all([
+      aiService.generateTypedQuestions(text),
+      aiService.analyzeText(text),
+    ]);
+
+    return res.json({
+      ok: true,
+      questions,
+      analysis: {
+        mainIdea: analysis.mainIdea,
+        keywords: analysis.keywords,
+        difficulty: analysis.difficulty,
+        readingTip: analysis.readingTip,
+      },
+    });
+  } catch (err) {
+    console.error('practice error:', err);
+    return res.status(500).json({ ok: false, error: 'No fue posible analizar el texto con IA' });
+  }
+});
+
 // ------- Rutas -------
 router.post('/chat', async (req, res) => {
   try {

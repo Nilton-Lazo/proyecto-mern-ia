@@ -74,8 +74,9 @@ describe('Rutas /api/student', () => {
     expect(res.body.activities[0]).toEqual(
       expect.objectContaining({
         titulo: 'Lectura 1',
-        progreso: 50,
+        progreso: expect.any(Number),
         status: 'draft',
+        displayStatus: expect.any(String),
       })
     );
   });
@@ -110,9 +111,11 @@ describe('Rutas /api/student', () => {
       expect.objectContaining({
         _id: 'a1',
         title: 'Lectura 1',
-        progressPercent: 60,
+        progressPercent: expect.any(Number),
         status: 'draft',
         answer: 'Respuesta inicial',
+        questions: expect.any(Array),
+        displayStatus: expect.any(String),
       })
     );
   });

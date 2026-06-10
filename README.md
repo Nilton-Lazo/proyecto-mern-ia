@@ -6,7 +6,7 @@
   <img src="https://img.shields.io/badge/Docker-Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white" />
   <img src="https://img.shields.io/badge/Estado-En%20Desarrollo-yellow?style=for-the-badge" />
   <img src="https://img.shields.io/badge/Licencia-Académica-blue?style=for-the-badge" />
-  <img src="https://img.shields.io/badge/Universidad-Continental-002C77?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Colegio-San-Carlos-002C77?style=for-the-badge" />
 </p>
 
 # 📚 Tutor Virtual de Lectura Crítica  
@@ -16,7 +16,7 @@
 
 A través de la lectura de textos, el sistema genera **preguntas automáticas**, detecta **sesgos o falacias lógicas** y evalúa la comprensión del contenido. Además, integra **automatización con n8n** para programar sesiones de estudio, enviar recordatorios y registrar el progreso de los usuarios.  
 
-Este proyecto forma parte del curso **Taller de Proyectos 2 – Ingeniería de Sistemas e Informática** de la **Universidad Continental**, bajo la dirección del docente:  
+Este proyecto forma parte del curso **Taller de Proyectos 2 – Ingeniería de Sistemas e Informática** del **Colegio San Carlos**, bajo la dirección del docente:  
 👨‍🏫 *Ing. Gamarra Moreno Daniel*  
 
 ---
@@ -434,6 +434,33 @@ El servicio de pruebas usa mocks definidos en jest.setup.js.
 
 ---
 
+## 🎓 Flujo del estudiante con IA
+
+### Dashboard (`/student/home`)
+Resumen personalizado: actividades pendientes, progreso promedio, acceso rápido a continuar una lectura o practicar con IA.
+
+### Mis actividades vs Práctica con IA
+| Sección | Ruta | Propósito |
+|---------|------|-----------|
+| **Mis actividades** | `/student/activities` | Lecturas asignadas por el docente. Generación de preguntas IA ligada a cada actividad, borrador, envío y retroalimentación. |
+| **Práctica con IA** | `/student/practice` | Práctica libre: el estudiante pega cualquier texto, sin depender del docente. |
+| **Progreso** | `/student/progress` | Vista resumida del avance en actividades asignadas. |
+| **Reportes** | `/reports` | Historial detallado y métricas globales de respuestas. |
+
+### Endpoints estudiante
+- `GET /api/student/activities` — lista asignada
+- `GET /api/student/activities/:id` — detalle con preguntas y análisis IA
+- `POST /api/student/activities/:id/generate-questions` — genera preguntas tipadas (no duplica)
+- `POST /api/student/activities/:id/save-draft` — guarda respuestas parciales
+- `POST /api/student/activities/:id/submit` — evalúa con IA y marca entregada
+- `GET /api/student/progress` — resumen de progreso
+- `POST /api/ai/practice` — práctica libre (análisis + preguntas)
+
+### Variables IA
+`OLLAMA_HOST`, `OLLAMA_MODEL` en `src/backend/.env`
+
+---
+
 ## 🧭 Guía de Usuario
 
 Esta guía explica el uso básico del sistema **Tutor Virtual de Lectura Crítica**.
@@ -479,7 +506,7 @@ Se incluirá un video demostrativo mostrando:
 ---
 
 ## 📜 Licencia
-Este proyecto es de uso académico para el curso **Taller de Proyectos 2** – **Universidad Continental** (2025).  
+Este proyecto es de uso académico para el curso **Taller de Proyectos 2** – **Colegio San Carlos** (2025).  
 
 ---
 

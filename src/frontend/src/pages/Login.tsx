@@ -17,8 +17,10 @@ export default function Login() {
       const user = await login(email, password);
       if (user.role === 'teacher') {
         nav('/teacher/dashboard');
+      } else if (user.role === 'student') {
+        nav('/student/home');
       } else {
-        nav('/questions');
+        nav('/');
       }
     } 
     catch (e:any) { setErr(e.message); }

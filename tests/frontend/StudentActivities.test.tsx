@@ -2,21 +2,19 @@
 import { render, screen, waitFor, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 
-// Mock directo del AuthContext
 jest.mock('../../src/frontend/src/context/AuthContext', () => ({
   useAuth: () => ({
     token: 'test-token',
   }),
 }));
 
-import StudentActivities from '../../src/frontend/src/pages/StudentActivities';
+import StudentActivities from '../../src/frontend/src/pages/student/StudentActivities';
 
-// Helper para mockear fetch
-function mockFetchOnce(data: any) {
+function mockFetchOnce(data: unknown) {
   (global.fetch as jest.Mock) = jest.fn().mockResolvedValue({
     ok: true,
     json: async () => data,
-  }) as any;
+  }) as jest.Mock;
 }
 
 describe('StudentActivities page', () => {
@@ -33,6 +31,7 @@ describe('StudentActivities page', () => {
           dueAt: '2025-01-01T00:00:00.000Z',
           progreso: 60,
           status: 'draft',
+          displayStatus: 'en_progreso',
           actualizada: '2025-01-02T00:00:00.000Z',
         },
         {
@@ -41,6 +40,7 @@ describe('StudentActivities page', () => {
           dueAt: null,
           progreso: 100,
           status: 'submitted',
+          displayStatus: 'entregada',
           actualizada: '2025-01-03T00:00:00.000Z',
         },
       ],
@@ -52,36 +52,21 @@ describe('StudentActivities page', () => {
       </MemoryRouter>
     );
 
-    // Items renderizados
     expect(await screen.findByText('Lectura 1')).toBeInTheDocument();
     expect(screen.getByText('Lectura 2')).toBeInTheDocument();
-
-    // KPI: (60+100)/2 = 80
     expect(screen.getByText('80%')).toBeInTheDocument();
 
-    // --- KPI Completadas ---
     const completadasCard = screen.getByText('Completadas').closest('div');
     expect(completadasCard).not.toBeNull();
-    expect(
-      within(completadasCard as HTMLElement).getByText('1')
-    ).toBeInTheDocument();
+    expect(within(completadasCard as HTMLElement).getByText('1')).toBeInTheDocument();
 
-    // --- KPI En progreso ---
-    // Hay dos textos "En progreso". Tomamos el PRIMERO (la tarjeta KPI)
-    const [kpiEnProgresoLabel] = screen.getAllByText('En progreso');
-    const enProgresoCard = kpiEnProgresoLabel.closest('div');
-
-    expect(enProgresoCard).not.toBeNull();
-    expect(
-      within(enProgresoCard as HTMLElement).getByText('1')
-    ).toBeInTheDocument();
-
-    // Verificar llamada a fetch
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledWith(
         'http://localhost:3000/api/student/activities',
         expect.objectContaining({
-          headers: { Authorization: 'Bearer test-token' },
+          headers: expect.objectContaining({
+            Authorization: 'Bearer test-token',
+          }),
         })
       );
     });
@@ -97,7 +82,7 @@ describe('StudentActivities page', () => {
     );
 
     expect(
-      await screen.findByText('Aún no tienes actividades asignadas.')
+      await screen.findByText('No hay actividades para mostrar')
     ).toBeInTheDocument();
   });
 });

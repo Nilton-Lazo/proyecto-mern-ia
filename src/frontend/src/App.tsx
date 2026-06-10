@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import Layout from "./components/Layout";
 import Home from "./pages/Home";
 import Questions from "./pages/Questions";
@@ -10,8 +10,11 @@ import TeacherDashboard from "./pages/TeacherDashboard";
 import RoleRoute from "./components/RoleRoute";
 import AssignActivity from "./pages/AssignActivity";
 
-import StudentActivities from './pages/StudentActivities';
-import StudentActivityDetail from './pages/StudentActivityDetail';
+import StudentHome from "./pages/student/StudentHome";
+import StudentActivities from "./pages/student/StudentActivities";
+import StudentActivityDetail from "./pages/student/StudentActivityDetail";
+import AIPractice from "./pages/student/AIPractice";
+import StudentProgress from "./pages/student/StudentProgress";
 
 function App() {
   return (
@@ -22,6 +25,14 @@ function App() {
         <Route path="reports" element={<Reports />} />
         <Route path="login" element={<Login />} />
         <Route path="register" element={<Register />} />
+
+        {/* Redirecciones de compatibilidad */}
+        <Route path="student" element={<Navigate to="/student/home" replace />} />
+        <Route
+          path="student/practice-legacy"
+          element={<Navigate to="/student/practice" replace />}
+        />
+
         <Route path="teacher/dashboard"
           element={
             <RoleRoute allowed={['teacher', 'admin']}>
@@ -34,6 +45,13 @@ function App() {
               <AssignActivity />
             </RoleRoute>
           } />
+
+        {/* Rutas estudiante */}
+        <Route path="student/home" element={
+          <RoleRoute allowed={['student', 'admin']}>
+            <StudentHome />
+          </RoleRoute>
+        } />
         <Route path="student/activities" element={
           <RoleRoute allowed={['student', 'admin']}>
             <StudentActivities />
@@ -42,6 +60,16 @@ function App() {
         <Route path="student/activities/:id" element={
           <RoleRoute allowed={['student', 'admin']}>
             <StudentActivityDetail />
+          </RoleRoute>
+        } />
+        <Route path="student/practice" element={
+          <RoleRoute allowed={['student', 'admin']}>
+            <AIPractice />
+          </RoleRoute>
+        } />
+        <Route path="student/progress" element={
+          <RoleRoute allowed={['student', 'admin']}>
+            <StudentProgress />
           </RoleRoute>
         } />
       </Route>

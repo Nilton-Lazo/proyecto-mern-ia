@@ -21,7 +21,7 @@ export default function Register() {
     setErr(null); setLoading(true);
     try { 
       await register(f); 
-      nav(f.role === 'teacher' ? '/teacher/dashboard' : '/questions');
+      nav(f.role === 'teacher' ? '/teacher/dashboard' : '/student/home');
     }
     catch (e:any) { setErr(e.message); }
     finally { setLoading(false); }

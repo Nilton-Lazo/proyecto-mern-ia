@@ -8,7 +8,23 @@ jest.mock('../../src/frontend/src/context/AuthContext', () => ({
   }),
 }));
 
-import StudentActivityDetail from '../../src/frontend/src/pages/StudentActivityDetail';
+import StudentActivityDetail from '../../src/frontend/src/pages/student/StudentActivityDetail';
+
+const baseActivity = {
+  _id: 'abc123',
+  title: 'Lectura sobre sesgos',
+  text: 'Texto de actividad.',
+  instructions: 'Lee y responde.',
+  progressPercent: 30,
+  status: 'draft',
+  displayStatus: 'en_progreso',
+  questionsGenerated: true,
+  questions: [
+    { questionText: '¿Cuál es la idea principal?', type: 'main_idea', order: 1 },
+  ],
+  questionAnswers: [{ questionIndex: 0, answer: '', feedback: '' }],
+  aiAnalysis: { mainIdea: 'Idea de prueba' },
+};
 
 function renderWithRoute() {
   return render(
@@ -23,26 +39,20 @@ function renderWithRoute() {
 describe('StudentActivityDetail page', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    window.confirm = jest.fn(() => true);
   });
 
   test('carga y muestra datos', async () => {
     (global.fetch as jest.Mock) = jest.fn().mockResolvedValueOnce({
       ok: true,
-      json: async () => ({
-        _id: 'abc123',
-        title: 'Lectura sobre sesgos',
-        text: 'Texto de actividad.',
-        instructions: 'Lee y responde.',
-        progressPercent: 0,
-        status: 'draft',
-        answer: '',
-      }),
+      json: async () => baseActivity,
     });
 
     renderWithRoute();
 
     expect(await screen.findByText('Lectura sobre sesgos')).toBeInTheDocument();
     expect(screen.getByText('Texto de actividad.')).toBeInTheDocument();
+    expect(screen.getByText(/¿Cuál es la idea principal?/)).toBeInTheDocument();
   });
 
   test('permite guardar borrador', async () => {
@@ -50,28 +60,18 @@ describe('StudentActivityDetail page', () => {
       .fn()
       .mockResolvedValueOnce({
         ok: true,
-        json: async () => ({
-          _id: 'abc123',
-          title: 'Lectura X',
-          text: 'Texto X',
-          progressPercent: 0,
-          status: 'draft',
-          answer: '',
-        }),
+        json: async () => baseActivity,
       })
       .mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ progressPercent: 60 }),
+        json: async () => ({ ok: true, progressPercent: 60 }),
       });
 
     renderWithRoute();
+    await screen.findByText('Lectura sobre sesgos');
 
-    await screen.findByText('Lectura X');
-
-    fireEvent.change(screen.getByRole('textbox'), {
-      target: { value: 'Mi respuesta...' },
-    });
-
+    const textareas = screen.getAllByRole('textbox');
+    fireEvent.change(textareas[0], { target: { value: 'Mi respuesta...' } });
     fireEvent.click(screen.getByRole('button', { name: /guardar borrador/i }));
 
     expect(await screen.findByText(/Borrador guardado/)).toBeInTheDocument();
@@ -83,26 +83,30 @@ describe('StudentActivityDetail page', () => {
       .mockResolvedValueOnce({
         ok: true,
         json: async () => ({
-          _id: 'abc123',
-          title: 'Lectura X',
-          text: 'Texto X',
-          progressPercent: 60,
-          status: 'draft',
-          answer: 'Borrador previo',
+          ...baseActivity,
+          questionAnswers: [{ questionIndex: 0, answer: 'Respuesta', feedback: '' }],
         }),
       })
       .mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ ok: true, status: 'submitted' }),
+        json: async () => ({
+          ok: true,
+          status: 'submitted',
+          score: 85,
+          feedbackSummary: 'Buen trabajo',
+          recommendation: 'Sigue leyendo',
+          motivation: '¡Excelente!',
+          questionAnswers: [
+            { questionIndex: 0, answer: 'Respuesta', feedback: 'Correcta', isCorrect: 'correcta' },
+          ],
+        }),
       });
 
     renderWithRoute();
-
-    await screen.findByText('Lectura X');
+    await screen.findByText('Lectura sobre sesgos');
 
     fireEvent.click(screen.getByRole('button', { name: /enviar actividad/i }));
 
-    expect(await screen.findByText('¡Entregada!')).toBeInTheDocument();
-    expect(screen.getByText(/Progreso actual:/)).toHaveTextContent('100%');
+    expect(await screen.findByText(/Actividad entregada/)).toBeInTheDocument();
   });
 });

@@ -50,7 +50,7 @@ export default function Layout() {
               </span>
               <div className="leading-tight">
                 <p className="text-sm font-semibold tracking-tight text-slate-900">
-                  Universidad Continental
+                  Colegio San Carlos
                 </p>
                 <p className="text-xs text-slate-500">
                   Tutor Virtual de Lectura Crítica
@@ -59,67 +59,98 @@ export default function Layout() {
             </Link>
 
             {/* NAV DESKTOP */}
-            <nav className="hidden md:flex items-center gap-2">
-              <NavLink
-                to="/"
-                end
-                className={({ isActive }) =>
-                  `${linkBase} ${isActive ? linkActive : linkInactive}`
-                }
-              >
-                Inicio
-              </NavLink>
-
-              <NavLink
-                to="/questions"
-                className={({ isActive }) =>
-                  `${linkBase} ${isActive ? linkActive : linkInactive}`
-                }
-              >
-                Preguntas
-              </NavLink>
-
-              <NavLink
-                to="/reports"
-                className={({ isActive }) =>
-                  `${linkBase} ${isActive ? linkActive : linkInactive}`
-                }
-              >
-                Reportes
-              </NavLink>
-
-              {/* ---- Ítems exclusivos del docente ---- */}
-              {isTeacher && (
+            <nav className="hidden md:flex items-center gap-1">
+              {isStudent ? (
                 <>
                   <NavLink
-                    to="/teacher/dashboard"
+                    to="/student/home"
                     className={({ isActive }) =>
                       `${linkBase} ${isActive ? linkActive : linkInactive}`
                     }
                   >
-                    Panel docente
+                    Inicio
                   </NavLink>
                   <NavLink
-                    to="/teacher/assign"
+                    to="/student/activities"
                     className={({ isActive }) =>
                       `${linkBase} ${isActive ? linkActive : linkInactive}`
                     }
                   >
-                    Asignar actividades
+                    Mis actividades
+                  </NavLink>
+                  <NavLink
+                    to="/student/practice"
+                    className={({ isActive }) =>
+                      `${linkBase} ${isActive ? linkActive : linkInactive}`
+                    }
+                  >
+                    Práctica con IA
+                  </NavLink>
+                  <NavLink
+                    to="/student/progress"
+                    className={({ isActive }) =>
+                      `${linkBase} ${isActive ? linkActive : linkInactive}`
+                    }
+                  >
+                    Progreso
+                  </NavLink>
+                  <NavLink
+                    to="/reports"
+                    className={({ isActive }) =>
+                      `${linkBase} ${isActive ? linkActive : linkInactive}`
+                    }
+                  >
+                    Reportes
                   </NavLink>
                 </>
-              )}
-
-              {/* ---- Ítems exclusivos del estudiante ---- */}
-              {isStudent && (
-                <NavLink
-                  to="/student/activities"
-                  className={({ isActive }) =>
-                    `${linkBase} ${isActive ? linkActive : linkInactive}`
-                  }
-                >
-                  Mis actividades
-                </NavLink>
+              ) : (
+                <>
+                  <NavLink
+                    to="/"
+                    end
+                    className={({ isActive }) =>
+                      `${linkBase} ${isActive ? linkActive : linkInactive}`
+                    }
+                  >
+                    Inicio
+                  </NavLink>
+                  <NavLink
+                    to="/questions"
+                    className={({ isActive }) =>
+                      `${linkBase} ${isActive ? linkActive : linkInactive}`
+                    }
+                  >
+                    Preguntas
+                  </NavLink>
+                  <NavLink
+                    to="/reports"
+                    className={({ isActive }) =>
+                      `${linkBase} ${isActive ? linkActive : linkInactive}`
+                    }
+                  >
+                    Reportes
+                  </NavLink>
+                  {isTeacher && (
+                    <>
+                      <NavLink
+                        to="/teacher/dashboard"
+                        className={({ isActive }) =>
+                          `${linkBase} ${isActive ? linkActive : linkInactive}`
+                        }
+                      >
+                        Panel docente
+                      </NavLink>
+                      <NavLink
+                        to="/teacher/assign"
+                        className={({ isActive }) =>
+                          `${linkBase} ${isActive ? linkActive : linkInactive}`
+                        }
+                      >
+                        Asignar actividades
+                      </NavLink>
+                    </>
+                  )}
+                </>
               )}
 
               {/* ---- Auth (desktop) ---- */}
@@ -223,72 +254,26 @@ export default function Layout() {
           {/* MOBILE MENU */}
           {open && (
             <nav className="md:hidden pb-4 flex flex-col gap-2 border-t border-slate-100 pt-3">
-              <NavLink
-                to="/"
-                end
-                onClick={() => setOpen(false)}
-                className={({ isActive }) =>
-                  `${linkBase} ${isActive ? linkActive : linkInactive}`
-                }
-              >
-                Inicio
-              </NavLink>
-
-              <NavLink
-                to="/questions"
-                onClick={() => setOpen(false)}
-                className={({ isActive }) =>
-                  `${linkBase} ${isActive ? linkActive : linkInactive}`
-                }
-              >
-                Preguntas
-              </NavLink>
-
-              <NavLink
-                to="/reports"
-                onClick={() => setOpen(false)}
-                className={({ isActive }) =>
-                  `${linkBase} ${isActive ? linkActive : linkInactive}`
-                }
-              >
-                Reportes
-              </NavLink>
-
-              {/* Menú móvil docente */}
-              {isTeacher && (
+              {isStudent ? (
                 <>
-                  <NavLink
-                    to="/teacher/dashboard"
-                    onClick={() => setOpen(false)}
-                    className={({ isActive }) =>
-                      `${linkBase} ${isActive ? linkActive : linkInactive}`
-                    }
-                  >
-                    Panel docente
-                  </NavLink>
-                  <NavLink
-                    to="/teacher/assign"
-                    onClick={() => setOpen(false)}
-                    className={({ isActive }) =>
-                      `${linkBase} ${isActive ? linkActive : linkInactive}`
-                    }
-                  >
-                    Asignar actividades
-                  </NavLink>
+                  <NavLink to="/student/home" onClick={() => setOpen(false)} className={({ isActive }) => `${linkBase} ${isActive ? linkActive : linkInactive}`}>Inicio</NavLink>
+                  <NavLink to="/student/activities" onClick={() => setOpen(false)} className={({ isActive }) => `${linkBase} ${isActive ? linkActive : linkInactive}`}>Mis actividades</NavLink>
+                  <NavLink to="/student/practice" onClick={() => setOpen(false)} className={({ isActive }) => `${linkBase} ${isActive ? linkActive : linkInactive}`}>Práctica con IA</NavLink>
+                  <NavLink to="/student/progress" onClick={() => setOpen(false)} className={({ isActive }) => `${linkBase} ${isActive ? linkActive : linkInactive}`}>Progreso</NavLink>
+                  <NavLink to="/reports" onClick={() => setOpen(false)} className={({ isActive }) => `${linkBase} ${isActive ? linkActive : linkInactive}`}>Reportes</NavLink>
                 </>
-              )}
-
-              {/* Menú móvil estudiante */}
-              {isStudent && (
-                <NavLink
-                  to="/student/activities"
-                  onClick={() => setOpen(false)}
-                  className={({ isActive }) =>
-                    `${linkBase} ${isActive ? linkActive : linkInactive}`
-                  }
-                >
-                  Mis actividades
-                </NavLink>
+              ) : (
+                <>
+                  <NavLink to="/" end onClick={() => setOpen(false)} className={({ isActive }) => `${linkBase} ${isActive ? linkActive : linkInactive}`}>Inicio</NavLink>
+                  <NavLink to="/questions" onClick={() => setOpen(false)} className={({ isActive }) => `${linkBase} ${isActive ? linkActive : linkInactive}`}>Preguntas</NavLink>
+                  <NavLink to="/reports" onClick={() => setOpen(false)} className={({ isActive }) => `${linkBase} ${isActive ? linkActive : linkInactive}`}>Reportes</NavLink>
+                  {isTeacher && (
+                    <>
+                      <NavLink to="/teacher/dashboard" onClick={() => setOpen(false)} className={({ isActive }) => `${linkBase} ${isActive ? linkActive : linkInactive}`}>Panel docente</NavLink>
+                      <NavLink to="/teacher/assign" onClick={() => setOpen(false)} className={({ isActive }) => `${linkBase} ${isActive ? linkActive : linkInactive}`}>Asignar actividades</NavLink>
+                    </>
+                  )}
+                </>
               )}
 
               {/* Auth (móvil) */}
@@ -368,7 +353,7 @@ export default function Layout() {
             <p className="text-sm font-semibold text-slate-900">Tutor Virtual</p>
             <p className="mt-2 text-sm text-slate-600">
               Plataforma para fortalecer la comprensión lectora con apoyo de IA,
-              diseñada para docentes y estudiantes de Educación Superior.
+              diseñada para docentes y estudiantes del Colegio San Carlos.
             </p>
           </div>
 
