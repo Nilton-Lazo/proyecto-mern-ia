@@ -4,8 +4,25 @@ const Submission = require('../models/Submission');
 const authRequired = require('../middlewares/auth');
 const requireRole = require('../middlewares/roles');
 const aiService = require('../services/aiService');
+const {
+  displayStatus,
+  calcProgress,
+  mapActivityRow,
+  filterActivityRows,
+  groupByArea,
+  persistDraft,
+  computeSkillScores,
+  aggregateSkillScores,
+  getSkillRecommendations,
+} = require('./studentHelpers');
 
 const router = express.Router();
+
+const ACTIVITY_POPULATE = {
+  path: 'activity',
+  select: 'title instructions dueAt createdAt area topic createdBy',
+  populate: { path: 'createdBy', select: 'nombres apellidos' },
+};
 
 function assertAssigned(act, userId) {
   if (!act) return { code: 404, error: 'Actividad no existe' };
@@ -15,52 +32,32 @@ function assertAssigned(act, userId) {
   return null;
 }
 
-function displayStatus(sub, dueAt) {
-  if (sub?.status === 'submitted') return 'entregada';
-  if (dueAt && new Date(dueAt) < new Date()) return 'vencida';
-  const hasWork =
-    (sub?.progressPercent ?? 0) > 0 ||
-    sub?.questionsGenerated ||
-    (sub?.questionAnswers?.length ?? 0) > 0 ||
-    (sub?.questions?.length ?? 0) > 0;
-  if (!hasWork) return 'pendiente';
-  return 'en_progreso';
-}
+// GET /api/student/progress/skills — Mapa de mejora lectora
+router.get('/progress/skills', authRequired, requireRole('student', 'admin'), async (req, res) => {
+  try {
+    const subs = await Submission.find({ student: req.user._id, status: 'submitted' })
+      .select('skillScores questions questionAnswers score')
+      .lean();
 
-function calcProgress(sub) {
-  if (sub?.status === 'submitted') return 100;
-  const qs = sub?.questions?.length ?? 0;
-  if (qs === 0) {
-    return sub?.answer?.trim() ? 15 : sub?.progressPercent ?? 0;
+    const skillScores = aggregateSkillScores(subs);
+    const recommendations = getSkillRecommendations(skillScores);
+
+    res.json({
+      skillScores,
+      recommendations,
+      submissionsEvaluated: subs.length,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
   }
-  const answered = (sub?.questionAnswers ?? []).filter((a) => a.answer?.trim()).length;
-  return Math.min(99, Math.round((answered / qs) * 90) + (sub?.questionsGenerated ? 10 : 0));
-}
-
-function mapActivityRow(sub) {
-  const act = sub.activity;
-  if (!act) return null;
-  const st = displayStatus(sub, act.dueAt);
-  return {
-    _id: act._id,
-    titulo: act.title,
-    descripcion: act.instructions || '',
-    dueAt: act.dueAt,
-    progreso: sub.status === 'submitted' ? 100 : calcProgress(sub),
-    status: sub.status,
-    displayStatus: st,
-    preguntasCount: sub.questions?.length ?? 0,
-    questionsGenerated: !!sub.questionsGenerated,
-    actualizada: sub.updatedAt,
-    score: sub.score,
-  };
-}
+});
 
 // GET /api/student/progress
 router.get('/progress', authRequired, requireRole('student', 'admin'), async (req, res) => {
   try {
     const subs = await Submission.find({ student: req.user._id })
-      .populate({ path: 'activity', select: 'title dueAt' })
+      .populate(ACTIVITY_POPULATE)
       .sort({ updatedAt: -1 })
       .lean();
 
@@ -77,6 +74,9 @@ router.get('/progress', authRequired, requireRole('student', 'admin'), async (re
       ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length)
       : null;
 
+    const submittedSubs = subs.filter((s) => s.status === 'submitted');
+    const skillScores = aggregateSkillScores(submittedSubs);
+
     res.json({
       totalActivities: rows.length,
       pending,
@@ -85,8 +85,11 @@ router.get('/progress', authRequired, requireRole('student', 'admin'), async (re
       overdue,
       avgProgress,
       avgScore,
+      skillScores,
+      skillRecommendations: getSkillRecommendations(skillScores),
       lastActivity: rows[0] || null,
       activities: rows,
+      groupedByArea: groupByArea(rows),
     });
   } catch (err) {
     console.error(err);
@@ -94,16 +97,24 @@ router.get('/progress', authRequired, requireRole('student', 'admin'), async (re
   }
 });
 
-// GET /api/student/activities
+// GET /api/student/activities?area=&status=&search=
 router.get('/activities', authRequired, requireRole('student', 'admin'), async (req, res) => {
   try {
     const subs = await Submission.find({ student: req.user._id })
-      .populate({ path: 'activity', select: 'title instructions dueAt createdAt' })
+      .populate(ACTIVITY_POPULATE)
       .sort({ updatedAt: -1 })
       .lean();
 
-    const activities = subs.map((s) => mapActivityRow(s)).filter(Boolean);
-    res.json({ activities });
+    const all = subs.map((s) => mapActivityRow(s)).filter(Boolean);
+    const activities = filterActivityRows(all, req.query);
+    const groupedByArea = groupByArea(activities);
+
+    res.json({
+      activities,
+      groupedByArea,
+      total: all.length,
+      filtered: activities.length,
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: err.message });
@@ -118,9 +129,7 @@ router.post('/activities/:id/generate-questions', authRequired, requireRole('stu
     if (denied) return res.status(denied.code).json({ error: denied.error });
 
     let sub = await Submission.findOne({ activity: act._id, student: req.user._id });
-    if (!sub) {
-      sub = await Submission.create({ activity: act._id, student: req.user._id });
-    }
+    if (!sub) sub = await Submission.create({ activity: act._id, student: req.user._id });
     if (sub.status === 'submitted') {
       return res.status(400).json({ error: 'La actividad ya fue entregada' });
     }
@@ -152,6 +161,8 @@ router.post('/activities/:id/generate-questions', authRequired, requireRole('stu
       isCorrect: '',
     }));
     sub.progressPercent = Math.max(sub.progressPercent, 15);
+    sub.currentStep = Math.max(sub.currentStep, 3);
+    sub.lastSavedAt = new Date();
     await sub.save();
 
     res.json({
@@ -177,7 +188,7 @@ router.post('/activities/:id/analyze', authRequired, requireRole('student', 'adm
     const aiAnalysis = await aiService.analyzeText(act.text);
     const sub = await Submission.findOneAndUpdate(
       { activity: act._id, student: req.user._id },
-      { $set: { aiAnalysis } },
+      { $set: { aiAnalysis, currentStep: 2, lastSavedAt: new Date() } },
       { upsert: true, new: true }
     );
     res.json({ ok: true, aiAnalysis: sub.aiAnalysis });
@@ -187,10 +198,10 @@ router.post('/activities/:id/analyze', authRequired, requireRole('student', 'adm
   }
 });
 
-// POST /api/student/activities/:id/save-draft
+// POST /api/student/activities/:id/save-draft (manual — compatible)
 router.post('/activities/:id/save-draft', authRequired, requireRole('student', 'admin'), async (req, res) => {
   try {
-    const { answers = [], answer = '' } = req.body || {};
+    const { answers = [], answer = '', currentStep } = req.body || {};
     const act = await Activity.findById(req.params.id).lean();
     const denied = assertAssigned(act, req.user._id);
     if (denied) return res.status(denied.code).json({ error: denied.error });
@@ -201,22 +212,37 @@ router.post('/activities/:id/save-draft', authRequired, requireRole('student', '
       return res.status(400).json({ error: 'La actividad ya fue entregada' });
     }
 
-    if (Array.isArray(answers) && answers.length > 0) {
-      sub.questionAnswers = answers.map((a, i) => ({
-        questionIndex: a.questionIndex ?? i,
-        answer: a.answer ?? '',
-        feedback: sub.questionAnswers?.[i]?.feedback || '',
-        isCorrect: sub.questionAnswers?.[i]?.isCorrect || '',
-      }));
-    }
-    if (answer) sub.answer = answer;
-    sub.progressPercent = calcProgress(sub);
-    sub.status = 'draft';
-    await sub.save();
-
-    res.json({ ok: true, progressPercent: sub.progressPercent });
+    await persistDraft(sub, { answers, answer, currentStep });
+    res.json({ ok: true, progressPercent: sub.progressPercent, lastSavedAt: sub.lastSavedAt });
   } catch (err) {
     console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /api/student/activities/:id/autosave
+router.post('/activities/:id/autosave', authRequired, requireRole('student', 'admin'), async (req, res) => {
+  try {
+    const { answers = [], answer = '', currentStep } = req.body || {};
+    const act = await Activity.findById(req.params.id).lean();
+    const denied = assertAssigned(act, req.user._id);
+    if (denied) return res.status(denied.code).json({ error: denied.error });
+
+    let sub = await Submission.findOne({ activity: act._id, student: req.user._id });
+    if (!sub) sub = await Submission.create({ activity: act._id, student: req.user._id });
+    if (sub.status === 'submitted') {
+      return res.status(400).json({ error: 'La actividad ya fue entregada' });
+    }
+
+    await persistDraft(sub, { answers, answer, currentStep });
+    res.json({
+      ok: true,
+      progressPercent: sub.progressPercent,
+      lastSavedAt: sub.lastSavedAt,
+      currentStep: sub.currentStep,
+    });
+  } catch (err) {
+    console.error('autosave:', err);
     res.status(500).json({ error: err.message });
   }
 });
@@ -272,6 +298,8 @@ router.post('/activities/:id/submit', authRequired, requireRole('student', 'admi
     sub.feedbackSummary = evaluation.summary || '';
     sub.recommendation = evaluation.recommendation || '';
     sub.motivation = evaluation.motivation || '';
+    sub.skillScores = computeSkillScores(sub.questions, sub.questionAnswers);
+
     if (Array.isArray(evaluation.items)) {
       evaluation.items.forEach((item) => {
         const idx = item.index;
@@ -283,16 +311,20 @@ router.post('/activities/:id/submit', authRequired, requireRole('student', 'admi
 
     sub.status = 'submitted';
     sub.progressPercent = 100;
+    sub.currentStep = 5;
+    sub.lastSavedAt = new Date();
     await sub.save();
 
     res.json({
       ok: true,
       status: sub.status,
       score: sub.score,
+      skillScores: sub.skillScores,
       feedbackSummary: sub.feedbackSummary,
       recommendation: sub.recommendation,
       motivation: sub.motivation,
       questionAnswers: sub.questionAnswers,
+      skillRecommendations: getSkillRecommendations(sub.skillScores),
     });
   } catch (err) {
     console.error('submit:', err);
@@ -303,28 +335,40 @@ router.post('/activities/:id/submit', authRequired, requireRole('student', 'admi
 // GET /api/student/activities/:id
 router.get('/activities/:id', authRequired, requireRole('student', 'admin'), async (req, res) => {
   try {
-    const act = await Activity.findById(req.params.id).lean();
+    const act = await Activity.findById(req.params.id)
+      .populate('createdBy', 'nombres apellidos')
+      .lean();
     const denied = assertAssigned(act, req.user._id);
     if (denied) return res.status(denied.code).json({ error: denied.error });
 
     const sub = await Submission.findOne({ activity: act._id, student: req.user._id }).lean();
     const display = displayStatus(sub, act.dueAt);
+    const teacher = act.createdBy;
 
     res.json({
       _id: act._id,
       title: act.title,
+      area: act.area || 'Comunicación',
+      topic: act.topic || '',
       instructions: act.instructions,
       text: act.text,
+      sourceType: act.sourceType || 'text',
+      originalFileName: act.originalFileName || '',
       dueAt: act.dueAt,
+      teacherName: teacher ? `${teacher.nombres || ''} ${teacher.apellidos || ''}`.trim() : '',
       progressPercent: sub?.status === 'submitted' ? 100 : calcProgress(sub),
       status: sub?.status ?? 'draft',
       displayStatus: display,
+      currentStep: sub?.currentStep ?? 1,
+      lastSavedAt: sub?.lastSavedAt,
       answer: sub?.answer ?? '',
       questions: sub?.questions ?? [],
       questionAnswers: sub?.questionAnswers ?? [],
       aiAnalysis: sub?.aiAnalysis ?? {},
       questionsGenerated: !!sub?.questionsGenerated,
       score: sub?.score,
+      skillScores: sub?.skillScores ?? {},
+      skillRecommendations: getSkillRecommendations(sub?.skillScores ?? {}),
       feedbackSummary: sub?.feedbackSummary ?? '',
       recommendation: sub?.recommendation ?? '',
       motivation: sub?.motivation ?? '',
@@ -346,13 +390,13 @@ router.post('/progress', authRequired, requireRole('student', 'admin'), async (r
 
   const sub = await Submission.findOneAndUpdate(
     { activity: activityId, student: req.user._id },
-    { $set: { answer, progressPercent: Math.max(0, Math.min(100, progressPercent)), status: 'draft' } },
+    { $set: { answer, progressPercent: Math.max(0, Math.min(100, progressPercent)), status: 'draft', lastSavedAt: new Date() } },
     { upsert: true, new: true }
   );
   res.json({ ok: true, progressPercent: sub.progressPercent });
 });
 
-// Legacy: POST /api/student/submit (compatibilidad tests/clientes antiguos)
+// Legacy: POST /api/student/submit
 router.post('/submit', authRequired, requireRole('student', 'admin'), async (req, res) => {
   const { activityId } = req.body || {};
   if (!activityId) return res.status(400).json({ error: 'activityId requerido' });
@@ -363,7 +407,7 @@ router.post('/submit', authRequired, requireRole('student', 'admin'), async (req
 
   const sub = await Submission.findOneAndUpdate(
     { activity: activityId, student: req.user._id },
-    { $set: { status: 'submitted', progressPercent: 100 } },
+    { $set: { status: 'submitted', progressPercent: 100, lastSavedAt: new Date() } },
     { upsert: true, new: true }
   );
   res.json({ ok: true, status: sub.status });

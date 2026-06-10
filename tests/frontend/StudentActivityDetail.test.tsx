@@ -50,7 +50,7 @@ describe('StudentActivityDetail page', () => {
 
     renderWithRoute();
 
-    expect(await screen.findByText('Lectura sobre sesgos')).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Lectura sobre sesgos' })).toBeInTheDocument();
     expect(screen.getByText('Texto de actividad.')).toBeInTheDocument();
     expect(screen.getByText(/¿Cuál es la idea principal?/)).toBeInTheDocument();
   });
@@ -68,7 +68,7 @@ describe('StudentActivityDetail page', () => {
       });
 
     renderWithRoute();
-    await screen.findByText('Lectura sobre sesgos');
+    await screen.findByRole('heading', { name: 'Lectura sobre sesgos' });
 
     const textareas = screen.getAllByRole('textbox');
     fireEvent.change(textareas[0], { target: { value: 'Mi respuesta...' } });
@@ -103,7 +103,7 @@ describe('StudentActivityDetail page', () => {
       });
 
     renderWithRoute();
-    await screen.findByText('Lectura sobre sesgos');
+    await screen.findByRole('heading', { name: 'Lectura sobre sesgos' });
 
     fireEvent.click(screen.getByRole('button', { name: /enviar actividad/i }));
 

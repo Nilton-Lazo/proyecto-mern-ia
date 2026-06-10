@@ -9,6 +9,7 @@ import Card from '../../components/ui/Card';
 import { STATUS_LABELS, STATUS_STYLES } from '../../utils/statusHelpers';
 import { formatDate } from '../../utils/formatDate';
 import Badge from '../../components/ui/Badge';
+import PageHeader from '../../components/ui/PageHeader';
 
 export default function StudentHome() {
   const { user, token } = useAuth();
@@ -34,21 +35,17 @@ export default function StudentHome() {
   const pending = data?.activities.filter((a) => a.displayStatus === 'pendiente' || a.displayStatus === 'en_progreso').slice(0, 3) ?? [];
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8">
-      <header className="mb-8">
-        <p className="text-xs font-medium uppercase tracking-wide text-indigo-600">
-          Panel del estudiante
-        </p>
-        <h1 className="mt-1 text-3xl font-bold text-slate-900">Hola, {firstName}</h1>
-        <p className="mt-2 max-w-2xl text-sm text-slate-600">
-          Bienvenido a tu espacio de aprendizaje con IA. Completa las lecturas asignadas por tus
-          docentes y practica comprensión lectora cuando quieras.
-        </p>
-      </header>
+    <div>
+      <PageHeader
+        badge="Panel del estudiante"
+        title={`Hola, ${firstName}`}
+        subtitle="Bienvenido a tu espacio de aprendizaje con IA. Completa las lecturas asignadas por tus docentes y practica comprensión lectora cuando quieras."
+        crumbs={[{ label: 'Inicio', to: '/student/home' }]}
+      />
 
       {loading && <LoadingState label="Cargando tu resumen…" />}
       {error && (
-        <p className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>
+        <p className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700 dark:bg-red-950/50 dark:text-red-300">{error}</p>
       )}
 
       {data && !loading && (
@@ -100,7 +97,7 @@ export default function StudentHome() {
             </Card>
 
             <Card title="Consejo de lectura" subtitle="Recomendación del tutor virtual">
-              <p className="text-sm text-slate-700">
+              <p className="text-sm text-slate-700 dark:text-slate-300">
                 Lee el texto completo antes de responder. Subraya ideas clave, formula preguntas
                 propias y usa la retroalimentación de IA para mejorar tu comprensión.
               </p>
@@ -112,7 +109,7 @@ export default function StudentHome() {
 
           <section className="mt-8">
             <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-slate-900">Actividades pendientes</h2>
+              <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Actividades pendientes</h2>
               <Link to="/student/activities" className="text-xs font-medium text-indigo-600 hover:underline">
                 Ver todas
               </Link>
@@ -125,10 +122,10 @@ export default function StudentHome() {
                   <Link
                     key={a._id}
                     to={`/student/activities/${a._id}`}
-                    className="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-100 transition hover:ring-indigo-200"
+                    className="app-card flex flex-wrap items-center justify-between gap-3 p-4 transition hover:ring-indigo-200 dark:hover:ring-indigo-800"
                   >
                     <div>
-                      <p className="font-medium text-slate-900">{a.titulo}</p>
+                      <p className="font-medium text-slate-900 dark:text-white">{a.titulo}</p>
                       <p className="text-xs text-slate-500">Vence: {formatDate(a.dueAt)}</p>
                     </div>
                     <Badge className={STATUS_STYLES[a.displayStatus]}>

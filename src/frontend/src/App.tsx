@@ -1,7 +1,10 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import Layout from "./components/Layout";
+import AuthRoute from "./components/AuthRoute";
 import Home from "./pages/Home";
 import Questions from "./pages/Questions";
+import HowItWorks from "./pages/HowItWorks";
+import Benefits from "./pages/Benefits";
 import Reports from "./pages/Reports";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -22,7 +25,16 @@ function App() {
       <Route path="/" element={<Layout />}>
         <Route index element={<Home />} />
         <Route path="questions" element={<Questions />} />
-        <Route path="reports" element={<Reports />} />
+        <Route path="como-funciona" element={<HowItWorks />} />
+        <Route path="beneficios" element={<Benefits />} />
+        <Route
+          path="reports"
+          element={
+            <AuthRoute>
+              <Reports />
+            </AuthRoute>
+          }
+        />
         <Route path="login" element={<Login />} />
         <Route path="register" element={<Register />} />
 

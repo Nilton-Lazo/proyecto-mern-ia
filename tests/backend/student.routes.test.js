@@ -92,6 +92,7 @@ describe('Rutas /api/student', () => {
     };
 
     Activity.findById.mockReturnValue({
+      populate: jest.fn().mockReturnThis(),
       lean: jest.fn().mockResolvedValue(fakeActivity),
     });
 
@@ -122,6 +123,7 @@ describe('Rutas /api/student', () => {
 
   test('GET /activities/:id responde 404 si la actividad no existe', async () => {
     Activity.findById.mockReturnValue({
+      populate: jest.fn().mockReturnThis(),
       lean: jest.fn().mockResolvedValue(null),
     });
 
@@ -138,6 +140,7 @@ describe('Rutas /api/student', () => {
     };
 
     Activity.findById.mockReturnValue({
+      populate: jest.fn().mockReturnThis(),
       lean: jest.fn().mockResolvedValue(fakeActivity),
     });
 
@@ -160,6 +163,80 @@ describe('Rutas /api/student', () => {
     expect(res.body).toEqual({ ok: true, progressPercent: 75 });
   });
 
+  test('POST /activities/:id/autosave guarda borrador', async () => {
+    const fakeActivity = { _id: 'a1', assignees: ['s1'] };
+    Activity.findById.mockReturnValue({
+      populate: jest.fn().mockReturnThis(),
+      lean: jest.fn().mockResolvedValue(fakeActivity),
+    });
+
+    const mockSub = {
+      status: 'draft',
+      questions: [{ questionText: 'Q1', type: 'literal' }],
+      questionAnswers: [{ questionIndex: 0, answer: 'parcial' }],
+      progressPercent: 0,
+      save: jest.fn().mockResolvedValue(true),
+    };
+    Submission.findOne.mockResolvedValue(mockSub);
+
+    const res = await request(app)
+      .post('/api/student/activities/a1/autosave')
+      .send({
+        answers: [{ questionIndex: 0, answer: 'Mi respuesta' }],
+        currentStep: 4,
+      });
+
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual(
+      expect.objectContaining({ ok: true, progressPercent: expect.any(Number) })
+    );
+    expect(mockSub.save).toHaveBeenCalled();
+  });
+
+  test('GET /activities filtra por área', async () => {
+    Submission.find.mockReturnValue({
+      populate: jest.fn().mockReturnThis(),
+      sort: jest.fn().mockReturnThis(),
+      lean: jest.fn().mockResolvedValue([
+        {
+          activity: {
+            _id: 'a1',
+            title: 'Lectura Com',
+            area: 'Comunicación',
+            topic: 'Narrativo',
+            dueAt: null,
+            createdAt: new Date(),
+            createdBy: { nombres: 'Luis', apellidos: 'P' },
+          },
+          progressPercent: 0,
+          status: 'draft',
+          updatedAt: new Date(),
+        },
+        {
+          activity: {
+            _id: 'a2',
+            title: 'Lectura Mat',
+            area: 'Matemática',
+            topic: 'Fracciones',
+            dueAt: null,
+            createdAt: new Date(),
+            createdBy: { nombres: 'Luis', apellidos: 'P' },
+          },
+          progressPercent: 50,
+          status: 'draft',
+          updatedAt: new Date(),
+        },
+      ]),
+    });
+
+    const res = await request(app).get('/api/student/activities?area=Matemática');
+
+    expect(res.status).toBe(200);
+    expect(res.body.activities).toHaveLength(1);
+    expect(res.body.activities[0].area).toBe('Matemática');
+    expect(res.body.groupedByArea).toBeDefined();
+  });
+
   test('POST /submit cambia estado a submitted', async () => {
     const fakeActivity = {
       _id: 'a1',
@@ -167,6 +244,7 @@ describe('Rutas /api/student', () => {
     };
 
     Activity.findById.mockReturnValue({
+      populate: jest.fn().mockReturnThis(),
       lean: jest.fn().mockResolvedValue(fakeActivity),
     });
 

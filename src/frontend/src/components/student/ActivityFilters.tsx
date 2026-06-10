@@ -1,8 +1,11 @@
+import { CURRICULAR_AREAS, AREA_FILTER_ALL } from '../../constants/curricularAreas';
 import type { ActivityFilter } from '../../utils/statusHelpers';
 
 type Props = {
   filter: ActivityFilter;
   onFilter: (f: ActivityFilter) => void;
+  areaFilter: string;
+  onAreaFilter: (a: string) => void;
   search: string;
   onSearch: (q: string) => void;
   counts: Record<string, number>;
@@ -16,9 +19,17 @@ const FILTERS: { id: ActivityFilter; label: string }[] = [
   { id: 'vencida', label: 'Vencidas' },
 ];
 
-export default function ActivityFilters({ filter, onFilter, search, onSearch, counts }: Props) {
+export default function ActivityFilters({
+  filter,
+  onFilter,
+  areaFilter,
+  onAreaFilter,
+  search,
+  onSearch,
+  counts,
+}: Props) {
   return (
-    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div className="space-y-3">
       <div className="flex flex-wrap gap-2">
         {FILTERS.map((f) => (
           <button
@@ -28,7 +39,7 @@ export default function ActivityFilters({ filter, onFilter, search, onSearch, co
             className={`rounded-full px-3 py-1.5 text-xs font-medium transition ${
               filter === f.id
                 ? 'bg-indigo-600 text-white shadow-sm'
-                : 'bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50'
+                : 'bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50 dark:bg-slate-800 dark:text-slate-300 dark:ring-slate-700 dark:hover:bg-slate-700'
             }`}
           >
             {f.label}
@@ -36,13 +47,28 @@ export default function ActivityFilters({ filter, onFilter, search, onSearch, co
           </button>
         ))}
       </div>
-      <input
-        type="search"
-        placeholder="Buscar por título…"
-        value={search}
-        onChange={(e) => onSearch(e.target.value)}
-        className="w-full rounded-xl border-0 bg-white px-3 py-2 text-sm text-slate-800 shadow-sm ring-1 ring-slate-200 placeholder:text-slate-400 focus:ring-2 focus:ring-indigo-400 sm:max-w-xs"
-      />
+
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <select
+          value={areaFilter}
+          onChange={(e) => onAreaFilter(e.target.value)}
+          className="app-input w-full text-sm sm:max-w-[220px]"
+        >
+          <option value={AREA_FILTER_ALL}>Todas las áreas</option>
+          {CURRICULAR_AREAS.map((a) => (
+            <option key={a} value={a}>
+              {a}
+            </option>
+          ))}
+        </select>
+        <input
+          type="search"
+          placeholder="Buscar por título, tema o docente…"
+          value={search}
+          onChange={(e) => onSearch(e.target.value)}
+          className="app-input w-full flex-1 text-sm"
+        />
+      </div>
     </div>
   );
 }

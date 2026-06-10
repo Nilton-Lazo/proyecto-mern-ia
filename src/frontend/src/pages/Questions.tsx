@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { Link } from "react-router-dom";
+import PageHeader from "../components/ui/PageHeader";
+import Button from "../components/ui/Button";
+import { Textarea } from "../components/ui/Input";
 
 export default function Questions() {
   const { token } = useAuth();
@@ -128,58 +131,38 @@ export default function Questions() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50/80">
-      <div className="mx-auto max-w-6xl px-4 pb-10 pt-6 lg:px-6">
-        {/* Migas + encabezado */}
-        <nav className="mb-3 flex items-center justify-between text-xs text-slate-500">
-          <div>
-            <span className="cursor-pointer hover:text-slate-700">Inicio</span>
-            <span className="mx-2">/</span>
-            <span className="font-medium text-slate-700">Preguntas</span>
-          </div>
-
-          {questions.length > 0 && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-slate-900/90 px-3 py-1 text-[11px] font-medium text-slate-50">
-              <span className="text-[10px]">●</span>
-              {questions.length} pregunta
-              {questions.length === 1 ? "" : "s"} generada
-            </span>
-          )}
-        </nav>
-
-        <header className="mb-6 flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <div className="inline-flex items-center gap-2 rounded-full bg-blue-50 px-3 py-1 text-[11px] font-medium text-blue-700 ring-1 ring-blue-100">
-              <span className="text-xs">📚</span>
-              Tutor virtual de lectura crítica
-            </div>
-            <h1 className="mt-3 text-2xl font-semibold tracking-tight text-slate-900 md:text-3xl">
-              Generador de preguntas y retroalimentación
-            </h1>
-            <p className="mt-1 max-w-xl text-sm text-slate-600">
-              Pega un fragmento del texto, obtén preguntas automáticas, identifica sesgos
-              argumentativos y recibe retroalimentación inmediata sobre tus respuestas.
-            </p>
-          </div>
-
-          <div className="rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-sky-500 px-4 py-3 text-xs text-slate-50 shadow-sm">
-            <p className="font-semibold">Consejo rápido</p>
-            <p className="mt-1">
-              Usa entre 2 y 5 párrafos y evita listas de viñetas para obtener mejores
-              resultados de IA.
-            </p>
-          </div>
-        </header>
+    <div className="pb-4">
+        <PageHeader
+          badge="📚 Tutor virtual de lectura crítica"
+          title="Generador de preguntas y retroalimentación"
+          subtitle="Pega un fragmento del texto, obtén preguntas automáticas, identifica sesgos argumentativos y recibe retroalimentación inmediata."
+          crumbs={[{ label: "Inicio", to: "/" }, { label: "Preguntas" }]}
+          action={
+            questions.length > 0 ? (
+              <span className="inline-flex items-center gap-1 rounded-full bg-slate-900/90 px-3 py-1 text-[11px] font-medium text-slate-50 dark:bg-indigo-600">
+                <span className="text-[10px]">●</span>
+                {questions.length} pregunta{questions.length === 1 ? "" : "s"} generada
+              </span>
+            ) : (
+              <div className="max-w-xs rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-sky-500 px-4 py-3 text-xs text-white shadow-sm">
+                <p className="font-semibold">Consejo rápido</p>
+                <p className="mt-1 opacity-90">
+                  Usa entre 2 y 5 párrafos y evita listas de viñetas para mejores resultados.
+                </p>
+              </div>
+            )
+          }
+        />
 
         <div className="grid gap-6 lg:grid-cols-[1.55fr_1fr]">
           {/* Columna izquierda */}
-          <section className="relative rounded-3xl border border-slate-100 bg-white/90 p-5 shadow-sm backdrop-blur-sm lg:p-6">
-            <div className="flex items-center justify-between gap-3 border-b border-slate-100 pb-4">
+          <section className="app-panel relative p-5 lg:p-6">
+            <div className="flex items-center justify-between gap-3 border-b border-slate-100 pb-4 dark:border-slate-800">
               <div>
-                <p className="text-sm font-semibold text-slate-900">
+                <p className="text-sm font-semibold text-slate-900 dark:text-white">
                   1) Ingresar texto a analizar
                 </p>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-slate-500 dark:text-slate-400">
                   Copia un fragmento de tu lectura. Puedes editarlo antes de generar
                   preguntas.
                 </p>
@@ -190,16 +173,16 @@ export default function Questions() {
             </div>
 
             <form onSubmit={handleSubmit} className="mt-4 space-y-4">
-              <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50/60 p-3">
-                <textarea
-                  className="h-52 w-full resize-none rounded-xl bg-white/90 p-3 text-sm text-slate-800 outline-none ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-400/70"
+              <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50/60 p-3 dark:border-slate-700 dark:bg-slate-900/40">
+                <Textarea
+                  className="h-52 ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-400/70 dark:ring-slate-700"
                   placeholder="Escribe o pega aquí el texto a analizar…"
                   value={text}
                   onChange={(
                     e: React.ChangeEvent<HTMLTextAreaElement>
                   ) => setText(e.target.value)}
                 />
-                <div className="mt-2 flex items-center justify-between text-[11px] text-slate-500">
+                <div className="mt-2 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
                   <span>
                     Tip: evita listas de viñetas; usa texto continuo y párrafos completos.
                   </span>
@@ -216,19 +199,10 @@ export default function Questions() {
                   Al generar preguntas también se analizarán posibles sesgos en el
                   fragmento.
                 </p>
-                <button
-                  type="submit"
-                  disabled={loading || !text.trim()}
-                  className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 hover:shadow disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-50"
-                >
-                  {loading && (
-                    <span className="inline-flex h-4 w-4 items-center justify-center">
-                      <span className="h-3 w-3 animate-spin rounded-full border-[2px] border-white/70 border-t-transparent" />
-                    </span>
-                  )}
+                <Button type="submit" disabled={!text.trim()} loading={loading}>
                   <span className="text-base leading-none">↗</span>
                   {loading ? "Generando…" : "Generar preguntas"}
-                </button>
+                </Button>
               </div>
             </form>
 
@@ -236,10 +210,10 @@ export default function Questions() {
             <div className="mt-6 space-y-3">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="text-sm font-semibold text-slate-900">
+                  <h2 className="text-sm font-semibold text-slate-900 dark:text-white">
                     2) Responde las preguntas generadas
                   </h2>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
                     Escribe tus respuestas y solicita retroalimentación para cada una.
                   </p>
                 </div>
@@ -253,8 +227,8 @@ export default function Questions() {
               </div>
 
               {questions.length === 0 && !loading && (
-                <div className="mt-3 rounded-2xl border border-dashed border-slate-200 bg-slate-50/70 p-4 text-xs text-slate-500">
-                  <p className="font-medium text-slate-700">Aún no hay preguntas.</p>
+                <div className="mt-3 rounded-2xl border border-dashed border-slate-200 bg-slate-50/70 p-4 text-xs text-slate-500 dark:border-slate-700 dark:bg-slate-900/40 dark:text-slate-400">
+                  <p className="font-medium text-slate-700 dark:text-slate-300">Aún no hay preguntas.</p>
                   <p className="mt-1">
                     Genera tu primer conjunto pegando un texto y haciendo clic en{" "}
                     <span className="font-semibold">“Generar preguntas”.</span> Luego
@@ -268,17 +242,17 @@ export default function Questions() {
                   {questions.map((q, i) => (
                     <article
                       key={i}
-                      className="rounded-2xl border border-slate-100 bg-slate-50/70 p-4 shadow-sm"
+                      className="rounded-2xl border border-slate-100 bg-slate-50/70 p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900/50"
                     >
                       <div className="flex items-start gap-3">
                         <div className="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full bg-blue-600 text-xs font-semibold text-white">
                           {i + 1}
                         </div>
                         <div className="flex-1">
-                          <p className="text-sm font-medium text-slate-900">{q}</p>
+                          <p className="text-sm font-medium text-slate-900 dark:text-white">{q}</p>
 
-                          <textarea
-                            className="mt-3 w-full resize-none rounded-xl bg-white p-3 text-sm text-slate-800 outline-none ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-400/70"
+                          <Textarea
+                            className="mt-3 ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-400/70 dark:ring-slate-700"
                             rows={3}
                             placeholder="Escribe tu respuesta…"
                             value={answers[i] || ""}
@@ -315,7 +289,7 @@ export default function Questions() {
                           </div>
 
                           {feedbacks[i] && (
-                            <div className="mt-3 rounded-xl bg-blue-50/80 p-3 text-xs text-blue-800 ring-1 ring-blue-100">
+                            <div className="mt-3 rounded-xl bg-blue-50/80 p-3 text-xs text-blue-800 ring-1 ring-blue-100 dark:bg-blue-950/40 dark:text-blue-200 dark:ring-blue-900">
                               <p className="font-semibold mb-1">
                                 Comentario de la IA
                               </p>
@@ -334,9 +308,9 @@ export default function Questions() {
           {/* Columna derecha: HU07 Sesgos + guía */}
           <aside className="space-y-4 lg:space-y-6">
             {/* Sesgos */}
-            <div className="rounded-3xl border border-slate-100 bg-white/90 p-5 shadow-sm backdrop-blur-sm">
+            <div className="app-panel p-5">
               <div className="flex items-center justify-between gap-2">
-                <h3 className="text-sm font-semibold text-slate-900">
+                <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
                   3) Sesgos detectados en el texto
                 </h3>
                 <span className="rounded-full bg-slate-900/5 px-2 py-0.5 text-[11px] text-slate-600">
@@ -346,7 +320,7 @@ export default function Questions() {
 
               {/* Estado vacío / mensaje */}
               {!biases.length && !biasMsg && (
-                <p className="mt-3 text-sm text-slate-500">
+                <p className="mt-3 text-sm text-slate-500 dark:text-slate-400">
                   Genera preguntas para analizar el texto y detectar posibles sesgos
                   argumentativos.
                 </p>
@@ -369,8 +343,8 @@ export default function Questions() {
                 </div>
               )}
 
-              <div className="mt-4 rounded-2xl bg-slate-50 p-3 text-[11px] text-slate-600">
-                <p className="font-semibold text-slate-800">
+              <div className="mt-4 rounded-2xl bg-slate-50 p-3 text-[11px] text-slate-600 dark:bg-slate-800/50 dark:text-slate-400">
+                <p className="font-semibold text-slate-800 dark:text-slate-200">
                   ¿Cómo se interpretan estas etiquetas?
                 </p>
                 <p className="mt-1">
@@ -383,7 +357,7 @@ export default function Questions() {
             </div>
 
             {/* Guía rápida */}
-            <div className="rounded-3xl border border-slate-100 bg-gradient-to-b from-slate-900 via-slate-900 to-slate-800 p-5 text-slate-50 shadow-sm">
+            <div className="rounded-3xl bg-gradient-to-b from-slate-900 via-slate-900 to-slate-800 p-5 text-slate-50 shadow-sm ring-1 ring-slate-800 dark:from-indigo-950 dark:via-slate-900 dark:to-slate-950">
               <p className="text-sm font-semibold">Guía rápida para responder</p>
               <ul className="mt-3 space-y-1.5 text-xs">
                 <li>• Lee el texto completo antes de responder.</li>
@@ -393,24 +367,23 @@ export default function Questions() {
               </ul>
 
               <Link
-                to="/reports"
+                to="/login"
                 className="mt-4 inline-flex items-center gap-1 text-xs font-medium text-sky-300 hover:text-sky-200"
               >
-                Ver reportes y progreso →
+                Inicia sesión para ver tu progreso →
               </Link>
             </div>
           </aside>
         </div>
-      </div>
 
       {/* Modal: requiere login */}
       {needLogin && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-md rounded-3xl bg-white p-6 shadow-xl">
-            <h3 className="text-lg font-semibold text-slate-900">
+          <div className="app-card w-full max-w-md rounded-3xl p-6 shadow-xl">
+            <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
               Necesitas iniciar sesión
             </h3>
-            <p className="mt-2 text-sm text-slate-600">
+            <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
               Para generar preguntas debes iniciar sesión o crear una cuenta. Esto nos
               permite guardar tu progreso y tus reportes.
             </p>
@@ -431,7 +404,7 @@ export default function Questions() {
               </Link>
             </div>
             <button
-              className="mt-4 w-full text-center text-xs font-medium text-slate-500 hover:text-slate-700"
+              className="mt-4 w-full text-center text-xs font-medium text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
               onClick={() => setNeedLogin(false)}
             >
               Cancelar

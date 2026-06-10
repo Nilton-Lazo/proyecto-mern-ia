@@ -53,6 +53,24 @@ describe('Rutas /api/teacher', () => {
     jest.clearAllMocks();
   });
 
+  test('GET /students filtra por búsqueda', async () => {
+    User.find.mockReturnValue({
+      select: jest.fn().mockReturnThis(),
+      sort: jest.fn().mockReturnThis(),
+      lean: jest.fn().mockResolvedValue([
+        { _id: 's1', nombres: 'Ana', apellidos: 'Pérez', email: 'ana@example.com' },
+      ]),
+    });
+
+    const res = await request(app).get('/api/teacher/students?search=ana');
+
+    expect(res.status).toBe(200);
+    expect(User.find).toHaveBeenCalledWith(
+      expect.objectContaining({ role: 'student', $or: expect.any(Array) })
+    );
+    expect(res.body.students).toHaveLength(1);
+  });
+
   test('GET /students devuelve lista de estudiantes', async () => {
     // simulamos el chain: find().select().sort().lean()
     User.find.mockReturnValue({
@@ -101,10 +119,13 @@ describe('Rutas /api/teacher', () => {
 
     const payload = {
       title: 'Lectura 1',
+      area: 'Ciencia y Tecnología',
+      topic: 'Cambio climático',
       instructions: 'Lee y responde',
       text: 'Texto de prueba',
       dueAt: null,
       assignees: ['s1', 's2'],
+      sourceType: 'text',
     };
 
     const res = await request(app)
@@ -115,9 +136,11 @@ describe('Rutas /api/teacher', () => {
     expect(Activity.create).toHaveBeenCalledWith(
       expect.objectContaining({
         title: 'Lectura 1',
+        area: 'Ciencia y Tecnología',
+        topic: 'Cambio climático',
         text: 'Texto de prueba',
         assignees: ['s1', 's2'],
-        createdBy: 't1', // viene del auth mock
+        createdBy: 't1',
       })
     );
     expect(Submission.insertMany).toHaveBeenCalled();

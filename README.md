@@ -434,6 +434,22 @@ El servicio de pruebas usa mocks definidos en jest.setup.js.
 
 ---
 
+## 🎯 Diferenciador educativo de la plataforma
+
+Esta plataforma no reemplaza al docente ni funciona como un chat genérico. A diferencia de usar ChatGPT directamente, el sistema organiza las lecturas por **áreas curriculares**, asigna actividades a estudiantes específicos, guarda el **progreso individual**, genera preguntas clasificadas por **habilidad lectora**, brinda **retroalimentación formativa** y permite **trazabilidad académica** mediante reportes. Esto convierte la IA en una herramienta de acompañamiento pedagógico, no solo en un generador de respuestas.
+
+- El docente controla qué lectura se asigna (texto, Markdown o PDF).
+- El estudiante trabaja dentro de una **ruta guiada**: lectura → análisis IA → preguntas → respuestas → retroalimentación.
+- El avance se **guarda automáticamente** (autosave cada ~8 s y al salir de la actividad).
+- La retroalimentación queda registrada como evidencia de aprendizaje.
+- El progreso se mide por habilidades en el **Mapa de mejora lectora** (literal, inferencial, crítico, vocabulario, idea principal).
+- El docente puede revisar avances por estudiante, área y estado.
+
+### Áreas curriculares soportadas
+Comunicación, Matemática, Ciencia y Tecnología, Personal Social, Arte y Cultura, Inglés, Educación Religiosa, Tutoría, Otro.
+
+---
+
 ## 🎓 Flujo del estudiante con IA
 
 ### Dashboard (`/student/home`)
@@ -447,13 +463,21 @@ Resumen personalizado: actividades pendientes, progreso promedio, acceso rápido
 | **Progreso** | `/student/progress` | Vista resumida del avance en actividades asignadas. |
 | **Reportes** | `/reports` | Historial detallado y métricas globales de respuestas. |
 
+### Endpoints docente
+- `GET /api/teacher/students?search=` — lista estudiantes con búsqueda
+- `POST /api/teacher/extract-pdf` — extrae texto de PDF (máx. 5 MB)
+- `POST /api/teacher/activities` — crea actividad con área, tema y asignados
+
 ### Endpoints estudiante
-- `GET /api/student/activities` — lista asignada
-- `GET /api/student/activities/:id` — detalle con preguntas y análisis IA
-- `POST /api/student/activities/:id/generate-questions` — genera preguntas tipadas (no duplica)
-- `POST /api/student/activities/:id/save-draft` — guarda respuestas parciales
-- `POST /api/student/activities/:id/submit` — evalúa con IA y marca entregada
+- `GET /api/student/activities?area=&status=&search=` — lista agrupable por área
+- `GET /api/student/activities/:id` — detalle con borrador, preguntas y análisis IA
+- `POST /api/student/activities/:id/analyze` — análisis de lectura con IA
+- `POST /api/student/activities/:id/generate-questions` — genera preguntas tipadas por habilidad
+- `POST /api/student/activities/:id/save-draft` — guarda borrador manual
+- `POST /api/student/activities/:id/autosave` — guardado automático de progreso
+- `POST /api/student/activities/:id/submit` — evalúa con IA, calcula skillScores y marca entregada
 - `GET /api/student/progress` — resumen de progreso
+- `GET /api/student/progress/skills` — mapa de mejora lectora agregado
 - `POST /api/ai/practice` — práctica libre (análisis + preguntas)
 
 ### Variables IA

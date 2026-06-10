@@ -6,6 +6,7 @@ type Props = {
   questions: ActivityQuestion[];
   answers: QuestionAnswer[];
   onAnswerChange: (index: number, value: string) => void;
+  onAnswerBlur?: () => void;
   onFeedback?: (index: number) => void;
   loadingFeedback?: number | null;
   readOnly?: boolean;
@@ -16,6 +17,7 @@ export default function QuestionList({
   questions,
   answers,
   onAnswerChange,
+  onAnswerBlur,
   onFeedback,
   loadingFeedback,
   readOnly,
@@ -62,6 +64,7 @@ export default function QuestionList({
                         value={ans}
                         disabled={readOnly}
                         onChange={(e) => onAnswerChange(globalIndex, e.target.value)}
+                        onBlur={onAnswerBlur}
                       />
                       {!readOnly && onFeedback && (
                         <button

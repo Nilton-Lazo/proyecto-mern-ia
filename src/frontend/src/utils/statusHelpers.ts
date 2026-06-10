@@ -8,10 +8,14 @@ export const STATUS_LABELS: Record<ActivityDisplayStatus, string> = {
 };
 
 export const STATUS_STYLES: Record<ActivityDisplayStatus, string> = {
-  pendiente: 'bg-slate-100 text-slate-700 border-slate-200',
-  en_progreso: 'bg-amber-50 text-amber-700 border-amber-100',
-  entregada: 'bg-emerald-50 text-emerald-700 border-emerald-100',
-  vencida: 'bg-red-50 text-red-700 border-red-100',
+  pendiente:
+    'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700',
+  en_progreso:
+    'bg-amber-50 text-amber-700 border-amber-100 dark:bg-amber-950/50 dark:text-amber-300 dark:border-amber-800',
+  entregada:
+    'bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-800',
+  vencida:
+    'bg-red-50 text-red-700 border-red-100 dark:bg-red-950/50 dark:text-red-300 dark:border-red-800',
 };
 
 export const QUESTION_TYPE_LABELS: Record<string, string> = {
@@ -24,18 +28,31 @@ export const QUESTION_TYPE_LABELS: Record<string, string> = {
 
 export type ActivityFilter = 'todas' | ActivityDisplayStatus;
 
-export function filterActivities<T extends { displayStatus?: ActivityDisplayStatus; titulo?: string }>(
-  items: T[],
-  filter: ActivityFilter,
-  search: string
-): T[] {
+export function filterActivities<
+  T extends {
+    displayStatus?: ActivityDisplayStatus;
+    titulo?: string;
+    tema?: string;
+    docente?: string;
+    area?: string;
+  },
+>(items: T[], filter: ActivityFilter, search: string, area?: string): T[] {
   let result = items;
   if (filter !== 'todas') {
     result = result.filter((i) => i.displayStatus === filter);
   }
+  if (area && area !== 'todas') {
+    result = result.filter((i) => i.area === area);
+  }
   const q = search.trim().toLowerCase();
   if (q) {
-    result = result.filter((i) => (i.titulo || '').toLowerCase().includes(q));
+    result = result.filter(
+      (i) =>
+        (i.titulo || '').toLowerCase().includes(q) ||
+        (i.tema || '').toLowerCase().includes(q) ||
+        (i.docente || '').toLowerCase().includes(q) ||
+        (i.area || '').toLowerCase().includes(q)
+    );
   }
   return result;
 }

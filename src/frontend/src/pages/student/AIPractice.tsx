@@ -7,6 +7,9 @@ import AIAnalysisPanel from '../../components/student/AIAnalysisPanel';
 import QuestionList from '../../components/student/QuestionList';
 import Card from '../../components/ui/Card';
 import EmptyState from '../../components/ui/EmptyState';
+import PageHeader from '../../components/ui/PageHeader';
+import Button from '../../components/ui/Button';
+import { Textarea } from '../../components/ui/Input';
 
 export default function AIPractice() {
   const { token } = useAuth();
@@ -88,44 +91,33 @@ export default function AIPractice() {
   };
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8">
-      <nav className="mb-3 text-xs text-slate-500">
-        <Link to="/student/home" className="hover:text-slate-700">Inicio</Link>
-        <span className="mx-2">/</span>
-        <span className="text-slate-700">Práctica con IA</span>
-      </nav>
-
-      <header className="mb-8">
-        <span className="inline-flex rounded-full bg-indigo-50 px-3 py-1 text-xs font-medium text-indigo-700">
-          Práctica libre
-        </span>
-        <h1 className="mt-3 text-2xl font-bold text-slate-900 md:text-3xl">Práctica con IA</h1>
-        <p className="mt-2 max-w-2xl text-sm text-slate-600">
-          Pega un texto, genera preguntas y mejora tu comprensión lectora con apoyo de inteligencia
-          artificial. Esta práctica es independiente de las actividades asignadas por tu docente.
-        </p>
-      </header>
+    <div>
+      <PageHeader
+        badge="Práctica libre"
+        title="Práctica con IA"
+        subtitle="Pega un texto, genera preguntas y mejora tu comprensión lectora con apoyo de inteligencia artificial."
+        crumbs={[
+          { label: 'Inicio', to: '/student/home' },
+          { label: 'Práctica con IA' },
+        ]}
+      />
 
       <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
         <Card title="Ingresa tu texto" subtitle="Pega cualquier fragmento para practicar">
           <form onSubmit={handleAnalyze} className="space-y-4">
-            <textarea
-              className="h-52 w-full resize-none rounded-xl border-0 bg-slate-50 p-4 text-sm text-slate-800 ring-1 ring-slate-200 focus:ring-2 focus:ring-indigo-400"
+            <Textarea
+              className="h-52 bg-slate-50 dark:bg-slate-900/50"
               placeholder="Escribe o pega aquí el texto que deseas analizar…"
               value={text}
               onChange={(e) => setText(e.target.value)}
             />
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <span className="text-xs text-slate-500">
+              <span className="text-xs text-slate-500 dark:text-slate-400">
                 {text.length > 0 ? `${text.length} caracteres` : 'Sin texto aún'}
               </span>
-              <button
-                type="submit"
-                disabled={loading || !text.trim()}
-                className="rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-50"
-              >
+              <Button type="submit" disabled={!text.trim()} loading={loading}>
                 {loading ? 'Analizando…' : 'Analizar y generar preguntas'}
-              </button>
+              </Button>
             </div>
           </form>
 

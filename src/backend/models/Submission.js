@@ -27,6 +27,14 @@ const AiAnalysisSchema = new Schema({
   readingTip: { type: String, default: '' },
 }, { _id: false });
 
+const SkillScoresSchema = new Schema({
+  literal: { type: Number, default: null },
+  inferential: { type: Number, default: null },
+  critical: { type: Number, default: null },
+  vocabulary: { type: Number, default: null },
+  main_idea: { type: Number, default: null },
+}, { _id: false });
+
 const SubmissionSchema = new Schema({
   activity: { type: Types.ObjectId, ref: 'Activity', required: true },
   student: { type: Types.ObjectId, ref: 'User', required: true },
@@ -38,7 +46,11 @@ const SubmissionSchema = new Schema({
   questionsGenerated: { type: Boolean, default: false },
 
   progressPercent: { type: Number, default: 0 },
+  currentStep: { type: Number, default: 1 },
+  lastSavedAt: { type: Date, default: null },
+
   score: { type: Number, default: null },
+  skillScores: { type: SkillScoresSchema, default: () => ({}) },
   feedbackSummary: { type: String, default: '' },
   recommendation: { type: String, default: '' },
   motivation: { type: String, default: '' },

@@ -23,6 +23,20 @@ class ResizeObserver {
 
 global.ResizeObserver = global.ResizeObserver || ResizeObserver;
 
+// Mock de IntersectionObserver (scroll reveal en landing/auth)
+class IntersectionObserver {
+  constructor(cb) {
+    this.cb = cb;
+  }
+  observe(el) {
+    this.cb([{ isIntersecting: true, target: el }]);
+  }
+  unobserve() {}
+  disconnect() {}
+}
+
+global.IntersectionObserver = global.IntersectionObserver || IntersectionObserver;
+
 globalThis.importMetaEnv = {
   VITE_API_URL: "http://localhost:3000"
 };

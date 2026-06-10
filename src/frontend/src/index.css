@@ -1,2 +1,154 @@
-
 @import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ── Design tokens ── */
+:root {
+  color-scheme: light;
+  --app-bg: #f8fafc;
+  --app-surface: #ffffff;
+  --app-border: #e2e8f0;
+  --app-text: #0f172a;
+  --app-muted: #64748b;
+}
+
+.dark {
+  color-scheme: dark;
+  --app-bg: #0b1120;
+  --app-surface: #111827;
+  --app-border: #1e293b;
+  --app-text: #f1f5f9;
+  --app-muted: #94a3b8;
+}
+
+body {
+  background-color: var(--app-bg);
+  color: var(--app-text);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* ── Reusable surfaces ── */
+.app-card {
+  @apply rounded-2xl bg-white shadow-sm ring-1 ring-slate-100 dark:bg-slate-900/90 dark:ring-slate-800;
+}
+
+.app-panel {
+  @apply rounded-3xl border border-slate-100 bg-white/90 shadow-sm backdrop-blur-sm dark:border-slate-800 dark:bg-slate-900/80;
+}
+
+.app-input {
+  @apply w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-indigo-400;
+}
+
+.app-muted {
+  @apply text-slate-600 dark:text-slate-300;
+}
+
+.app-heading {
+  @apply text-slate-900 dark:text-white;
+}
+
+.app-label {
+  @apply text-sm font-medium text-slate-800 dark:text-slate-200;
+}
+
+.app-breadcrumb {
+  @apply text-xs text-slate-500 dark:text-slate-400;
+}
+
+.app-breadcrumb-active {
+  @apply font-medium text-slate-700 dark:text-slate-200;
+}
+
+/* Mejor contraste en modo oscuro para textos secundarios */
+.dark .text-slate-500 {
+  color: #94a3b8;
+}
+
+.dark .text-slate-600 {
+  color: #cbd5e1;
+}
+
+/* ── Scroll reveal (estilo Apple) ── */
+.scroll-reveal {
+  opacity: 0;
+  transition:
+    opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+
+.scroll-reveal-up {
+  transform: translateY(48px);
+}
+
+.scroll-reveal-center {
+  transform: translateY(32px) scale(0.96);
+}
+
+.scroll-reveal-scale {
+  transform: scale(0.92);
+}
+
+.scroll-reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+/* Hero parallax suave */
+.hero-glow {
+  animation: hero-pulse 8s ease-in-out infinite alternate;
+}
+
+@keyframes hero-pulse {
+  0% { opacity: 0.5; transform: scale(1); }
+  100% { opacity: 0.85; transform: scale(1.08); }
+}
+
+/* Texto gradiente animado */
+.text-gradient-animate {
+  background-size: 200% auto;
+  animation: gradient-shift 6s ease infinite;
+}
+
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% center; }
+  50% { background-position: 100% center; }
+}
+
+/* Floating icons */
+.float-slow {
+  animation: float-y 6s ease-in-out infinite;
+}
+
+.float-delay {
+  animation: float-y 6s ease-in-out 2s infinite;
+}
+
+@keyframes float-y {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+/* Video play pulse */
+.play-pulse {
+  animation: play-ring 2.5s ease-out infinite;
+}
+
+@keyframes play-ring {
+  0% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.45); }
+  70% { box-shadow: 0 0 0 18px rgba(99, 102, 241, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
+}
+
+/* Sticky section backgrounds */
+.landing-section-dark {
+  background: linear-gradient(180deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+}
+
+.landing-mesh {
+  background-image:
+    radial-gradient(at 20% 30%, rgba(99, 102, 241, 0.25) 0, transparent 50%),
+    radial-gradient(at 80% 20%, rgba(56, 189, 248, 0.2) 0, transparent 45%),
+    radial-gradient(at 50% 80%, rgba(129, 140, 248, 0.15) 0, transparent 50%);
+}

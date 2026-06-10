@@ -41,7 +41,7 @@ describe('Login page', () => {
 
     renderLogin();
 
-    fireEvent.change(screen.getByPlaceholderText('Correo'), {
+    fireEvent.change(screen.getByPlaceholderText('Correo electrónico'), {
       target: { value: 'joel@gmail.com' },
     });
     fireEvent.change(screen.getByPlaceholderText('Contraseña'), {
@@ -61,7 +61,7 @@ describe('Login page', () => {
 
     renderLogin();
 
-    fireEvent.change(screen.getByPlaceholderText('Correo'), {
+    fireEvent.change(screen.getByPlaceholderText('Correo electrónico'), {
       target: { value: 'bad@mail.com' },
     });
     fireEvent.change(screen.getByPlaceholderText('Contraseña'), {
