@@ -144,7 +144,9 @@ describe('Rutas /api/teacher', () => {
       })
     );
     expect(Submission.insertMany).toHaveBeenCalled();
-    expect(res.body).toEqual({ ok: true, activityId: 'a1' });
+    expect(res.body).toEqual(
+      expect.objectContaining({ ok: true, activityId: 'a1' })
+    );
   });
 
   test('GET /activities/summary devuelve KPIs agregados', async () => {

@@ -357,6 +357,8 @@ Documentación completa: **[tests/README.md](tests/README.md)**
 | Postman / Newman | `pnpm test:postman` | — |
 | **Pipeline completo** | `pnpm test:all` | — |
 
+**CI/CD (GitHub Actions):** en cada push/PR a `main`, `master` o `rama-steven` se ejecuta el workflow [`.github/workflows/ci.yml`](.github/workflows/ci.yml). Guía completa: **[docs/CI_CD_GUIDE.md](docs/CI_CD_GUIDE.md)**.
+
 Abrir coverage en macOS: `pnpm coverage:open:unit-backend` (etc.)
 
 Meta: ≥70% cobertura (objetivo >90%).
@@ -466,6 +468,7 @@ Ver **[tests/README.md](tests/README.md)** para comandos y rutas de coverage HTM
 
 ## 📂 Documentación
 📄 `README.md` con información del proyecto y del equipo.  
+📄 **[docs/CI_CD_GUIDE.md](docs/CI_CD_GUIDE.md)** — pipeline CI/CD con GitHub Actions.  
 📊 Diagramas de arquitectura (UML, flujo de datos, contenedores).  
 📝 Informe técnico final con decisiones de diseño, IA, automatización e impacto ambiental.  
 

@@ -20,7 +20,13 @@ app.use('/api/auth', authRouter);
 let hashValido;
 
 beforeAll(async () => {
-  // Hash real de la contraseña "password-valida"
+  // Simula MongoDB conectado (auth.js verifica readyState === 1)
+  const mongoose = require('mongoose');
+  Object.defineProperty(mongoose.connection, 'readyState', {
+    get: () => 1,
+    configurable: true,
+  });
+
   hashValido = await bcrypt.hash('password-valida', 10);
 });
 

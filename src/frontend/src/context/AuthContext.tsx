@@ -5,6 +5,7 @@ export type User = {
   id: string;
   email: string;
   nombres: string;
+  apellidos?: string;
   role: 'student' | 'teacher' | 'admin';
 };
 

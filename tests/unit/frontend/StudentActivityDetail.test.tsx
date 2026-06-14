@@ -74,7 +74,7 @@ describe('StudentActivityDetail page', () => {
     fireEvent.change(textareas[0], { target: { value: 'Mi respuesta...' } });
     fireEvent.click(screen.getByRole('button', { name: /guardar borrador/i }));
 
-    expect(await screen.findByText(/Borrador guardado/)).toBeInTheDocument();
+    expect(await screen.findByText(/Borrador guardado \(60%\)/)).toBeInTheDocument();
   });
 
   test('permite enviar actividad', async () => {

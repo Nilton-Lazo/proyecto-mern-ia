@@ -3,7 +3,7 @@ module.exports = {
   displayName: 'integration-api',
   testEnvironment: 'node',
   roots: ['<rootDir>/tests/integration/api'],
-  setupFilesAfterEnv: ['<rootDir>/tests/support/jest.setup.js'],
+  setupFilesAfterEnv: ['<rootDir>/tests/support/jest.integration.api.setup.js'],
   collectCoverageFrom: [
     'src/backend/routes/**/*.js',
     'src/backend/middlewares/**/*.js',

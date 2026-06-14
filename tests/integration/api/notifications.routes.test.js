@@ -1,6 +1,5 @@
 const request = require('supertest');
 const express = require('express');
-const mongoose = require('mongoose');
 
 const mockInsertMany = jest.fn();
 const mockFindOne = jest.fn();
@@ -45,11 +44,11 @@ describe('Rutas /api/notifications', () => {
   describe('POST /bulk', () => {
     const validPayload = {
       event: 'activity_assigned',
-      activityId: new mongoose.Types.ObjectId().toString(),
+      activityId: '674000000000000000000001',
       title: 'Nueva actividad asignada: Prueba',
       message: 'Área: Comunicación | Fecha límite: 2026-06-20',
       students: [
-        { id: new mongoose.Types.ObjectId().toString(), name: 'Ana', email: 'ana@test.com' },
+        { id: '674000000000000000000002', name: 'Ana', email: 'ana@test.com' },
       ],
     };
 

@@ -1,52 +1,169 @@
-name: CI
+# CI — Tutor Virtual MERN IA
+# Valida backend, frontend y cobertura en cada push/PR a ramas principales.
+# CD (despliegue) queda documentado en docs/CI_CD_GUIDE.md — no se ejecuta aquí.
+
+name: CI - Tutor Virtual MERN IA
 
 on:
   push:
-    branches: [main, rama-steven]
+    branches: [main, master, rama-steven]
   pull_request:
-    branches: [main]
+    branches: [main, master, rama-steven]
 
 permissions:
   contents: read
 
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  unit-and-integration:
+  backend:
+    name: Backend — tests y sintaxis
     runs-on: ubuntu-latest
     env:
       NODE_ENV: test
-      JWT_SECRET: test-secret
-      VITE_API_URL: http://localhost:3000
+      PORT: 3000
+      JWT_SECRET: test_secret
+      JWT_EXPIRES: 7d
+      MONGODB_URI: mongodb://127.0.0.1:27017/tutor_virtual_test
+      OLLAMA_HOST: http://127.0.0.1:11434
+      OLLAMA_MODEL: llama3:8b
+      N8N_BASE_URL: http://localhost:5678
+      N8N_ACTIVITY_ASSIGNED_WEBHOOK_URL: http://localhost:5678/webhook/activity-assigned
+      N8N_INTERNAL_API_KEY: change_me
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: 20
-
-      - name: Enable pnpm
-        run: |
-          corepack enable
-          corepack prepare pnpm@9 --activate
+          cache: pnpm
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Syntax check — backend entrypoint
+        run: node --check src/backend/index.js
+
       - name: Unit tests — backend
         run: pnpm test:unit:backend
+
+      - name: Integration tests — API (Supertest)
+        run: pnpm test:integration:api
+
+      - name: Upload backend coverage
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-backend
+          path: |
+            coverage/unit-backend/
+            coverage/integration-api/
+          if-no-files-found: ignore
+
+  frontend:
+    name: Frontend — lint, tests y build
+    runs-on: ubuntu-latest
+    env:
+      VITE_API_URL: http://localhost:3000/api
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint — frontend
+        run: pnpm --filter frontend run lint
 
       - name: Unit tests — frontend
         run: pnpm test:unit:frontend
 
-      - name: Integration tests — API
-        run: pnpm test:integration:api
-
       - name: Integration tests — frontend (MSW)
         run: pnpm test:integration:frontend
 
-      - name: Upload coverage artifacts
+      - name: Build — frontend
+        run: pnpm build:frontend
+
+      - name: Upload frontend coverage
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: coverage-reports
-          path: coverage/
+          name: coverage-frontend
+          path: |
+            coverage/unit-frontend/
+            coverage/integration-frontend/
+          if-no-files-found: ignore
+
+  # ---------------------------------------------------------------------------
+  # E2E (Cypress) — DESACTIVADO temporalmente
+  # ---------------------------------------------------------------------------
+  # El script pnpm test:e2e (scripts/run-e2e.sh) requiere:
+  #   - MongoDB en ejecución
+  #   - Backend en :3000 y frontend en :5173
+  #   - Seed de usuarios (pnpm seed:e2e)
+  #   - n8n/Ollama no son obligatorios para Cypress, pero la infraestructura
+  #     completa no está automatizada en CI sin servicios adicionales.
+  #
+  # Para habilitar en el futuro:
+  #   1. Agregar servicio MongoDB (services.mongodb) o mongodb-memory-server en seed.
+  #   2. Levantar backend y frontend en background con wait-on.
+  #   3. Ejecutar: pnpm exec cypress run
+  #   4. Subir artifacts: cypress/screenshots, cypress/videos
+  #
+  # e2e:
+  #   name: E2E — Cypress
+  #   runs-on: ubuntu-latest
+  #   needs: [backend, frontend]
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: pnpm/action-setup@v4
+  #       with:
+  #         version: 10.15.1
+  #     - uses: actions/setup-node@v4
+  #       with:
+  #         node-version: 20
+  #         cache: pnpm
+  #     - run: pnpm install --frozen-lockfile
+  #     # ... servicios, wait-on, cy:run ...
+
+  # ---------------------------------------------------------------------------
+  # CD — DESPLIEGUE FUTURO (no ejecutar sin secretos reales)
+  # ---------------------------------------------------------------------------
+  # Frontend  → Vercel / Netlify (VITE_API_URL apuntando al backend en producción)
+  # Backend   → Render / Railway (MONGODB_URI Atlas, JWT_SECRET, vars n8n)
+  # MongoDB   → MongoDB Atlas
+  # n8n       → Servidor propio o n8n Cloud
+  #
+  # Secretos necesarios en GitHub (Settings → Secrets → Actions):
+  #   VERCEL_TOKEN, RENDER_API_KEY, MONGODB_URI, JWT_SECRET, N8N_* ...
+  #
+  # deploy:
+  #   if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+  #   needs: [backend, frontend]
+  #   runs-on: ubuntu-latest
+  #   environment: production
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     # ... despliegue manual/automatizado según plataforma elegida ...
