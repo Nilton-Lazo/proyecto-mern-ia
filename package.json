@@ -13,7 +13,6 @@
 		"@types/react": "^19.2.0",
 		"@types/react-dom": "^19.2.0",
 		"@types/react-router-dom": "^5.3.3",
-		"@types/testing-library__jest-dom": "^6.0.0",
 		"babel-jest": "^30.2.0",
 		"babel-plugin-transform-import-meta": "^2.3.3",
 		"babel-plugin-transform-vite-meta-env": "^1.0.3",
@@ -24,29 +23,51 @@
 		"jest-environment-jsdom": "^30.2.0",
 		"jsdom": "^27.0.0",
 		"mongodb-memory-server": "^10.2.2",
+		"msw": "^2.10.2",
+		"newman": "^6.2.1",
 		"react": "^19.2.0",
 		"react-dom": "^19.2.0",
 		"react-router-dom": "^7.9.3",
 		"recharts": "^3.2.1",
 		"supertest": "^7.1.4",
 		"ts-jest": "^29.4.4",
+		"undici": "^7.10.0",
 		"whatwg-url": "^15.1.0"
 	},
-	"jest": {
-		"testEnvironment": "node",
-		"setupFiles": [
-			"<rootDir>/tests/jest.setup.js"
-		]
-	},
 	"scripts": {
-		"test": "pnpm run test:backend && pnpm run test:frontend",
-		"test:backend": "jest -c jest.backend.config.cjs --coverage",
-		"test:frontend": "jest -c jest.frontend.config.cjs --coverage",
-		"cy:open": "cypress open"
+		"dev": "pnpm --parallel -r --filter backend --filter frontend run dev",
+		"dev:backend": "pnpm --filter backend run dev",
+		"dev:frontend": "pnpm --filter frontend run dev",
+		"build:frontend": "pnpm --filter frontend run build",
+
+		"docker:up": "docker compose up -d --build",
+		"docker:down": "docker compose down",
+		"docker:logs": "docker compose logs -f",
+
+		"test": "pnpm test:unit && pnpm test:integration",
+		"test:unit": "pnpm test:unit:backend && pnpm test:unit:frontend",
+		"test:unit:backend": "jest -c jest.unit.backend.config.cjs --coverage",
+		"test:unit:frontend": "jest -c jest.unit.frontend.config.cjs --coverage",
+		"test:integration": "pnpm test:integration:api && pnpm test:integration:frontend",
+		"test:integration:api": "jest -c jest.integration.api.config.cjs --coverage",
+		"test:integration:frontend": "jest -c jest.integration.frontend.config.cjs --coverage",
+		"test:e2e": "bash scripts/run-e2e.sh",
+		"test:postman": "bash scripts/run-postman.sh",
+		"test:all": "pnpm test && pnpm test:e2e",
+
+		"coverage:open:unit-backend": "open coverage/unit-backend/lcov-report/index.html",
+		"coverage:open:unit-frontend": "open coverage/unit-frontend/lcov-report/index.html",
+		"coverage:open:integration-api": "open coverage/integration-api/lcov-report/index.html",
+		"coverage:open:integration-frontend": "open coverage/integration-frontend/lcov-report/index.html",
+
+		"cy:open": "cypress open",
+		"cy:run": "cypress run",
+		"seed:e2e": "node scripts/seed-e2e-users.js"
 	},
 	"dependencies": {
 		"bcryptjs": "^3.0.3",
 		"express": "^5.1.0",
-		"jsonwebtoken": "^9.0.2"
+		"jsonwebtoken": "^9.0.2",
+		"mongoose": "^8.20.1"
 	}
 }

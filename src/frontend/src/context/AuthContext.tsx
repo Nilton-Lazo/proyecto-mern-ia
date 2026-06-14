@@ -14,6 +14,7 @@ type RegisterPayload = {
   centroEstudios?: string;
   email: string;
   password: string;
+  role?: 'student' | 'teacher';
 };
 
 type AuthCtx = {
@@ -47,13 +48,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // ---- Actions ----
   const login = async (email: string, password: string): Promise<User> => {
-    const res = await fetch(`${API}/api/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-    });
+    let res: Response;
+    try {
+      res = await fetch(`${API}/api/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+    } catch {
+      throw new Error(
+        `No se pudo conectar al servidor (${API}). Verifica que el backend esté activo en el puerto 3000.`
+      );
+    }
 
-    const data = await res.json();
+    const data = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(data.error || data.message || 'Error al iniciar sesión');
 
     // Normaliza por si el backend no envía role (default: student)
@@ -71,13 +79,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const register = async (payload: RegisterPayload): Promise<User> => {
-    const res = await fetch(`${API}/api/auth/register`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
+    let res: Response;
+    try {
+      res = await fetch(`${API}/api/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+    } catch {
+      throw new Error(
+        `No se pudo conectar al servidor (${API}). Verifica que el backend esté activo en el puerto 3000.`
+      );
+    }
 
-    const data = await res.json();
+    const data = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(data.error || data.message || 'Error al registrarse');
 
     const newUser: User = {

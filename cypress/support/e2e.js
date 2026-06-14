@@ -1,17 +1,24 @@
-// ***********************************************************
-// This example support/e2e.js is processed and
-// loaded automatically before your test files.
-//
-// This is a great place to put global configuration and
-// behavior that modifies Cypress.
-//
-// You can change the location of this file or turn off
-// automatically serving support files with the
-// 'supportFile' configuration option.
-//
-// You can read more here:
-// https://on.cypress.io/configuration
-// ***********************************************************
-
 // Import commands.js using ES2015 syntax:
-import './commands'
+import './commands';
+
+before(function () {
+  const baseApi = Cypress.env('baseApi');
+  cy.task('ensureE2EUsers', null, { timeout: 60000 });
+
+  cy.request({
+    method: 'POST',
+    url: `${baseApi}/auth/login`,
+    body: {
+      email: Cypress.env('teacherEmail'),
+      password: Cypress.env('teacherPass'),
+    },
+    failOnStatusCode: false,
+  }).then((res) => {
+    if (res.status !== 200) {
+      throw new Error(
+        `Backend/MongoDB no disponible (login → ${res.status}). ` +
+          'Ejecuta: docker compose up mongo -d && pnpm seed:e2e && pnpm dev:backend'
+      );
+    }
+  });
+});

@@ -1,175 +1,153 @@
-import { Link } from "react-router-dom";
+import { Link } from 'react-router-dom';
+import ScrollReveal from '../components/ui/ScrollReveal';
 
 export default function Home() {
   return (
-    <main className="relative overflow-hidden">
-      {/* Fondo decorativo */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 -z-10"
-      >
-        <div className="absolute -top-40 -left-40 h-96 w-96 rounded-full bg-blue-100 blur-3xl opacity-70" />
-        <div className="absolute -bottom-40 -right-40 h-[28rem] w-[28rem] rounded-full bg-indigo-100 blur-3xl opacity-70" />
-      </div>
-
-      {/* Hero */}
-      <section className="mx-auto max-w-6xl px-6 py-16 md:py-24">
-        {/* Badge */}
-        <div className="mx-auto mb-6 w-fit rounded-full border border-blue-200 bg-blue-50/70 px-3 py-1 text-xs font-medium text-blue-700">
-          IA educativa • Lectura crítica
+    <main className="overflow-hidden bg-white dark:bg-slate-950">
+      {/* ── HERO full-screen estilo Apple ── */}
+      <section className="relative flex min-h-[90vh] flex-col items-center justify-center px-6 text-center">
+        <div className="pointer-events-none absolute inset-0 landing-mesh" />
+        <div className="hero-glow pointer-events-none absolute left-1/2 top-1/3 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-indigo-200/40 blur-3xl" />
+        <div className="float-slow pointer-events-none absolute left-[8%] top-[25%] hidden h-16 w-16 items-center justify-center rounded-2xl bg-white/80 text-2xl shadow-lg ring-1 ring-slate-100 dark:bg-slate-800/80 dark:ring-slate-700 md:flex">
+          📖
+        </div>
+        <div className="float-delay pointer-events-none absolute right-[10%] top-[35%] hidden h-14 w-14 items-center justify-center rounded-2xl bg-indigo-500/10 text-2xl md:flex">
+          🤖
         </div>
 
-        <div className="grid items-center gap-12 md:grid-cols-2">
-          {/* Texto */}
-          <div className="text-center md:text-left">
-            <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 md:text-6xl leading-tight">
-              Desarrolla tu{" "}
-              <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                pensamiento crítico
-              </span>{" "}
-              con un tutor virtual
-            </h1>
-
-            <p className="mt-5 text-lg text-slate-700 leading-relaxed md:max-w-xl md:text-xl">
-              Lee un texto, genera preguntas inteligentes, recibe retroalimentación
-              inmediata y visualiza tu progreso. Todo apoyado por modelos de IA
-              locales (Ollama) y almacenamiento en MongoDB.
-            </p>
-
-            {/* CTA */}
-            <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row md:items-start">
-              <Link
-                to="/questions"
-                className="inline-flex items-center justify-center rounded-xl bg-blue-600 px-6 py-3 text-base font-semibold text-white shadow hover:bg-blue-700 transition"
-              >
-                Comenzar
-                <svg
-                  className="ml-2 h-5 w-5"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M12 5l7 7-7 7" />
-                </svg>
-              </Link>
-
-              <a
-                href="https://github.com/Nilton-Lazo/proyecto-mern-ia"
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center justify-center rounded-xl bg-white px-6 py-3 text-base font-semibold text-slate-700 shadow ring-1 ring-slate-200 hover:bg-slate-50 transition"
-              >
-                Saber más
-              </a>
-            </div>
-
-            {/* Métricas / confianza */}
-            <ul className="mt-8 grid grid-cols-3 gap-3 text-center md:text-left md:max-w-md">
-              <li className="rounded-lg bg-white p-3 shadow-sm ring-1 ring-slate-100">
-                <p className="text-2xl font-bold text-slate-900">IA</p>
-                <p className="text-xs text-slate-500">Ollama local</p>
-              </li>
-              <li className="rounded-lg bg-white p-3 shadow-sm ring-1 ring-slate-100">
-                <p className="text-2xl font-bold text-slate-900">Mongo</p>
-                <p className="text-xs text-slate-500">Datos seguros</p>
-              </li>
-              <li className="rounded-lg bg-white p-3 shadow-sm ring-1 ring-slate-100">
-                <p className="text-2xl font-bold text-slate-900">Reportes</p>
-                <p className="text-xs text-slate-500">Progreso claro</p>
-              </li>
-            </ul>
+        <ScrollReveal variant="fade-center">
+          <p className="text-xs font-semibold uppercase tracking-[0.25em] text-indigo-600 dark:text-indigo-400">
+            Colegio San Carlos
+          </p>
+          <h1 className="mx-auto mt-6 max-w-4xl text-5xl font-bold tracking-tight text-slate-900 dark:text-white md:text-7xl md:leading-[1.05]">
+            Lectura comprensiva.
+            <br />
+            <span className="bg-gradient-to-r from-indigo-600 via-blue-600 to-sky-500 bg-clip-text text-transparent text-gradient-animate">
+              Potenciada con IA.
+            </span>
+          </h1>
+          <p className="mx-auto mt-6 max-w-2xl text-lg text-slate-600 dark:text-slate-300 md:text-xl">
+            El tutor virtual que genera preguntas, brinda retroalimentación inmediata y
+            acompaña el progreso de cada estudiante.
+          </p>
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+            <Link
+              to="/register"
+              className="rounded-full bg-slate-900 px-8 py-3.5 text-sm font-semibold text-white shadow-lg transition hover:bg-black dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100"
+            >
+              Comenzar ahora
+            </Link>
+            <Link
+              to="/como-funciona"
+              className="rounded-full bg-white px-8 py-3.5 text-sm font-semibold text-slate-800 ring-1 ring-slate-200 transition hover:bg-slate-50 dark:bg-slate-800 dark:text-slate-100 dark:ring-slate-700 dark:hover:bg-slate-700"
+            >
+              Ver tutorial
+            </Link>
           </div>
+        </ScrollReveal>
 
-          {/* Ilustración */}
-          <div className="mx-auto w-full max-w-md">
-            <div className="relative">
-              <div className="absolute -inset-2 rounded-3xl bg-gradient-to-tr from-blue-200 to-indigo-200 blur-xl opacity-60" />
-              <div className="relative rounded-3xl bg-white p-8 shadow-xl ring-1 ring-slate-100">
-                {/* SVG ilustración */}
-                <svg
-                  viewBox="0 0 200 200"
-                  className="mx-auto h-64 w-64"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <defs>
-                    <linearGradient id="g1" x1="0" x2="1" y1="0" y2="1">
-                      <stop offset="0%" stopColor="#2563eb" />
-                      <stop offset="100%" stopColor="#6366f1" />
-                    </linearGradient>
-                  </defs>
-                  <circle cx="100" cy="100" r="90" fill="#EEF2FF" />
-                  <rect x="40" y="65" width="120" height="70" rx="12" fill="url(#g1)" />
-                  <rect x="52" y="78" width="96" height="12" rx="6" fill="white" opacity="0.9" />
-                  <rect x="52" y="98" width="72" height="12" rx="6" fill="white" opacity="0.9" />
-                  <circle cx="150" cy="104" r="8" fill="white" opacity="0.95" />
-                  <path
-                    d="M148 104 l4 4 l8 -8"
-                    stroke="#22c55e"
-                    strokeWidth="2"
-                    fill="none"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-
-                <p className="mt-4 text-center text-sm text-slate-600">
-                  Genera preguntas, responde y recibe feedback automático.
-                </p>
+        <ScrollReveal variant="fade-up" delay={200} className="mt-16 w-full max-w-3xl">
+          <div className="mx-auto rounded-3xl bg-gradient-to-b from-slate-100 to-white p-1 shadow-2xl ring-1 ring-slate-200/80">
+            <div className="rounded-[1.35rem] bg-slate-900 px-6 py-8 text-left text-slate-300 md:px-10">
+              <p className="text-[11px] uppercase tracking-widest text-sky-400">Vista previa</p>
+              <p className="mt-3 text-lg font-medium text-white">
+                «La lectura comprensiva fortalece el pensamiento crítico…»
+              </p>
+              <div className="mt-4 space-y-2">
+                <div className="h-2 w-3/4 rounded-full bg-indigo-500/40" />
+                <div className="h-2 w-1/2 rounded-full bg-sky-500/30" />
               </div>
+              <p className="mt-4 text-xs text-emerald-400">✓ 5 preguntas generadas · Retroalimentación lista</p>
             </div>
+          </div>
+        </ScrollReveal>
+      </section>
+
+      {/* ── Sección sticky scroll: texto centrado ── */}
+      <section className="landing-section-dark px-6 py-32 text-center text-white">
+        <ScrollReveal variant="fade-center">
+          <h2 className="mx-auto max-w-3xl text-4xl font-bold leading-tight md:text-5xl">
+            Preguntas que entienden el texto.
+            <br />
+            <span className="text-slate-400">No genéricas. No al azar.</span>
+          </h2>
+          <p className="mx-auto mt-6 max-w-xl text-slate-400">
+            La IA analiza cada lectura y crea preguntas de comprensión literal, inferencial
+            y pensamiento crítico adaptadas al contenido.
+          </p>
+        </ScrollReveal>
+      </section>
+
+      <section className="px-6 py-28">
+        <div className="mx-auto max-w-6xl">
+          <ScrollReveal variant="fade-center" className="mb-16 text-center">
+            <h2 className="text-3xl font-bold text-slate-900 dark:text-white md:text-4xl">
+              Diseñado para el aula peruana
+            </h2>
+            <p className="mt-3 text-slate-600 dark:text-slate-400">Inicial, primaria y secundaria — I.E.P. San Carlos</p>
+          </ScrollReveal>
+          <div className="grid gap-8 md:grid-cols-3">
+            {[
+              {
+                title: 'Para estudiantes',
+                desc: 'Actividades asignadas, práctica libre con IA y seguimiento de tu progreso.',
+                to: '/beneficios',
+                cta: 'Conocer ventajas',
+              },
+              {
+                title: 'Para docentes',
+                desc: 'Asigna lecturas, monitorea entregas y accede a reportes de comprensión.',
+                to: '/como-funciona',
+                cta: 'Ver cómo funciona',
+              },
+              {
+                title: 'Para el colegio',
+                desc: 'Digitaliza la evaluación lectora y reduce la carga administrativa.',
+                to: '/beneficios',
+                cta: 'Explorar beneficios',
+              },
+            ].map((card, i) => (
+              <ScrollReveal key={card.title} delay={i * 100}>
+                <article className="flex h-full flex-col rounded-3xl bg-slate-50 p-8 ring-1 ring-slate-100 dark:bg-slate-900/60 dark:ring-slate-800">
+                  <h3 className="text-xl font-semibold text-slate-900 dark:text-white">{card.title}</h3>
+                  <p className="mt-3 flex-1 text-sm leading-relaxed text-slate-600 dark:text-slate-400">{card.desc}</p>
+                  <Link
+                    to={card.to}
+                    className="mt-6 text-sm font-semibold text-indigo-600 hover:underline"
+                  >
+                    {card.cta} →
+                  </Link>
+                </article>
+              </ScrollReveal>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Features rápidas */}
-      <section className="mx-auto max-w-6xl px-6 pb-16">
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          <Feature
-            title="Preguntas inteligentes"
-            desc="Analizamos tu texto y generamos preguntas enfocadas en comprensión y análisis."
-            icon={
-              <path d="M12 3 1 8l11 5 11-5-11-5Zm-8 9v4l8 4 8-4v-4l-8 4-8-4Z" />
-            }
-          />
-          <Feature
-            title="Retroalimentación inmediata"
-            desc="Recibe comentarios claros sobre tus respuestas para mejorar al instante."
-            icon={
-              <path d="M4 4h16v12H7l-3 3V4Zm4 4h8M8 11h8" />
-            }
-          />
-          <Feature
-            title="Reportes y progreso"
-            desc="Visualiza tu evolución con gráficos y últimas respuestas guardadas."
-            icon={
-              <path d="M4 19h16M7 16V8m5 8V6m5 10v-4" />
-            }
-          />
-        </div>
+      {/* CTA final */}
+      <section className="border-t border-slate-100 bg-slate-50 px-6 py-24 text-center dark:border-slate-800 dark:bg-slate-900/50">
+        <ScrollReveal variant="fade-center">
+          <h2 className="text-3xl font-bold text-slate-900 dark:text-white">Empieza a leer con propósito</h2>
+          <p className="mx-auto mt-3 max-w-lg text-slate-600 dark:text-slate-400">
+            Regístrate como estudiante o docente. Los reportes y datos personales solo son
+            visibles tras iniciar sesión.
+          </p>
+          <div className="mt-8 flex flex-wrap justify-center gap-4">
+            <Link
+              to="/login"
+              className="rounded-full bg-indigo-600 px-8 py-3 text-sm font-semibold text-white hover:bg-indigo-700"
+            >
+              Iniciar sesión
+            </Link>
+            <Link
+              to="/questions"
+              className="rounded-full border border-slate-300 bg-white px-8 py-3 text-sm font-semibold text-slate-800 hover:bg-slate-100 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700"
+            >
+              Probar generador
+            </Link>
+          </div>
+        </ScrollReveal>
       </section>
     </main>
-  );
-}
-
-function Feature({
-  title,
-  desc,
-  icon,
-}: {
-  title: string;
-  desc: string;
-  icon: React.ReactNode;
-}) {
-  return (
-    <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-100">
-      <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white">
-        <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2}>
-          {icon}
-        </svg>
-      </div>
-      <h3 className="text-base font-semibold text-slate-900">{title}</h3>
-      <p className="mt-1 text-sm leading-6 text-slate-600">{desc}</p>
-    </div>
   );
 }

@@ -1,7 +1,3 @@
 {
-    "watch": ["."],
-    "ext": "js,json",
-    "ignore": ["node_modules"],
-    "legacyWatch": true
-  }
-  
+  "watch": [".env", "index.js", "routes", "controllers", "services", "models", "middlewares"]
+}

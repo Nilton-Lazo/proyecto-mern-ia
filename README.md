@@ -6,7 +6,7 @@
   <img src="https://img.shields.io/badge/Docker-Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white" />
   <img src="https://img.shields.io/badge/Estado-En%20Desarrollo-yellow?style=for-the-badge" />
   <img src="https://img.shields.io/badge/Licencia-Académica-blue?style=for-the-badge" />
-  <img src="https://img.shields.io/badge/Universidad-Continental-002C77?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Colegio-San-Carlos-002C77?style=for-the-badge" />
 </p>
 
 # 📚 Tutor Virtual de Lectura Crítica  
@@ -16,7 +16,7 @@
 
 A través de la lectura de textos, el sistema genera **preguntas automáticas**, detecta **sesgos o falacias lógicas** y evalúa la comprensión del contenido. Además, integra **automatización con n8n** para programar sesiones de estudio, enviar recordatorios y registrar el progreso de los usuarios.  
 
-Este proyecto forma parte del curso **Taller de Proyectos 2 – Ingeniería de Sistemas e Informática** de la **Universidad Continental**, bajo la dirección del docente:  
+Este proyecto forma parte del curso **Taller de Proyectos 2 – Ingeniería de Sistemas e Informática** del **Colegio San Carlos**, bajo la dirección del docente:  
 👨‍🏫 *Ing. Gamarra Moreno Daniel*  
 
 ---
@@ -183,8 +183,10 @@ tutor-virtual-lectura-critica/
 │   ├── package.json
 │   └── server.js                 # Punto de inicio del backend
 
-├── n8n/                          # Flujos automatizados n8n
-│   └── workflows.json            # Recordatorios, registro de avance, emails
+├── src/n8n-automation/           # Workflows n8n (sin Docker)
+│   ├── workflows/                # JSON exportables
+│   ├── docs/                     # N8N_SETUP.md, WORKFLOWS.md
+│   └── examples/                 # Payloads de prueba
 
 ├── docker-compose.yml            # Orquestación de contenedores
 ├── .env.example                  # Variables de entorno modelo
@@ -338,21 +340,23 @@ Copiar código
 }
 ```
 ### 🧪 Ejecución de Pruebas Automatizadas
-El proyecto utiliza Jest con pnpm para las pruebas unitarias e integradas.
 
-Comando para ejecutar todas las pruebas:
+Documentación completa: **[tests/README.md](tests/README.md)**
 
-Copiar código
-```bash
-pnpm test
-```
-Comando para ver la cobertura:
+| Tipo | Comando | Reporte HTML coverage |
+|------|---------|----------------------|
+| Unitarias backend | `pnpm test:unit:backend` | `coverage/unit-backend/lcov-report/index.html` |
+| Unitarias frontend | `pnpm test:unit:frontend` | `coverage/unit-frontend/lcov-report/index.html` |
+| Integración API (Supertest) | `pnpm test:integration:api` | `coverage/integration-api/lcov-report/index.html` |
+| Integración frontend | `pnpm test:integration:frontend` | `coverage/integration-frontend/lcov-report/index.html` |
+| **Todas Jest** | `pnpm test` | (genera las 4 carpetas) |
+| E2E / Aceptación (Cypress) | `pnpm test:e2e` | — |
+| Postman / Newman | `pnpm test:postman` | — |
+| **Pipeline completo** | `pnpm test:all` | — |
 
-Copiar código
-```bash
-pnpm jest --coverage
-```
-La meta es alcanzar al menos 70% de cobertura, con objetivo ideal de 90%.
+Abrir coverage en macOS: `pnpm coverage:open:unit-backend` (etc.)
+
+Meta: ≥70% cobertura (objetivo >90%).
 
 ### 💡 Notas Técnicas
 Todos los endpoints se encuentran en src/backend/routes/ia.js.
@@ -366,26 +370,34 @@ OLLAMA_MODEL=llama3:8b
 OLLAMA_HOST=http://<tu_ip_local>:11434
 La base de datos se ejecuta en MongoDB (local o Atlas).
 ```
-El servicio de pruebas usa mocks definidos en jest.setup.js.
+El servicio de pruebas usa mocks definidos en `tests/support/jest.setup.js`.
 
 ---
 
 ## ⚙️ Instrucciones de Instalación  
 
-1. **Instalar Docker**  
-   - Seguir la guía en video: [Cómo instalar Docker](https://www.youtube.com/watch?v=wMioaU5yk_w).  
+### Opción A — Docker (backend + frontend)
 
-2. **Clonar el repositorio**  
-   ```bash
-   git clone https://github.com/Nilton-Lazo/proyecto-mern-ia.git
-   cd proyecto-mern-ia
-   
-3. **Levantar los servicios con Docker Compose**
-   ```bash
-   docker-compose up --build
+MongoDB corre **aparte** (local en `:27017`, como ya lo haces).
 
-4. **Acceder al sistema**
-   - Una vez completados los pasos, navegar a: [Sistema local](http://localhost:5173/).
+```bash
+git clone https://github.com/Nilton-Lazo/proyecto-mern-ia.git
+cd proyecto-mern-ia
+cp docker/.env.example .env    # opcional
+docker compose up -d --build
+```
+
+- Frontend: http://localhost:5173  
+- Backend: http://localhost:3000  
+- MongoDB: `mongodb://127.0.0.1:27017/tutor-lectura` (en el host)
+
+### Opción B — Desarrollo local
+
+```bash
+pnpm install
+pnpm dev:backend    # :3000
+pnpm dev:frontend   # :5173
+```
      
 ---
 
@@ -407,10 +419,32 @@ El servicio de pruebas usa mocks definidos en jest.setup.js.
 
 ---
 
+### Pruebas E2E (Cypress)
+
+Requisitos: **MongoDB en :27017** + backend + frontend.
+
+```bash
+pnpm seed:e2e          # usuarios de prueba
+pnpm test:e2e          # verifica servicios y corre Cypress
+pnpm cy:open           # modo interactivo
+```
+
+Credenciales: `cypress.env.json` — docente `luis@gmail.com` / estudiante `joel@gmail.com` (pass: `prueba`).
+
+---
+
 ## ✅ Pruebas Automatizadas
-- **Unitarias:** Jest (backend y frontend).  
-- **E2E:** Cypress o Playwright.  
-- **Cobertura mínima:** 70% (objetivo >90%).  
+
+| Tipo | Herramienta | Carpeta |
+|------|-------------|---------|
+| Unitarias frontend | Jest + React Testing Library | `tests/unit/frontend/` |
+| Unitarias backend | Jest | `tests/unit/backend/` |
+| Integración API | Supertest | `tests/integration/api/` |
+| Integración frontend | RTL + mock API | `tests/integration/frontend/` |
+| Aceptación / E2E | Cypress | `cypress/e2e/` |
+| Contrato API | Postman + Newman | `tests/postman/` |
+
+Ver **[tests/README.md](tests/README.md)** para comandos y rutas de coverage HTML.
 
 ---
 
@@ -431,6 +465,183 @@ El servicio de pruebas usa mocks definidos en jest.setup.js.
 📄 `README.md` con información del proyecto y del equipo.  
 📊 Diagramas de arquitectura (UML, flujo de datos, contenedores).  
 📝 Informe técnico final con decisiones de diseño, IA, automatización e impacto ambiental.  
+
+---
+
+## 🎯 Diferenciador educativo de la plataforma
+
+Esta plataforma no reemplaza al docente ni funciona como un chat genérico. A diferencia de usar ChatGPT directamente, el sistema organiza las lecturas por **áreas curriculares**, asigna actividades a estudiantes específicos, guarda el **progreso individual**, genera preguntas clasificadas por **habilidad lectora**, brinda **retroalimentación formativa** y permite **trazabilidad académica** mediante reportes. Esto convierte la IA en una herramienta de acompañamiento pedagógico, no solo en un generador de respuestas.
+
+- El docente controla qué lectura se asigna (texto, Markdown o PDF).
+- El estudiante trabaja dentro de una **ruta guiada**: lectura → análisis IA → preguntas → respuestas → retroalimentación.
+- El avance se **guarda automáticamente** (autosave cada ~8 s y al salir de la actividad).
+- La retroalimentación queda registrada como evidencia de aprendizaje.
+- El progreso se mide por habilidades en el **Mapa de mejora lectora** (literal, inferencial, crítico, vocabulario, idea principal).
+- El docente puede revisar avances por estudiante, área y estado.
+
+## 📊 Módulo de reportes con IA
+
+A diferencia de un chat genérico, los reportes de esta plataforma convierten las interacciones con IA en **evidencia académica organizada**, permitiendo identificar avances, dificultades y recomendaciones por estudiante, área y habilidad lectora.
+
+### Diferencia por rol
+
+| Rol | Ruta | Enfoque |
+|-----|------|---------|
+| **Estudiante** | `/student/reports` | ¿Cómo avanzo? ¿Qué habilidades debo mejorar? ¿Qué me recomienda la IA? |
+| **Docente** | `/teacher/reports` | ¿Cómo va el grupo? ¿Quién requiere acompañamiento? ¿Qué temas tienen bajo desempeño? |
+
+La ruta `/reports` redirige automáticamente según el rol del usuario autenticado.
+
+### Mapa de habilidades lectoras
+
+Se calcula a partir de las respuestas evaluadas en cada `Submission` entregada:
+
+- **Comprensión literal**, **inferencial**, **pensamiento crítico**, **vocabulario**, **idea principal**
+- Cada respuesta se puntúa: correcta = 100, parcial = 55, incorrecta = 15
+- Se promedian los puntajes por habilidad y se asigna nivel: Bajo / En proceso / Logrado / Destacado
+- Las recomendaciones se generan automáticamente según el nivel de cada habilidad
+
+### Indicadores calculados
+
+- Actividades asignadas, completadas, en progreso y vencidas
+- Progreso y comprensión promedio
+- Desempeño por área curricular y tema
+- Evolución temporal del avance
+- Retroalimentación reciente de IA con trazabilidad
+- Alertas pedagógicas y recomendaciones (docente)
+
+### Exportación
+
+- **Estudiante:** `GET /api/student/reports/export-pdf` — resumen, habilidades, actividades y recomendaciones
+- **Docente:** `GET /api/teacher/reports/export-pdf` y `GET /api/teacher/reports/export-csv`
+
+Todos los endpoints de reportes requieren **JWT** y validan el rol. Los datos provienen del modelo `Submission` (flujo pedagógico principal), no de práctica libre.
+
+### Endpoints de reportes — estudiante
+
+- `GET /api/student/reports/summary`
+- `GET /api/student/reports/skills`
+- `GET /api/student/reports/areas`
+- `GET /api/student/reports/timeline`
+- `GET /api/student/reports/recent-feedback`
+- `GET /api/student/reports/recommendations`
+- `GET /api/student/reports/export-pdf`
+
+### Endpoints de reportes — docente
+
+- `GET /api/teacher/reports/summary`
+- `GET /api/teacher/reports/skills`
+- `GET /api/teacher/reports/students`
+- `GET /api/teacher/reports/areas`
+- `GET /api/teacher/reports/activities-difficulty`
+- `GET /api/teacher/reports/recent-answers`
+- `GET /api/teacher/reports/alerts`
+- `GET /api/teacher/reports/recommendations`
+- `GET /api/teacher/reports/export-pdf`
+- `GET /api/teacher/reports/export-csv`
+
+### Áreas curriculares soportadas
+Comunicación, Matemática, Ciencia y Tecnología, Personal Social, Arte y Cultura, Inglés, Educación Religiosa, Tutoría, Otro.
+
+---
+
+## ⚡ Automatización con n8n
+
+n8n funciona como **capa de automatización externa** conectada al backend mediante webhooks y endpoints internos. No reemplaza la lógica principal ni vive en el frontend.
+
+### Ubicación
+- Workflows: `src/n8n-automation/workflows/`
+- Documentación: `src/n8n-automation/docs/N8N_SETUP.md`
+- Payloads de ejemplo: `src/n8n-automation/examples/webhook-payloads.json`
+
+### Instalar n8n (sin Docker)
+
+```bash
+npm install -g n8n
+n8n start
+# Panel: http://localhost:5678
+```
+
+Alternativa: `npx n8n`
+
+### Workflows incluidos
+
+| Workflow | Propósito |
+|----------|-----------|
+| `reading-reminder-workflow.json` | Recordatorios de lectura (cron diario) |
+| `activity-assigned-notification.json` | Notificar actividad asignada (webhook) |
+| `weekly-teacher-report.json` | Resumen semanal docente (cron lunes) |
+| `generate-questions-backend.json` | Generación de preguntas vía IA (webhook) |
+| `detect-biases-backend.json` | Detección de sesgos (webhook) |
+
+### Variables de entorno (backend)
+
+```env
+N8N_BASE_URL=http://localhost:5678
+N8N_INTERNAL_API_KEY=tu_clave_secreta
+N8N_GENERATE_QUESTIONS_WEBHOOK_URL=http://localhost:5678/webhook/generate-questions
+N8N_DETECT_BIASES_WEBHOOK_URL=http://localhost:5678/webhook/detect-biases
+N8N_ACTIVITY_ASSIGNED_WEBHOOK_URL=http://localhost:5678/webhook/activity-assigned
+```
+
+Ver `src/backend/.env.example` para la lista completa.
+
+### Endpoints de automatización
+
+Base: `/api/automation` — requieren header `x-n8n-api-key`
+
+| Método | Ruta | Descripción |
+|--------|------|-------------|
+| GET | `/pending-activities` | Actividades pendientes / por vencer |
+| POST | `/workflow-log` | Registrar ejecución de workflow |
+| GET | `/teacher-weekly-summary` | Resumen semanal para docentes |
+| POST | `/test-webhook` | Verificar configuración |
+
+### Probar conexión
+
+```bash
+curl -X POST http://localhost:3000/api/automation/test-webhook \
+  -H "x-n8n-api-key: tu_clave_secreta"
+```
+
+### Principio de diseño
+
+Si n8n no está configurado o falla, el backend **sigue funcionando** con Ollama directo. Los logs en `WorkflowLog` evidencian las automatizaciones para evaluación académica (ICACIT).
+
+---
+
+## 🎓 Flujo del estudiante con IA
+
+### Dashboard (`/student/home`)
+Resumen personalizado: actividades pendientes, progreso promedio, acceso rápido a continuar una lectura o practicar con IA.
+
+### Mis actividades vs Práctica con IA
+| Sección | Ruta | Propósito |
+|---------|------|-----------|
+| **Mis actividades** | `/student/activities` | Lecturas asignadas por el docente. Generación de preguntas IA ligada a cada actividad, borrador, envío y retroalimentación. |
+| **Práctica con IA** | `/student/practice` | Práctica libre: el estudiante pega cualquier texto, sin depender del docente. |
+| **Progreso** | `/student/progress` | Vista resumida del avance en actividades asignadas. |
+| **Reportes** | `/student/reports` | Analítica educativa personal: habilidades, áreas, evidencia IA y PDF. |
+
+### Endpoints docente
+- `GET /api/teacher/students?search=` — lista estudiantes con búsqueda
+- `POST /api/teacher/extract-pdf` — extrae texto de PDF (máx. 5 MB)
+- `POST /api/teacher/activities` — crea actividad con área, tema y asignados
+
+### Endpoints estudiante
+- `GET /api/student/activities?area=&status=&search=` — lista agrupable por área
+- `GET /api/student/activities/:id` — detalle con borrador, preguntas y análisis IA
+- `POST /api/student/activities/:id/analyze` — análisis de lectura con IA
+- `POST /api/student/activities/:id/generate-questions` — genera preguntas tipadas por habilidad
+- `POST /api/student/activities/:id/save-draft` — guarda borrador manual
+- `POST /api/student/activities/:id/autosave` — guardado automático de progreso
+- `POST /api/student/activities/:id/submit` — evalúa con IA, calcula skillScores y marca entregada
+- `GET /api/student/progress` — resumen de progreso
+- `GET /api/student/progress/skills` — mapa de mejora lectora agregado
+- `POST /api/ai/practice` — práctica libre (análisis + preguntas)
+
+### Variables IA
+`OLLAMA_HOST`, `OLLAMA_MODEL` en `src/backend/.env`
 
 ---
 
@@ -479,7 +690,7 @@ Se incluirá un video demostrativo mostrando:
 ---
 
 ## 📜 Licencia
-Este proyecto es de uso académico para el curso **Taller de Proyectos 2** – **Universidad Continental** (2025).  
+Este proyecto es de uso académico para el curso **Taller de Proyectos 2** – **Colegio San Carlos** (2025).  
 
 ---
 

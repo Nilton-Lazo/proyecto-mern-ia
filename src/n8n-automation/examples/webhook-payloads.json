@@ -1,0 +1,46 @@
+{
+  "test_connection": {
+    "source": "backend",
+    "event": "test_connection",
+    "message": "Probando conexión backend con n8n",
+    "timestamp": "2026-06-14T00:00:00.000Z"
+  },
+  "activity_assigned": {
+    "event": "activity_assigned",
+    "activityId": "example-id",
+    "title": "Lectura sobre cambio climático",
+    "area": "Ciencia y Tecnología",
+    "topic": "Cambio climático",
+    "dueDate": "2026-06-20",
+    "teacherName": "Docente ejemplo",
+    "students": [
+      {
+        "id": "student-id",
+        "name": "Alumno ejemplo",
+        "email": "alumno@example.com"
+      }
+    ]
+  },
+  "reading_reminder": {
+    "activityId": "674a1b2c3d4e5f6789012345",
+    "studentId": "674a00000000000000000001",
+    "studentName": "Joel Lazo Maravi",
+    "studentEmail": "joel@gmail.com",
+    "title": "Romeo y Julieta",
+    "area": "Comunicación",
+    "topic": "Texto narrativo",
+    "dueDate": "2026-06-21T23:59:59.000Z",
+    "status": "pending"
+  },
+  "generate_questions": {
+    "activityId": "674a1b2c3d4e5f6789012345",
+    "text": "La contaminación ambiental es un problema global.",
+    "area": "Comunicación",
+    "topic": "Texto narrativo",
+    "level": "primaria"
+  },
+  "detect_biases": {
+    "text": "Todos los jóvenes son irresponsables.",
+    "activityId": "674a1b2c3d4e5f6789012345"
+  }
+}

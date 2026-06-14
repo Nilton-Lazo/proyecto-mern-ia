@@ -1,0 +1,40 @@
+{
+  "name": "Test n8n Connection",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "test-n8n",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 0],
+      "id": "webhook-test-n8n",
+      "name": "Webhook Test n8n",
+      "webhookId": "test-n8n-connection"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { ok: true, received: true, source: $json.body?.source || $json.source, event: $json.body?.event || $json.event, message: $json.body?.message || $json.message, timestamp: $json.body?.timestamp || $json.timestamp } }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [260, 0],
+      "id": "respond-webhook",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "connections": {
+    "Webhook Test n8n": {
+      "main": [[{ "node": "Respond to Webhook", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "meta": { "instanceId": "tutor-virtual-n8n" },
+  "tags": [{ "name": "tutor-virtual" }, { "name": "test" }]
+}

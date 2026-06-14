@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import PageHeader from "../components/ui/PageHeader";
 
 type Activity = {
   _id: string;
@@ -104,43 +106,31 @@ export default function TeacherDashboard() {
   };
 
   return (
-    <div className="mx-auto max-w-6xl p-6">
-      {/* Migas */}
-      <nav className="mb-2 text-xs text-slate-500">
-        <span className="hover:text-slate-700">Inicio</span>
-        <span className="mx-2">/</span>
-        <span className="text-slate-700">Panel docente</span>
-      </nav>
-
-      {/* Header */}
-      <header className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
-            Hola{user?.nombres ? `, ${user.nombres.split(" ")[0]}` : ""} — Panel
-            docente
-          </h1>
-          <p className="mt-1 text-sm text-slate-600">
-            Gestiona actividades, revisa avances y asigna nuevas lecturas.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-2 rounded-full border bg-white px-3 py-1 text-xs text-slate-500 shadow-sm">
-          <span className="inline-flex h-2 w-2 rounded-full bg-emerald-500" />
-          Datos actualizados en tiempo real
-        </div>
-      </header>
+    <div>
+      <PageHeader
+        badge="Panel docente"
+        title={`Hola${user?.nombres ? `, ${user.nombres.split(" ")[0]}` : ""}`}
+        subtitle="Gestiona actividades, revisa avances y asigna nuevas lecturas."
+        crumbs={[{ label: "Inicio", to: "/" }, { label: "Panel docente" }]}
+        action={
+          <div className="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1 text-xs text-slate-500 shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400">
+            <span className="inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+            Datos actualizados en tiempo real
+          </div>
+        }
+      />
 
       {/* KPIs */}
       <section className="mt-6 grid gap-4 sm:grid-cols-3">
         {/* Actividades */}
-        <div className="relative overflow-hidden rounded-2xl border bg-white p-5 shadow-sm">
-          <div className="absolute -right-6 -top-6 h-20 w-20 rounded-full bg-blue-50" />
+        <div className="app-card relative overflow-hidden p-5">
+          <div className="absolute -right-6 -top-6 h-20 w-20 rounded-full bg-blue-50 dark:bg-blue-950/40" />
           <div className="relative flex items-start justify-between gap-3">
             <div>
-              <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
+              <p className="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
                 Actividades
               </p>
-              <p className="mt-1 text-3xl font-semibold text-slate-900">
+              <p className="mt-1 text-3xl font-semibold text-slate-900 dark:text-white">
                 {kpi.actividades}
               </p>
               <p className="mt-1 text-xs text-slate-500">
@@ -166,8 +156,8 @@ export default function TeacherDashboard() {
         </div>
 
         {/* Estudiantes */}
-        <div className="relative overflow-hidden rounded-2xl border bg-white p-5 shadow-sm">
-          <div className="absolute -right-8 -bottom-8 h-24 w-24 rounded-full bg-sky-50" />
+        <div className="app-card relative overflow-hidden p-5">
+          <div className="absolute -right-8 -bottom-8 h-24 w-24 rounded-full bg-sky-50 dark:bg-sky-950/40" />
           <div className="relative flex items-start justify-between gap-3">
             <div>
               <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
@@ -227,29 +217,29 @@ export default function TeacherDashboard() {
 
       {/* Acciones rápidas */}
       <div className="mt-7 flex flex-wrap gap-3">
-        <a
-          href="/teacher/assign"
+        <Link
+          to="/teacher/assign"
           className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700"
         >
           <span className="text-lg leading-none">＋</span>
           Asignar nueva actividad
-        </a>
-        <a
-          href="/reports"
-          className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50"
+        </Link>
+        <Link
+          to="/reports"
+          className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
         >
           📊 Ver reportes
-        </a>
+        </Link>
       </div>
 
       {/* Tabla actividades */}
-      <section className="mt-7 rounded-2xl border bg-white p-5 shadow-sm">
+      <section className="app-card mt-7 p-5">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h2 className="text-lg font-semibold text-slate-900">
+            <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
               Actividades asignadas
             </h2>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-slate-500 dark:text-slate-400">
               Revisa el avance de tus lecturas y entregas por grupo.
             </p>
           </div>
@@ -261,7 +251,7 @@ export default function TeacherDashboard() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Buscar actividad…"
-                className="w-48 rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 pr-8 text-xs text-slate-700 outline-none placeholder:text-slate-400 focus:border-blue-400 focus:bg-white"
+                className="app-input w-48 py-1.5 pr-8 text-xs"
               />
               <span className="pointer-events-none absolute right-2 top-1.5 text-slate-400">
                 🔍
@@ -277,9 +267,9 @@ export default function TeacherDashboard() {
           </div>
         </div>
 
-        <div className="overflow-x-auto rounded-xl border border-slate-100">
+        <div className="overflow-x-auto rounded-xl border border-slate-100 dark:border-slate-800">
           <table className="w-full text-left text-sm">
-            <thead className="bg-slate-50/80 text-xs uppercase tracking-wide text-slate-500">
+            <thead className="bg-slate-50/80 text-xs uppercase tracking-wide text-slate-500 dark:bg-slate-800/80 dark:text-slate-400">
               <tr>
                 <th className="px-4 py-3">Actividad</th>
                 <th className="px-4 py-3 text-center">Asignados</th>
@@ -293,9 +283,9 @@ export default function TeacherDashboard() {
               {loading && rows.length === 0 && (
                 <>
                   {Array.from({ length: 3 }).map((_, i) => (
-                    <tr key={i} className="border-t border-slate-100">
+                    <tr key={i} className="border-t border-slate-100 dark:border-slate-800">
                       <td className="px-4 py-4" colSpan={6}>
-                        <div className="h-3 w-full animate-pulse rounded bg-slate-100" />
+                        <div className="h-3 w-full animate-pulse rounded bg-slate-100 dark:bg-slate-800" />
                       </td>
                     </tr>
                   ))}
@@ -316,12 +306,12 @@ export default function TeacherDashboard() {
               {filteredRows.map((a, idx) => (
                 <tr
                   key={a._id}
-                  className={`border-t border-slate-100 ${
-                    idx % 2 === 0 ? "bg-white" : "bg-slate-50/30"
+                  className={`border-t border-slate-100 dark:border-slate-800 ${
+                    idx % 2 === 0 ? "bg-white dark:bg-slate-900/50" : "bg-slate-50/30 dark:bg-slate-800/30"
                   }`}
                 >
                   <td className="px-4 py-3">
-                    <p className="font-medium text-slate-900">{a.titulo}</p>
+                    <p className="font-medium text-slate-900 dark:text-white">{a.titulo}</p>
                     <p className="mt-0.5 text-xs text-slate-500">
                       ID: {a._id.slice(0, 6)}…
                     </p>

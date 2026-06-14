@@ -1,0 +1,109 @@
+{
+  "name": "Reading Reminder Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [{ "field": "cronExpression", "expression": "0 8 * * *" }]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 0],
+      "id": "cron-daily-reminder",
+      "name": "Daily 8am Reminder"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "http://localhost:3000/api/automation/pending-activities?daysAhead=3",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "x-n8n-api-key", "value": "={{$env.N8N_INTERNAL_API_KEY}}" }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [240, 0],
+      "id": "fetch-pending",
+      "name": "Fetch Pending Activities"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "activities",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [480, 0],
+      "id": "split-activities",
+      "name": "Split Activities"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "name": "message",
+              "value": "=Hola {{ $json.studentName }}, tienes pendiente la actividad \"{{ $json.title }}\" del área {{ $json.area }}. Fecha límite: {{ $json.dueDate || 'sin fecha' }}. Ingresa a la plataforma para continuar tu avance.",
+              "type": "string"
+            },
+            {
+              "name": "channel",
+              "value": "log",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [720, 0],
+      "id": "build-message",
+      "name": "Build Reminder Message"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:3000/api/automation/workflow-log",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "x-n8n-api-key", "value": "={{$env.N8N_INTERNAL_API_KEY}}" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ workflowName: 'reading-reminder-workflow', eventType: 'reading_reminder', status: 'success', activityId: $json.activityId, studentId: $json.studentId, payload: { message: $json.message, studentEmail: $json.studentEmail, channel: 'log' }, response: { delivered: false, note: 'Configure SMTP/Gmail/SendGrid para envío real de correo' } }) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [960, 0],
+      "id": "log-reminder",
+      "name": "Log Reminder (email stub)"
+    }
+  ],
+  "connections": {
+    "Daily 8am Reminder": {
+      "main": [[{ "node": "Fetch Pending Activities", "type": "main", "index": 0 }]]
+    },
+    "Fetch Pending Activities": {
+      "main": [[{ "node": "Split Activities", "type": "main", "index": 0 }]]
+    },
+    "Split Activities": {
+      "main": [[{ "node": "Build Reminder Message", "type": "main", "index": 0 }]]
+    },
+    "Build Reminder Message": {
+      "main": [[{ "node": "Log Reminder (email stub)", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "meta": { "instanceId": "tutor-virtual-n8n" },
+  "tags": [{ "name": "tutor-virtual" }, { "name": "notifications" }]
+}

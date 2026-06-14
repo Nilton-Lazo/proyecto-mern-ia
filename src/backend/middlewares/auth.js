@@ -8,7 +8,7 @@ module.exports = async function auth(req, res, next) {
     const token = hdr.startsWith('Bearer ') ? hdr.slice(7) : null;
     if (!token) return res.status(401).json({ error: 'No autorizado' });
 
-    const payload = jwt.verify(token, process.env.JWT_SECRET); // { id, email, ... }
+    const payload = jwt.verify(token, process.env.JWT_SECRET || 'secreto'); // { id, role, ... }
     // Trae el usuario para obtener el rol actual
     const u = await User.findById(payload.id)
       .select('_id email role nombres apellidos')

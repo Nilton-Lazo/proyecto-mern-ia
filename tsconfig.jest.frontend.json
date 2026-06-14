@@ -1,27 +1,20 @@
 {
   "compilerOptions": {
     "target": "ES2019",
-
     "module": "esnext",
     "moduleResolution": "node",
-
     "jsx": "react-jsx",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "skipLibCheck": true,
     "noEmit": true,
     "isolatedModules": true,
-
-    "types": [
-      "jest",
-      "node",
-      "jsdom",
-      "@testing-library/jest-dom"
-    ]
+    "types": ["jest", "node", "jsdom", "@testing-library/jest-dom"]
   },
   "include": [
     "src/frontend/src/**/*",
-    "tests/frontend/**/*",
-    "tests/jest.frontend.setup.js"
+    "tests/unit/frontend/**/*",
+    "tests/integration/frontend/**/*",
+    "tests/support/**/*"
   ]
 }
