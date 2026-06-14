@@ -183,6 +183,8 @@ tutor-virtual-lectura-critica/
 │   ├── package.json
 │   └── server.js                 # Punto de inicio del backend
 
+├── N8N_INTEGRATION_GUIDE.md      # Guía principal de integración n8n
+├── IMPLEMENTACION_Y_DEMOSTRACION_ICACIT.md  # Guía exposición ICACIT (2.5 min)
 ├── src/n8n-automation/           # Workflows n8n (sin Docker)
 │   ├── workflows/                # JSON exportables
 │   ├── docs/                     # N8N_SETUP.md, WORKFLOWS.md
@@ -550,6 +552,7 @@ Comunicación, Matemática, Ciencia y Tecnología, Personal Social, Arte y Cultu
 n8n funciona como **capa de automatización externa** conectada al backend mediante webhooks y endpoints internos. No reemplaza la lógica principal ni vive en el frontend.
 
 ### Ubicación
+- **Guía principal:** [`N8N_INTEGRATION_GUIDE.md`](./N8N_INTEGRATION_GUIDE.md)
 - Workflows: `src/n8n-automation/workflows/`
 - Documentación: `src/n8n-automation/docs/N8N_SETUP.md`
 - Payloads de ejemplo: `src/n8n-automation/examples/webhook-payloads.json`

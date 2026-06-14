@@ -18,7 +18,7 @@
 # ⚙️ Integración de n8n en el Tutor Virtual de Lectura Comprensiva
 
 <p align="center">
-  <strong>Proyecto:</strong> Tutor Virtual de Lectura Comprensiva — I.E.P. San Carlos<br/>
+  <strong>Proyecto:</strong> Tutor Virtual de Lectura Crítica — I.E.P. San Carlos<br/>
   <strong>Capa:</strong> Automatización externa vía webhooks &nbsp;·&nbsp; <strong>Última actualización:</strong> Junio 2026
 </p>
 
@@ -167,7 +167,7 @@ n8n responde al backend (nodo Respond to Webhook)
 </p>
 
 <p align="center">
-  <img src="./assets/activity-assigned-workflow.png" alt="Flujo Activity Assigned Notification" width="900" />
+  <img src="./src/n8n-automation/assets/activity-assigned-workflow.png" alt="Flujo Activity Assigned Notification" width="900" />
 </p>
 
 <p align="center"><em>Captura del workflow <strong>Activity Assigned Notification</strong> publicado en n8n (Editor).</em></p>
@@ -252,7 +252,7 @@ Cuando el docente asigna una actividad, el backend envía un JSON con la siguien
 | `timestamp` | `string` | Fecha y hora ISO del evento |
 
 > **Nota:**  
-> Un ejemplo exportable está disponible en `examples/activity-assigned-payload.json`.
+> Un ejemplo exportable está disponible en `src/n8n-automation/examples/activity-assigned-payload.json`.
 
 ---
 
@@ -332,13 +332,13 @@ Los siguientes archivos existen en el proyecto y están directamente relacionado
 
 | Recurso | Descripción |
 |---------|-------------|
-| `workflows/activity-assigned-notification.json` | Export JSON del workflow implementado |
-| `examples/activity-assigned-payload.json` | Payload de ejemplo |
+| `src/n8n-automation/workflows/activity-assigned-notification.json` | Export JSON del workflow implementado |
+| `src/n8n-automation/examples/activity-assigned-payload.json` | Payload de ejemplo |
 | `docs/` | Documentación complementaria |
-| `assets/activity-assigned-workflow.png` | Captura del flujo publicado |
+| `src/n8n-automation/assets/activity-assigned-workflow.png` | Captura del flujo publicado |
 
 > **Nota:**  
-> En `workflows/` existen otros archivos JSON (recordatorios, reportes, generación de preguntas). Estos corresponden a **flujos futuros** y no están implementados ni publicados en n8n actualmente.
+> En `src/n8n-automation/workflows/` existen otros archivos JSON (recordatorios, reportes, generación de preguntas). Estos corresponden a **flujos futuros** y no están implementados ni publicados en n8n actualmente.
 
 ---
 
@@ -539,10 +539,10 @@ En conjunto, n8n complementa al stack MERN como capa de automatización externa,
 
 Archivos JSON de referencia para estos flujos futuros (no publicados):
 
-- `workflows/reading-reminder-workflow.json`
-- `workflows/weekly-teacher-report.json`
-- `workflows/generate-questions-backend.json`
-- `workflows/detect-biases-backend.json`
+- `src/n8n-automation/workflows/reading-reminder-workflow.json`
+- `src/n8n-automation/workflows/weekly-teacher-report.json`
+- `src/n8n-automation/workflows/generate-questions-backend.json`
+- `src/n8n-automation/workflows/detect-biases-backend.json`
 
 ---
 
@@ -634,11 +634,11 @@ curl http://localhost:3000/api/automation/test-activity-assigned
 
 | Documento | Contenido |
 |-----------|-----------|
-| [README.md](./README.md) | Índice general de la carpeta n8n-automation |
-| [docs/N8N_SETUP.md](./docs/N8N_SETUP.md) | Instalación y configuración inicial |
-| [docs/N8N_ACTIVITY_ASSIGNED.md](./docs/N8N_ACTIVITY_ASSIGNED.md) | Detalle del webhook Activity Assigned |
-| [docs/ACTIVITY_ASSIGNED_AUTOMATION.md](./docs/ACTIVITY_ASSIGNED_AUTOMATION.md) | Automatización con notificaciones in-app (extensión) |
-| [docs/N8N_TEST_CONNECTION.md](./docs/N8N_TEST_CONNECTION.md) | Prueba de conexión genérica |
+| [README.md](./src/n8n-automation/README.md) | Índice general de la carpeta n8n-automation |
+| [docs/N8N_SETUP.md](./src/n8n-automation/docs/N8N_SETUP.md) | Instalación y configuración inicial |
+| [docs/N8N_ACTIVITY_ASSIGNED.md](./src/n8n-automation/docs/N8N_ACTIVITY_ASSIGNED.md) | Detalle del webhook Activity Assigned |
+| [docs/ACTIVITY_ASSIGNED_AUTOMATION.md](./src/n8n-automation/docs/ACTIVITY_ASSIGNED_AUTOMATION.md) | Automatización con notificaciones in-app (extensión) |
+| [docs/N8N_TEST_CONNECTION.md](./src/n8n-automation/docs/N8N_TEST_CONNECTION.md) | Prueba de conexión genérica |
 
 ---
 
