@@ -1,13 +1,83 @@
+<p align="center">
+  <img src="https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=white" />
+  <img src="https://img.shields.io/badge/Node.js-20.x-339933?style=for-the-badge&logo=node.js&logoColor=white" />
+  <img src="https://img.shields.io/badge/Express.js-5.x-000000?style=for-the-badge&logo=express&logoColor=white" />
+  <img src="https://img.shields.io/badge/MongoDB-8.x-47A248?style=for-the-badge&logo=mongodb&logoColor=white" />
+  <img src="https://img.shields.io/badge/n8n-Automation-EA4B71?style=for-the-badge&logo=n8n&logoColor=white" />
+  <img src="https://img.shields.io/badge/Webhooks-REST-FF6B35?style=for-the-badge&logo=postman&logoColor=white" />
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Colegio-San_Carlos-002C77?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Workflow-Activity_Assigned-22C55E?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Estado-Publicado-success?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Integración-Funcional-0EA5E9?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Documentación-v1.0-blue?style=for-the-badge" />
+</p>
+
 # ⚙️ Integración de n8n en el Tutor Virtual de Lectura Comprensiva
 
-**Proyecto:** Tutor Virtual de Lectura Crítica — I.E.P. San Carlos  
-**Stack:** MERN (MongoDB, Express, React, Node.js) + n8n (automatización externa)  
-**Versión del documento:** 1.0  
-**Última actualización:** Junio 2026
+<p align="center">
+  <strong>Proyecto:</strong> Tutor Virtual de Lectura Crítica — I.E.P. San Carlos<br/>
+  <strong>Capa:</strong> Automatización externa vía webhooks &nbsp;·&nbsp; <strong>Última actualización:</strong> Junio 2026
+</p>
+
+---
+
+## 🛠️ Stack Tecnológico
+
+<p align="center">
+  <img src="https://skillicons.dev/icons?i=react,nodejs,express,mongodb,ts,tailwind,git,github" alt="Stack MERN del proyecto" />
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/n8n-Workflow_Engine-EA4B71?style=flat-square&logo=n8n&logoColor=white" height="48" />
+  &nbsp;
+  <img src="https://img.shields.io/badge/Mongoose-ODM-880000?style=flat-square&logo=mongodb&logoColor=white" height="48" />
+  &nbsp;
+  <img src="https://img.shields.io/badge/JWT-Auth-F59E0B?style=flat-square" height="48" />
+  &nbsp;
+  <img src="https://img.shields.io/badge/pnpm-Monorepo-F69220?style=flat-square&logo=pnpm&logoColor=white" height="48" />
+</p>
+
+| Capa | Tecnología | Rol en la integración |
+|------|------------|------------------------|
+| **Frontend** | React + TypeScript + Tailwind | Docente asigna actividades; estudiante ve notificaciones |
+| **Backend** | Node.js + Express | Dispara webhooks hacia n8n al crear actividades |
+| **Base de datos** | MongoDB + Mongoose | Persiste actividades, logs y notificaciones |
+| **Automatización** | n8n (externo) | Recibe eventos y ejecuta workflows |
+| **Comunicación** | Webhooks REST | Backend → n8n → respuesta JSON |
+
+---
+
+## 📑 Índice
+
+| | Sección |
+|---|---------|
+| 📋 | [1. Resumen de la integración](#-1-resumen-de-la-integración) |
+| 🔔 | [2. Flujo implementado en n8n](#-2-flujo-implementado-en-n8n) |
+| 🖼️ | [3. Imagen del workflow](#️-3-imagen-del-workflow) |
+| 🧩 | [4. Estructura del workflow](#-4-estructura-del-workflow) |
+| 📦 | [5. Payload que recibe n8n](#-5-payload-que-recibe-n8n) |
+| ⚙️ | [6. Configuración en el backend](#️-6-configuración-en-el-backend) |
+| 📁 | [7. Archivos relacionados](#-7-archivos-del-backend-relacionados) |
+| 🚀 | [8. Cómo probar desde la interfaz](#-8-cómo-probar-desde-la-interfaz) |
+| ✅ | [9. Cómo saber que funciona](#-9-cómo-saber-que-funciona) |
+| 🔀 | [10. Integración vs automatización](#-10-diferencia-entre-integración-y-automatización) |
+| 💡 | [11. Valor para el proyecto](#-11-valor-para-el-proyecto) |
+| 📌 | [12. Próximas mejoras](#-12-próximas-mejoras-propuestas) |
+| 🛠️ | [13. Problemas comunes](#️-13-problemas-comunes) |
+| 💻 | [14. Comandos útiles](#-14-comandos-útiles) |
 
 ---
 
 ## Introducción
+
+<p align="left">
+  <img src="https://img.shields.io/badge/Rol-Capa_externa-6366F1?style=flat-square" />
+  <img src="https://img.shields.io/badge/No_reemplaza-Backend_ni_Frontend-F59E0B?style=flat-square" />
+  <img src="https://img.shields.io/badge/Comunicación-Webhooks_POST-10B981?style=flat-square" />
+</p>
 
 n8n se integró como una **capa externa de automatización** conectada al backend mediante webhooks. Su función principal es recibir eventos académicos del sistema y ejecutar flujos automáticos relacionados con la asignación de actividades.
 
@@ -17,6 +87,12 @@ n8n se integró como una **capa externa de automatización** conectada al backen
 ---
 
 ## 📋 1. Resumen de la integración
+
+<p align="left">
+  <img src="https://img.shields.io/badge/Flujos_implementados-1-22C55E?style=flat-square" />
+  <img src="https://img.shields.io/badge/Workflow-Activity_Assigned_Notification-EA4B71?style=flat-square&logo=n8n&logoColor=white" />
+  <img src="https://img.shields.io/badge/Trigger-Asignación_docente-3B82F6?style=flat-square" />
+</p>
 
 ### Flujo implementado
 
@@ -49,6 +125,12 @@ n8n responde al backend (nodo Respond to Webhook)
 
 ## 🔔 2. Flujo implementado en n8n
 
+<p align="left">
+  <img src="https://img.shields.io/badge/Estado-Published-22C55E?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Método-POST-FF6B35?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Ruta-/activity--assigned-6366F1?style=for-the-badge" />
+</p>
+
 ### Activity Assigned Notification
 
 | Propiedad | Valor |
@@ -59,6 +141,11 @@ n8n responde al backend (nodo Respond to Webhook)
 | **Ruta del webhook** | `/activity-assigned` |
 
 ### URLs del webhook
+
+<p align="left">
+  <img src="https://img.shields.io/badge/Producción-/webhook/activity--assigned-22C55E?style=flat-square" />
+  <img src="https://img.shields.io/badge/Pruebas-/webhook--test/activity--assigned-F59E0B?style=flat-square" />
+</p>
 
 | Entorno | URL | Uso |
 |---------|-----|-----|
@@ -72,9 +159,18 @@ n8n responde al backend (nodo Respond to Webhook)
 
 ## 🖼️ 3. Imagen del workflow
 
-![Flujo Activity Assigned Notification](./assets/activity-assigned-workflow.png)
+<p align="center">
+  <img src="https://img.shields.io/badge/Nodos-3-0EA5E9?style=flat-square" />
+  <img src="https://img.shields.io/badge/Webhook-✓-22C55E?style=flat-square" />
+  <img src="https://img.shields.io/badge/Edit_Fields-✓-22C55E?style=flat-square" />
+  <img src="https://img.shields.io/badge/Respond_to_Webhook-✓-22C55E?style=flat-square" />
+</p>
 
-*Captura del workflow **Activity Assigned Notification** publicado en n8n (Editor).*
+<p align="center">
+  <img src="./assets/activity-assigned-workflow.png" alt="Flujo Activity Assigned Notification" width="900" />
+</p>
+
+<p align="center"><em>Captura del workflow <strong>Activity Assigned Notification</strong> publicado en n8n (Editor).</em></p>
 
 El flujo visual actual está compuesto por **tres nodos**:
 
@@ -346,6 +442,12 @@ Confirmar que los tres nodos completaron correctamente:
 
 ## ✅ 9. Cómo saber que funciona
 
+<p align="left">
+  <img src="https://img.shields.io/badge/Criterio-Actividad_creada-22C55E?style=flat-square" />
+  <img src="https://img.shields.io/badge/Criterio-Ejecución_Succeeded-22C55E?style=flat-square" />
+  <img src="https://img.shields.io/badge/Criterio-3_nodos_✓-22C55E?style=flat-square" />
+</p>
+
 La integración backend ↔ n8n funciona correctamente cuando se cumplen **todas** estas condiciones:
 
 | Criterio | Verificación |
@@ -542,6 +644,14 @@ curl http://localhost:3000/api/automation/test-activity-assigned
 
 ## 📎 16. Resumen ejecutivo
 
+<p align="center">
+  <img src="https://img.shields.io/badge/Integración_backend_↔_n8n-Funcional-22C55E?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Workflow-Publicado-22C55E?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Notificaciones_UI-Implementada-22C55E?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/n8n_→_bulk-Pendiente-F59E0B?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Flujos_adicionales-Futuros-6366F1?style=for-the-badge" />
+</p>
+
 | Aspecto | Estado |
 |---------|--------|
 | Flujo n8n implementado | **Activity Assigned Notification** (3 nodos) |
@@ -553,4 +663,10 @@ curl http://localhost:3000/api/automation/test-activity-assigned
 
 ---
 
-*Documento elaborado como evidencia técnica de la integración n8n en el Tutor Virtual de Lectura Comprensiva — I.E.P. San Carlos.*
+<p align="center">
+  <img src="https://img.shields.io/badge/I.E.P._San_Carlos-Tutor_Virtual-002C77?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Evidencia-Automatización_n8n-EA4B71?style=for-the-badge&logo=n8n&logoColor=white" />
+  <img src="https://img.shields.io/badge/Ingeniería-MERN_+_n8n-0EA5E9?style=for-the-badge" />
+</p>
+
+<p align="center"><em>Documento elaborado como evidencia técnica de la integración n8n en el Tutor Virtual de Lectura Comprensiva.</em></p>
