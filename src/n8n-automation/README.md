@@ -1,5 +1,7 @@
 # Automatización con n8n — Tutor Virtual
 
+> 📘 **Documentación principal:** [N8N_INTEGRATION_GUIDE.md](./N8N_INTEGRATION_GUIDE.md) — Guía completa de integración (evaluadores, desarrolladores, evidencia técnica).
+
 n8n es un **servicio externo** de automatización. Se ejecuta por separado del backend y del frontend. Esta carpeta solo contiene workflows exportables, documentación y ejemplos.
 
 ## ¿Qué hace n8n en este proyecto?
