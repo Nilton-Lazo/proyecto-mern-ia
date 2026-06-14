@@ -5,24 +5,37 @@ const User = require('../models/User');
 
 const router = express.Router();
 
+function dbReady() {
+  const mongoose = require('mongoose');
+  return mongoose.connection.readyState === 1;
+}
+
 // --- Registro ---
 router.post('/register', async (req, res) => {
   try {
+    if (!dbReady()) {
+      return res.status(503).json({ message: 'Base de datos no disponible. Verifica MongoDB.' });
+    }
+
     const { nombres, apellidos, centroEstudios, email, password, role } = req.body;
 
-    const exists = await User.findOne({ email });
+    if (!nombres?.trim() || !apellidos?.trim() || !email?.trim() || !password?.trim()) {
+      return res.status(400).json({ message: 'Completa nombres, apellidos, correo y contraseña.' });
+    }
+
+    const exists = await User.findOne({ email: email.trim().toLowerCase() });
     if (exists) return res.status(400).json({ message: 'El correo ya está registrado.' });
 
     const passwordHash = await bcrypt.hash(password, 10);
 
-    const userRole = role || 'student';
+    const userRole = ['student', 'teacher', 'admin'].includes(role) ? role : 'student';
     const user = await User.create({
-      nombres,
-      apellidos,
-      centroEstudios,
-      email,
+      nombres: nombres.trim(),
+      apellidos: apellidos.trim(),
+      centroEstudios: centroEstudios?.trim() || '',
+      email: email.trim().toLowerCase(),
       passwordHash,
-      role: userRole // permite registrar docentes también
+      role: userRole,
     });
 
     const token = jwt.sign(
@@ -51,9 +64,17 @@ router.post('/register', async (req, res) => {
 // --- Login ---
 router.post('/login', async (req, res) => {
   try {
+    if (!dbReady()) {
+      return res.status(503).json({ message: 'Base de datos no disponible. Verifica MongoDB.' });
+    }
+
     const { email, password } = req.body;
 
-    const user = await User.findOne({ email });
+    if (!email?.trim() || !password?.trim()) {
+      return res.status(400).json({ message: 'Correo y contraseña son obligatorios.' });
+    }
+
+    const user = await User.findOne({ email: email.trim().toLowerCase() });
     if (!user) return res.status(404).json({ message: 'Usuario no encontrado.' });
 
     const match = await bcrypt.compare(password, user.passwordHash);
@@ -72,7 +93,8 @@ router.post('/login', async (req, res) => {
         id: user._id,
         nombres: user.nombres,
         apellidos: user.apellidos,
-        role: user.role
+        email: user.email,
+        role: user.role,
       }
     });
   } catch (err) {

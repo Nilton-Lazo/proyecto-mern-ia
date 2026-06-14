@@ -6,6 +6,8 @@ import Questions from "./pages/Questions";
 import HowItWorks from "./pages/HowItWorks";
 import Benefits from "./pages/Benefits";
 import Reports from "./pages/Reports";
+import StudentReports from "./pages/student/StudentReports";
+import TeacherReports from "./pages/teacher/TeacherReports";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 
@@ -33,6 +35,22 @@ function App() {
             <AuthRoute>
               <Reports />
             </AuthRoute>
+          }
+        />
+        <Route
+          path="student/reports"
+          element={
+            <RoleRoute allowed={['student', 'admin']}>
+              <StudentReports />
+            </RoleRoute>
+          }
+        />
+        <Route
+          path="teacher/reports"
+          element={
+            <RoleRoute allowed={['teacher', 'admin']}>
+              <TeacherReports />
+            </RoleRoute>
           }
         />
         <Route path="login" element={<Login />} />

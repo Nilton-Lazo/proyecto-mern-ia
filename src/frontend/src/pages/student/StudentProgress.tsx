@@ -111,7 +111,7 @@ export default function StudentProgress() {
 
           <p className="mt-8 text-sm text-slate-500 dark:text-slate-400">
             Para reportes detallados e historial de práctica libre, visita{' '}
-            <Link to="/reports" className="font-medium text-indigo-600 hover:underline dark:text-indigo-400">
+            <Link to="/student/reports" className="font-medium text-indigo-600 hover:underline dark:text-indigo-400">
               Reportes
             </Link>
             .

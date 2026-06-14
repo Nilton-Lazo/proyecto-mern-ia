@@ -16,7 +16,11 @@ const {
   getSkillRecommendations,
 } = require('./studentHelpers');
 
+const studentReportsRouter = require('./studentReports');
+
 const router = express.Router();
+
+router.use('/reports', authRequired, requireRole('student', 'admin'), studentReportsRouter);
 
 const ACTIVITY_POPULATE = {
   path: 'activity',

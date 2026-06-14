@@ -8,7 +8,11 @@ const requireRole = require('../middlewares/roles');
 const { isValidArea, DEFAULT_AREA } = require('../constants/curricularAreas');
 const { extractTextFromPdf, MAX_PDF_BYTES } = require('../services/pdfService');
 
+const teacherReportsRouter = require('./teacherReports');
+
 const router = express.Router();
+
+router.use('/reports', authRequired, requireRole('teacher', 'admin'), teacherReportsRouter);
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: MAX_PDF_BYTES },

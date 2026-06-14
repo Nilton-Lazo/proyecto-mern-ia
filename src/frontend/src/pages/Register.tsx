@@ -8,7 +8,14 @@ import Button from '../components/ui/Button';
 export default function Register() {
   const { register } = useAuth();
   const nav = useNavigate();
-  const [f, setF] = useState({
+  const [f, setF] = useState<{
+    nombres: string;
+    apellidos: string;
+    centroEstudios: string;
+    email: string;
+    password: string;
+    role: 'student' | 'teacher';
+  }>({
     nombres: '',
     apellidos: '',
     centroEstudios: '',
@@ -82,7 +89,10 @@ export default function Register() {
           required
           autoComplete="new-password"
         />
-        <Select value={f.role} onChange={(e) => setF({ ...f, role: e.target.value })}>
+        <Select
+          value={f.role}
+          onChange={(e) => setF({ ...f, role: e.target.value as 'student' | 'teacher' })}
+        >
           <option value="student">Soy estudiante</option>
           <option value="teacher">Soy docente</option>
         </Select>
