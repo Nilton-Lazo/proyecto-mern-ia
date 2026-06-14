@@ -185,7 +185,7 @@ tutor-virtual-lectura-critica/
 
 ├── N8N_INTEGRATION_GUIDE.md      # Guía principal de integración n8n
 ├── IMPLEMENTACION_Y_DEMOSTRACION_ICACIT.md  # Guía exposición ICACIT (2.5 min)
-├── PPT_IMPLEMENTACION_DEMOSTRACION_ICACIT.md  # Diapositivas ICACIT (Canva/PPT)
+├── PPT_IMPLEMENTACION_DEMOSTRACION_ICACIT.md  # Síntesis implementación ICACIT
 ├── src/n8n-automation/           # Workflows n8n (sin Docker)
 │   ├── workflows/                # JSON exportables
 │   ├── docs/                     # N8N_SETUP.md, WORKFLOWS.md

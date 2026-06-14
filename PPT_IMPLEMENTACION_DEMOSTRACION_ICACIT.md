@@ -1,44 +1,75 @@
-# PPT — Implementación y Demostración ICACIT
+<p align="center">
+  <img src="https://img.shields.io/badge/ICACIT-Implementación_y_Demostración-002C77?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Proyecto-Tutor_Virtual-0EA5E9?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Institución-I.E.P._San_Carlos-6366F1?style=for-the-badge" />
+</p>
 
-**Sección 4 · Expositor 4 · ~2.5 min**  
-**Proyecto:** Tutor Virtual de Lectura Comprensiva Escolar  
-**Fuente:** [`IMPLEMENTACION_Y_DEMOSTRACION_ICACIT.md`](./IMPLEMENTACION_Y_DEMOSTRACION_ICACIT.md)
+# Implementación y Demostración
+
+## Tutor Virtual de Lectura Comprensiva Escolar
+
+**Institución:** I.E.P. San Carlos  
+**Stack:** MERN + IA local (Ollama) + Automatización (n8n)
+
+Documento de síntesis sobre la **implementación real** del sistema: arquitectura, flujos operativos, uso de tecnologías modernas y evidencia funcional verificable.
+
+> Documento complementario: [`IMPLEMENTACION_Y_DEMOSTRACION_ICACIT.md`](./IMPLEMENTACION_Y_DEMOSTRACION_ICACIT.md) · [`N8N_INTEGRATION_GUIDE.md`](./N8N_INTEGRATION_GUIDE.md)
 
 ---
 
-> Copia cada bloque **“Texto para la lámina”** directamente en PowerPoint o Canva.  
-> Usa **máximo 4–5 líneas** por diapositiva. El guion oral va en notas del presentador.
+## Índice
+
+| | Sección |
+|---|---------|
+| 1 | [Alcance de la implementación](#1-alcance-de-la-implementación) |
+| 2 | [Arquitectura general](#2-arquitectura-general) |
+| 3 | [Flujo principal del sistema](#3-flujo-principal-del-sistema) |
+| 4 | [Generación de preguntas con IA](#4-generación-de-preguntas-con-ia) |
+| 5 | [Retroalimentación inteligente](#5-retroalimentación-inteligente) |
+| 6 | [Panel docente y seguimiento](#6-panel-docente-y-seguimiento) |
+| 7 | [Base de datos MongoDB](#7-base-de-datos-mongodb) |
+| 8 | [Automatización con n8n](#8-automatización-con-n8n) |
+| 9 | [Tecnologías modernas aplicadas](#9-tecnologías-modernas-aplicadas) |
+| 10 | [Verificación operativa del sistema](#10-verificación-operativa-del-sistema) |
+| 11 | [Estado de implementación](#11-estado-de-implementación) |
 
 ---
 
-## Diapositiva 1: Arquitectura general del sistema
+## 1. Alcance de la implementación
 
-### Texto para la lámina (≤ 25 palabras)
+El Tutor Virtual es una aplicación web que integra **frontend moderno**, **backend con lógica de negocio**, **base de datos NoSQL**, **inteligencia artificial local** y **automatización externa** para fortalecer la comprensión lectora en el ámbito escolar.
 
-> Arquitectura web moderna: React, Express, MongoDB, Ollama y n8n conectados para lectura, IA y automatización académica.
+Esta implementación evidencia:
 
-### Contenido extendido (notas)
+- Asignación de actividades de lectura por parte del docente.
+- Generación automática de preguntas mediante IA.
+- Retroalimentación inmediata al estudiante.
+- Seguimiento académico mediante panel docente y reportes.
+- Persistencia de datos y trazabilidad del proceso pedagógico.
+- Automatización de eventos académicos mediante n8n.
 
-| Capa | Tecnología | Función |
-|------|------------|---------|
-| 🖥️ Frontend | React + TypeScript | Interfaz docente y estudiante |
-| ⚙️ Backend | Node.js + Express | Lógica, API REST, seguridad JWT |
-| 🗃️ Datos | MongoDB | Usuarios, actividades, entregas |
-| 🤖 IA | Ollama (local) | Preguntas y retroalimentación |
-| 🔄 Automatización | n8n | Eventos al asignar actividades |
+---
 
-### Diagrama sugerido
+## 2. Arquitectura general
+
+El sistema se organiza en capas desacopladas que permiten escalabilidad, mantenimiento y extensión funcional.
+
+| Capa | Tecnología | Responsabilidad |
+|------|------------|-----------------|
+| **Presentación** | React + TypeScript + Tailwind | Interfaz para docentes y estudiantes |
+| **Aplicación** | Node.js + Express | API REST, autenticación JWT, orquestación |
+| **Datos** | MongoDB + Mongoose | Persistencia de usuarios, actividades y entregas |
+| **Inteligencia artificial** | Ollama (llama3:8b) | Generación de preguntas, análisis y evaluación |
+| **Automatización** | n8n | Recepción de eventos al asignar actividades |
 
 ```mermaid
 flowchart LR
-    U[👤 Usuario] --> FE[Frontend React]
+    U[Usuario] --> FE[Frontend React]
     FE --> BE[Backend Express]
     BE --> DB[(MongoDB)]
     BE --> IA[Ollama / IA local]
     BE --> N8[n8n]
 ```
-
-**Versión textual (Canva):**
 
 ```
 [Docente / Estudiante]
@@ -53,357 +84,302 @@ Backend → Ollama (IA local)
 Backend → n8n (automatización)
 ```
 
-### Idea visual
-
-- Bloques rectangulares con bordes redondeados.
-- Colores: azul (frontend), gris oscuro (backend), verde (MongoDB), morado (IA), rosa/n8n.
-- Flechas horizontales de izquierda a derecha.
-
-### Guion del expositor (~20 s)
-
-> “El sistema usa una arquitectura web moderna. El frontend permite la interacción de docentes y estudiantes; el backend centraliza la lógica; MongoDB almacena los datos; Ollama genera y evalúa preguntas; y n8n automatiza eventos como la asignación de actividades.”
+> **Nota:** n8n opera como servicio externo. No reemplaza al backend ni al frontend; complementa el flujo principal con automatización desacoplada.
 
 ---
 
-## Diapositiva 2: Flujo principal del sistema
+## 3. Flujo principal del sistema
 
-### Texto para la lámina (≤ 25 palabras)
-
-> Docente asigna → estudiante lee → IA genera preguntas → responde → recibe feedback → docente consulta reportes.
-
-### Contenido extendido (notas)
-
-1. 👨‍🏫 Docente asigna actividad con texto de lectura  
-2. ⚙️ Backend guarda en MongoDB  
-3. 👨‍🎓 Estudiante visualiza la actividad  
-4. 🤖 IA genera preguntas de comprensión  
-5. ✍️ Estudiante responde  
-6. 💬 IA entrega retroalimentación  
-7. 📊 Docente revisa avance y reportes  
-
-### Diagrama sugerido
+El flujo operativo conecta al docente, al estudiante y al motor de IA en un ciclo completo de enseñanza-aprendizaje.
 
 ```mermaid
 flowchart LR
-    A[👨‍🏫 Docente] --> B[Asigna actividad]
-    B --> C[👨‍🎓 Estudiante]
-    C --> D[🤖 IA genera preguntas]
-    D --> E[Responde]
-    E --> F[💬 Retroalimentación]
-    F --> G[📊 Reportes docente]
+    A[Docente] --> B[Asigna actividad]
+    B --> C[Backend guarda en MongoDB]
+    C --> D[Estudiante accede]
+    D --> E[IA genera preguntas]
+    E --> F[Estudiante responde]
+    F --> G[IA evalúa y retroalimenta]
+    G --> H[Docente consulta reportes]
 ```
 
-**Versión textual (Canva):**
+| Etapa | Descripción |
+|-------|-------------|
+| **Asignación** | El docente crea una actividad con texto de lectura y la asigna a estudiantes |
+| **Registro** | El backend persiste la actividad y crea un registro de entrega por estudiante |
+| **Consumo** | El estudiante visualiza la actividad desde su panel |
+| **Generación IA** | El sistema produce preguntas tipificadas a partir del texto |
+| **Respuesta** | El estudiante responde con guardado automático de borrador |
+| **Evaluación** | La IA analiza respuestas y clasifica el desempeño |
+| **Retroalimentación** | Se entrega feedback contextual al estudiante |
+| **Seguimiento** | El docente consulta progreso, métricas y reportes exportables |
 
-```
-Docente → Asigna actividad → Estudiante responde → IA evalúa → Reportes docente
-```
-
-### Idea visual
-
-- Flujo lineal con íconos por rol (docente, estudiante, IA, reportes).
-- Numerar del 1 al 7 en círculos pequeños.
-
-### Guion del expositor (~25 s)
-
-> “El flujo inicia cuando el docente asigna una lectura. El estudiante desarrolla la actividad; el sistema usa IA para generar preguntas y brindar retroalimentación. Los resultados quedan disponibles para el seguimiento docente.”
+> **Importante:** La creación de actividades no depende de n8n. Si la automatización falla, el flujo pedagógico principal continúa operando.
 
 ---
 
-## Diapositiva 3: Generación de preguntas con IA
+## 4. Generación de preguntas con IA
 
-### Texto para la lámina (≤ 25 palabras)
+La generación de preguntas transforma un texto de lectura en una actividad interactiva orientada a distintas habilidades de comprensión lectora.
 
-> El texto asignado se analiza con Ollama. La IA genera preguntas de comprensión literal, inferencial, crítica y más.
+### Proceso
 
-### Contenido extendido (notas)
-
-| Paso | Detalle |
+| Fase | Detalle |
 |------|---------|
 | **Entrada** | Texto de lectura asignado por el docente |
-| **Proceso** | Backend envía texto a Ollama (`aiService.js`) |
-| **Salida** | 5–8 preguntas tipificadas por habilidad |
-| **Uso** | Práctica interactiva y evaluación del estudiante |
-
-**Tipos generados:** literal · inferencial · pensamiento crítico · vocabulario · idea principal
-
-### Diagrama sugerido
+| **Procesamiento** | Backend invoca `aiService.js` → Ollama |
+| **Salida** | 5–8 preguntas clasificadas por habilidad |
+| **Persistencia** | Preguntas almacenadas en el modelo `Submission` |
+| **Endpoint** | `POST /api/student/activities/:id/generate-questions` |
 
 ```mermaid
-flowchart LR
-    T[📄 Texto asignado] --> B[Backend]
-    B --> IA[🤖 Ollama analiza]
-    IA --> P[❓ Preguntas generadas]
-    P --> E[👨‍🎓 Estudiante responde]
+sequenceDiagram
+    participant E as Estudiante
+    participant F as Frontend
+    participant B as Backend
+    participant IA as Ollama
+    participant DB as MongoDB
+
+    E->>F: Solicita generar preguntas
+    F->>B: POST generate-questions
+    B->>IA: generateTypedQuestions(texto)
+    B->>IA: analyzeText(texto)
+    IA-->>B: Preguntas + análisis
+    B->>DB: Guarda en Submission
+    B-->>F: Preguntas por habilidad
 ```
 
-**Versión textual (Canva):**
+### Tipos de preguntas generadas
 
-```
-Texto asignado → IA analiza → Preguntas generadas → Estudiante responde
-```
+| Tipo | Habilidad evaluada |
+|------|-------------------|
+| `literal` | Comprensión literal |
+| `inferential` | Comprensión inferencial |
+| `critical` | Pensamiento crítico |
+| `vocabulary` | Vocabulario e interpretación |
+| `main_idea` | Idea principal |
 
-### Idea visual
+### Motor de IA
 
-- Icono de documento → cerebro/robot → lista de preguntas → estudiante.
-- Destacar “IA local” con badge pequeño.
-
-### Guion del expositor (~30 s)
-
-> “La generación de preguntas convierte una lectura en actividad interactiva. La IA analiza el contenido y produce preguntas orientadas a reforzar distintas habilidades de comprensión lectora.”
+- **Tecnología:** Ollama — ejecución **local** del modelo `llama3:8b`.
+- **Ventaja:** Control del proceso, personalización pedagógica y menor dependencia de servicios externos.
+- **Alternativa preparada:** Infraestructura para delegar generación a n8n; el flujo operativo actual usa Ollama como motor principal.
 
 ---
 
-## Diapositiva 4: Retroalimentación inteligente
+## 5. Retroalimentación inteligente
 
-### Texto para la lámina (≤ 25 palabras)
-
-> La IA clasifica cada respuesta: correcta, parcial o incorrecta. El estudiante recibe feedback inmediato y el resultado se guarda.
-
-### Contenido extendido (notas)
-
-- 👨‍🎓 El estudiante envía sus respuestas  
-- 🤖 Ollama analiza cada respuesta vs. el texto  
-- ✅ Clasificación: **correcta** · **parcial** · **incorrecta**  
-- 💬 Mensaje de mejora personalizado  
-- 🗃️ Registro en `Submission` para reportes docentes  
-
-### Diagrama sugerido
+Tras responder las preguntas, el estudiante recibe retroalimentación generada por IA, clasificada y registrada para seguimiento docente.
 
 ```mermaid
 flowchart TD
-    A[Respuesta del estudiante] --> B[Backend procesa]
-    B --> C[🤖 IA evalúa]
-    C --> D{Clasificación}
-    D --> E[💬 Feedback inmediato]
-    D --> F[🗃️ Progreso guardado]
+    A[Estudiante responde] --> B[Frontend envía submit]
+    B --> C[Backend procesa Submission]
+    C --> D[Ollama evalúa cada respuesta]
+    D --> E{Clasificación}
+    E --> F[Feedback al estudiante]
+    E --> G[Registro en MongoDB]
+    G --> H[Disponible en reportes docente]
 ```
 
-**Versión textual (Canva):**
+| Componente | Función |
+|------------|---------|
+| **Frontend** | Captura respuestas y muestra feedback (`FeedbackPanel.tsx`) |
+| **Backend** | Orquesta evaluación en `POST /api/student/activities/:id/submit` |
+| **Ollama** | Genera feedback por pregunta y evaluación global |
+| **MongoDB** | Persiste respuestas, clasificación y puntajes en `Submission` |
 
-```
-Respuesta estudiante → IA evalúa → Feedback → Progreso guardado
-```
+### Clasificación de respuestas
 
-### Idea visual
+| Estado | Significado pedagógico |
+|--------|------------------------|
+| **Correcta** | Comprensión adecuada del texto |
+| **Parcial** | Comprensión incompleta o imprecisa |
+| **Incorrecta** | Respuesta que no cumple el criterio esperado |
 
-- Tres badges de color: verde (correcta), amarillo (parcial), rojo (incorrecta).
-- Burbuja de chat con ejemplo breve de feedback.
-
-### Guion del expositor (~30 s)
-
-> “La retroalimentación es clave del sistema. No solo indica si la respuesta es correcta: orienta al estudiante sobre qué mejorar, generando una experiencia de aprendizaje más personalizada.”
+Adicionalmente, el sistema calcula **puntajes por habilidad** (`skillScores`), un **resumen de feedback**, **recomendaciones** y **mensajes motivacionales** para el estudiante.
 
 ---
 
-## Diapositiva 5: Panel docente y seguimiento académico
+## 6. Panel docente y seguimiento
 
-### Texto para la lámina (≤ 25 palabras)
-
-> El docente asigna lecturas, selecciona estudiantes, revisa progreso, consulta reportes PDF y detecta quién necesita apoyo.
-
-### Contenido extendido (notas)
-
-```
-Panel docente
-├── 📋 Asignar actividades (texto / PDF)
-├── 👥 Seleccionar estudiantes
-├── 📈 Revisar progreso
-├── 📊 Consultar reportes (grupo / alumno)
-└── 🎯 Detectar dificultades
-```
-
-| Funcionalidad | Evidencia |
-|---------------|-----------|
-| Asignación | `AssignActivity.tsx` |
-| Reportes PDF | Export formal ICACIT |
-| Seguimiento | Métricas por habilidad |
-
-### Diagrama sugerido
+El panel docente centraliza la gestión académica y el monitoreo del aprendizaje.
 
 ```mermaid
 flowchart TD
-    P[👨‍🏫 Panel docente] --> A[Asignar actividades]
-    P --> B[Revisar progreso]
-    P --> C[Consultar reportes]
-    P --> D[Detectar dificultades]
+    P[Panel docente] --> A[Asignar actividades]
+    P --> B[Seleccionar estudiantes]
+    P --> C[Revisar progreso]
+    P --> D[Consultar reportes]
+    P --> E[Detectar dificultades]
 ```
 
-### Idea visual
+| Funcionalidad | Descripción | Componente |
+|---------------|-------------|------------|
+| **Asignar actividad** | Crear lectura, área curricular, fecha límite | `AssignActivity.tsx` |
+| **Cargar PDF** | Extracción de texto desde archivo PDF | `POST /api/teacher/extract-pdf` |
+| **Seleccionar alumnos** | Asignación individual o grupal | `StudentSelector.tsx` |
+| **Revisar progreso** | Avance por actividad y estudiante | `TeacherDashboard.tsx` |
+| **Reportes de grupo** | Métricas agregadas de entregas y promedios | `TeacherReports.tsx` |
+| **Reportes por alumno** | Desempeño individual con evidencias | Export PDF formal |
+| **Exportación** | PDF institucional y CSV | `reportPdfService.js` |
 
-- Dashboard mockup con tarjetas: pendientes, completadas, promedio.
-- Icono PDF para exportación de reportes.
+### Roles del sistema
 
-### Guion del expositor (~25 s)
-
-> “El panel docente permite gestionar actividades y hacer seguimiento al desempeño. Así el docente no solo asigna lecturas: identifica avances y dificultades con evidencia.”
+| Rol | Acceso |
+|-----|--------|
+| `teacher` | Asignación de actividades, reportes, seguimiento |
+| `student` | Actividades, práctica IA, progreso, notificaciones |
+| `admin` | Acceso extendido a funcionalidades docente y estudiante |
 
 ---
 
-## Diapositiva 6: Tecnologías aplicadas y demostración
+## 7. Base de datos MongoDB
 
-### Texto para la lámina (≤ 25 palabras)
+MongoDB es una base de datos **NoSQL orientada a documentos**. Almacena información en colecciones de documentos con estructura similar a JSON (BSON internamente).
 
-> React, Express, MongoDB, Ollama, n8n, Jest y Cypress. Demo: asignar, generar preguntas, responder, ver feedback y reportes.
-
-### Tabla compacta (Canva)
-
-| Tecnología | Uso |
-|------------|-----|
-| **React** | Interfaz del usuario |
-| **Node.js / Express** | Backend y API |
-| **MongoDB** | Base de datos NoSQL |
-| **Ollama** | IA local — generación y evaluación |
-| **n8n** | Automatización de eventos |
-| **Jest / Cypress** | Pruebas del sistema |
-
-### Ruta de demo en vivo
-
-```
-1. Login docente
-2. Asignar actividad
-3. Login estudiante
-4. Generar preguntas 🤖
-5. Responder ✍️
-6. Ver retroalimentación 💬
-7. Reportes docente 📊
-```
-
-### Diagrama sugerido
+> MongoDB fue elegido porque el sistema maneja usuarios, actividades, preguntas embebidas, respuestas, retroalimentaciones y reportes con estructuras flexibles. Al ser una base de datos orientada a documentos, facilita el desarrollo dentro del stack MERN y se adapta a la evolución del modelo pedagógico.
 
 ```mermaid
-flowchart LR
-    subgraph Demo["🎬 Demo 2.5 min"]
-        D1[Docente asigna] --> D2[Estudiante responde]
-        D2 --> D3[IA feedback]
-        D3 --> D4[Reportes]
-    end
+erDiagram
+    USER ||--o{ ACTIVITY : "createdBy"
+    USER ||--o{ ACTIVITY : "assignees"
+    ACTIVITY ||--o{ SUBMISSION : "tiene"
+    USER ||--o{ SUBMISSION : "responde"
+    USER ||--o{ NOTIFICATION : "recibe"
+    ACTIVITY ||--o{ NOTIFICATION : "referencia"
 ```
 
-### Idea visual
+| Modelo | Colección | Propósito |
+|--------|-----------|-----------|
+| `User` | `users` | Docentes, estudiantes y administradores |
+| `Activity` | `activities` | Lecturas asignadas con texto, área y destinatarios |
+| `Submission` | `submissions` | Preguntas, respuestas, feedback y puntajes del estudiante |
+| `Notification` | `notifications` | Notificaciones in-app |
+| `WorkflowLog` | `workflowlogs` | Registro de ejecuciones n8n |
+| `Answer` | `answers` | Retroalimentación en práctica libre (`/api/ai/feedback`) |
 
-- Grid de logos (skillicons.dev) + checklist de demo al costado.
-- Fondo oscuro, acentos celeste y morado.
-
-### Guion del expositor (~30 s)
-
-> “En la demo evidenciamos tecnologías modernas: React para la interfaz, Express para la lógica, MongoDB para datos flexibles, Ollama para la IA y n8n para automatizar eventos académicos.”
+> El modelo **`Submission`** concentra el núcleo del flujo estudiante: preguntas generadas, respuestas, retroalimentación y evaluación en un documento por `(activity, student)`.
 
 ---
 
-## Textos cortos — MongoDB (notas / lámina extra)
+## 8. Automatización con n8n
 
-**Versión corta (Canva):**
+n8n funciona como **capa externa de automatización**. Cuando el docente asigna una actividad, el backend envía un evento al webhook de n8n mediante `N8N_ACTIVITY_ASSIGNED_WEBHOOK_URL`.
 
-> MongoDB almacena usuarios, actividades, preguntas y respuestas en documentos tipo JSON, integrándose con Node.js en el stack MERN.
+### Flujo implementado
 
-**Versión media (notas del expositor):**
-
-> MongoDB es una base de datos NoSQL orientada a documentos. En lugar de tablas rígidas, guarda datos similares a JSON. Esto facilita manejar usuarios, actividades, respuestas, retroalimentaciones y reportes de forma flexible.
-
----
-
-## Textos cortos — n8n (notas / lámina extra)
-
-**Versión corta (Canva):**
-
-> n8n automatiza eventos académicos. Al asignar una actividad, el backend envía un webhook a n8n para procesar acciones posteriores.
-
-**Flujo implementado hoy:**
+**Workflow:** Activity Assigned Notification (publicado)
 
 ```
-Activity Assigned Notification
 Webhook → Edit Fields → Respond to Webhook
 ```
 
-**Base preparada para ampliar (mejoras futuras):**
+| Nodo | Función |
+|------|---------|
+| **Webhook** | Recibe evento `activity_assigned` desde el backend |
+| **Edit Fields** | Organiza título, área, docente y estudiantes |
+| **Respond to Webhook** | Confirma recepción al backend |
 
-- Notificaciones internas vía backend  
-- Recordatorios automáticos  
-- Reportes semanales  
-- Alertas pedagógicas  
+### Integración vs automatización extendida
 
-> **Importante:** No afirmar que n8n ya envía correos o recordatorios — el flujo publicado recibe, transforma y responde el evento.
+| Aspecto | Estado |
+|---------|--------|
+| Backend → n8n (webhook) | Implementado |
+| n8n recibe y procesa evento | Implementado |
+| Notificaciones in-app vía backend | Implementado (respaldo al asignar) |
+| n8n → `POST /api/notifications/bulk` | Base preparada; nodo HTTP pendiente en workflow |
+| Recordatorios / reportes semanales n8n | Mejora futura (JSON exportable) |
 
----
-
-## Guion completo de 2.5 minutos — Expositor 4
-
-### 0:00 – 0:20 · Arquitectura
-
-> “Mostramos la implementación real del Tutor Virtual. Usamos React en el frontend, Express en el backend, MongoDB como base de datos, Ollama como motor de IA local y n8n para automatización. Todo conectado en una arquitectura web moderna.”
-
-### 0:20 – 0:45 · Flujo principal
-
-> “El flujo es simple: el docente asigna una lectura, el estudiante accede desde su panel, la IA genera preguntas, el estudiante responde y recibe retroalimentación. Finalmente, el docente consulta reportes con evidencia del desempeño.”
-
-### 0:45 – 1:15 · Generación de preguntas
-
-> “Cuando el estudiante solicita preguntas, el backend envía el texto a Ollama. La IA produce preguntas de comprensión literal, inferencial, crítica, vocabulario e idea principal. Así convertimos una lectura estática en práctica interactiva.”
-
-### 1:15 – 1:45 · Retroalimentación
-
-> “Al enviar respuestas, la IA evalúa cada una y la clasifica como correcta, parcial o incorrecta. El estudiante recibe feedback inmediato y orientación de mejora. Todo queda registrado para el seguimiento docente.”
-
-### 1:45 – 2:10 · Panel docente
-
-> “Desde el panel docente se asignan actividades, se seleccionan estudiantes y se consultan reportes por grupo o por alumno. Esto permite detectar avances y dificultades con datos, no solo con intuición.”
-
-### 2:10 – 2:30 · Tecnologías y cierre
-
-> “Con esta demo evidenciamos tecnologías actuales aplicadas a la educación: MERN, IA local, automatización y pruebas automatizadas. El sistema fortalece la comprensión lectora y mejora el seguimiento pedagógico. Gracias.”
+> **Nota:** El flujo publicado recibe, transforma y responde el evento. No envía correos ni recordatorios automáticos en la versión actual.
 
 ---
 
-## Textos exactos para copiar en Canva (ultra resumido)
+## 9. Tecnologías modernas aplicadas
 
-| # | Texto exacto (≤ 25 palabras) |
-|---|------------------------------|
-| **1** | Arquitectura web moderna: React, Express, MongoDB, Ollama y n8n conectados para lectura, IA y automatización académica. |
-| **2** | Docente asigna → estudiante lee → IA genera preguntas → responde → recibe feedback → docente consulta reportes. |
-| **3** | El texto asignado se analiza con Ollama. La IA genera preguntas de comprensión literal, inferencial, crítica y más. |
-| **4** | La IA clasifica cada respuesta: correcta, parcial o incorrecta. El estudiante recibe feedback inmediato y el resultado se guarda. |
-| **5** | El docente asigna lecturas, selecciona estudiantes, revisa progreso, consulta reportes PDF y detecta quién necesita apoyo. |
-| **6** | React, Express, MongoDB, Ollama, n8n, Jest y Cypress. Demo: asignar, generar preguntas, responder, ver feedback y reportes. |
+<p align="center">
+  <img src="https://skillicons.dev/icons?i=react,nodejs,express,mongodb,ts,tailwind,git,github,docker" alt="Stack tecnológico" />
+</p>
+
+| Tecnología | Tipo | Función en el proyecto |
+|------------|------|------------------------|
+| **React 19** | Frontend | Interfaces dinámicas por rol |
+| **TypeScript** | Frontend | Tipado estático y mantenibilidad |
+| **Vite** | Build | Compilación y desarrollo frontend |
+| **Tailwind CSS** | UI | Diseño responsive |
+| **Node.js** | Backend | Runtime del servidor |
+| **Express 5** | Backend | Rutas REST y middlewares |
+| **MongoDB** | Base de datos | Persistencia NoSQL |
+| **Mongoose** | ODM | Modelado de esquemas |
+| **Ollama** | IA local | Generación, análisis y evaluación |
+| **n8n** | Automatización | Workflow Activity Assigned Notification |
+| **JWT** | Seguridad | Autenticación por roles |
+| **pnpm** | Monorepo | Gestión backend + frontend |
+| **Jest** | Testing | Pruebas unitarias e integración |
+| **Cypress** | E2E | Pruebas de flujo en navegador |
+| **Newman** | API testing | Colecciones Postman automatizadas |
+| **GitHub Actions** | CI/CD | Pipeline de calidad continua |
 
 ---
 
-## Recomendaciones visuales (PowerPoint / Canva)
+## 10. Verificación operativa del sistema
 
-| Recomendación | Detalle |
-|---------------|---------|
-| **Texto** | Máximo 4–5 líneas por lámina; usar los textos ≤ 25 palabras |
-| **Diagramas** | Priorizar flechas y bloques sobre párrafos |
-| **Íconos** | 👨‍🏫 docente · 👨‍🎓 estudiante · 🤖 IA · 🗃️ BD · 🔄 n8n · 📊 reportes |
-| **Colores** | Azul `#2563EB`, morado `#6366F1`, celeste `#0EA5E9`, gris `#1E293B`, blanco |
-| **Tipografía** | Título bold 28–32 pt · cuerpo 18–22 pt |
-| **Coherencia** | Mismo estilo que la interfaz del Tutor Virtual |
-| **Demo** | Preparar pestañas: docente + estudiante + reportes + n8n Executions |
+El sistema puede verificarse mediante recorrido funcional completo en entorno local.
 
----
+| Paso | Acción | Evidencia |
+|------|--------|-----------|
+| 1 | Autenticación como docente | JWT + rol `teacher` |
+| 2 | Crear y asignar actividad con texto | Actividad en MongoDB |
+| 3 | Evento hacia n8n | Ejecución en n8n Executions |
+| 4 | Autenticación como estudiante | Rol `student` |
+| 5 | Generar preguntas con IA | Preguntas tipificadas visibles |
+| 6 | Responder y enviar actividad | Clasificación y feedback |
+| 7 | Consultar reportes docente | PDF / métricas de desempeño |
 
-## Qué mostrar en la demo en vivo
-
-| Paso | Pantalla | Rol |
-|------|----------|-----|
-| 1 | `/login` | Docente |
-| 2 | Asignar actividad (texto + estudiantes) | Docente |
-| 3 | n8n → Executions (opcional) | Automatización |
-| 4 | `/login` | Estudiante |
-| 5 | Mis actividades → Generar preguntas | Estudiante + IA |
-| 6 | Responder → Enviar → Feedback | Retroalimentación |
-| 7 | Reportes docente → PDF | Seguimiento |
-
-**Comandos previos:**
+### Requisitos de entorno
 
 ```bash
-pnpm run dev          # backend + frontend
-ollama serve          # IA local
-n8n start             # automatización (opcional)
+pnpm run dev          # Backend + frontend
+ollama serve          # Motor de IA local
+n8n start             # Automatización (opcional)
 ```
+
+---
+
+## 11. Estado de implementación
+
+| Funcionalidad | Estado |
+|---------------|--------|
+| Asignación de actividades (texto, PDF, estudiantes) | ✅ Implementado |
+| Generación de preguntas con Ollama | ✅ Implementado |
+| Retroalimentación (correcta / parcial / incorrecta) | ✅ Implementado |
+| Evaluación global y puntajes por habilidad | ✅ Implementado |
+| Panel docente y reportes PDF/CSV | ✅ Implementado |
+| Notificaciones in-app para estudiantes | ✅ Implementado |
+| Integración n8n — Activity Assigned | ✅ Implementado |
+| n8n → notificaciones bulk | 🔶 Base preparada |
+| Recordatorios y reportes n8n | 📌 Mejora futura |
+| Pruebas automatizadas (Jest, Cypress, CI) | ✅ Implementado |
+
+---
+
+## Valor académico y tecnológico
+
+Esta implementación demuestra:
+
+- **Integración de tecnologías modernas** en un producto funcional orientado a la educación.
+- **IA aplicada al aprendizaje** con generación de preguntas y retroalimentación contextual.
+- **Automatización desacoplada** mediante n8n sin comprometer el flujo principal.
+- **Arquitectura escalable** con capas claramente definidas.
+- **Trazabilidad pedagógica** mediante persistencia de entregas, puntajes y reportes exportables.
+- **Calidad de software** respaldada por pruebas automatizadas e integración continua.
 
 ---
 
 <p align="center">
-  <em>6 diapositivas · Guion 2.5 min · Listo para PowerPoint / Canva · ICACIT Expositor 4</em>
+  <img src="https://img.shields.io/badge/I.E.P._San_Carlos-Tutor_Virtual-002C77?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Implementación-Real-22C55E?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Evidencia-ICACIT-6366F1?style=for-the-badge" />
 </p>
+
+<p align="center"><em>Implementación y demostración — Tutor Virtual de Lectura Comprensiva Escolar</em></p>
