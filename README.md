@@ -183,8 +183,10 @@ tutor-virtual-lectura-critica/
 │   ├── package.json
 │   └── server.js                 # Punto de inicio del backend
 
-├── n8n/                          # Flujos automatizados n8n
-│   └── workflows.json            # Recordatorios, registro de avance, emails
+├── src/n8n-automation/           # Workflows n8n (sin Docker)
+│   ├── workflows/                # JSON exportables
+│   ├── docs/                     # N8N_SETUP.md, WORKFLOWS.md
+│   └── examples/                 # Payloads de prueba
 
 ├── docker-compose.yml            # Orquestación de contenedores
 ├── .env.example                  # Variables de entorno modelo
@@ -540,6 +542,71 @@ Todos los endpoints de reportes requieren **JWT** y validan el rol. Los datos pr
 
 ### Áreas curriculares soportadas
 Comunicación, Matemática, Ciencia y Tecnología, Personal Social, Arte y Cultura, Inglés, Educación Religiosa, Tutoría, Otro.
+
+---
+
+## ⚡ Automatización con n8n
+
+n8n funciona como **capa de automatización externa** conectada al backend mediante webhooks y endpoints internos. No reemplaza la lógica principal ni vive en el frontend.
+
+### Ubicación
+- Workflows: `src/n8n-automation/workflows/`
+- Documentación: `src/n8n-automation/docs/N8N_SETUP.md`
+- Payloads de ejemplo: `src/n8n-automation/examples/webhook-payloads.json`
+
+### Instalar n8n (sin Docker)
+
+```bash
+npm install -g n8n
+n8n start
+# Panel: http://localhost:5678
+```
+
+Alternativa: `npx n8n`
+
+### Workflows incluidos
+
+| Workflow | Propósito |
+|----------|-----------|
+| `reading-reminder-workflow.json` | Recordatorios de lectura (cron diario) |
+| `activity-assigned-notification.json` | Notificar actividad asignada (webhook) |
+| `weekly-teacher-report.json` | Resumen semanal docente (cron lunes) |
+| `generate-questions-backend.json` | Generación de preguntas vía IA (webhook) |
+| `detect-biases-backend.json` | Detección de sesgos (webhook) |
+
+### Variables de entorno (backend)
+
+```env
+N8N_BASE_URL=http://localhost:5678
+N8N_INTERNAL_API_KEY=tu_clave_secreta
+N8N_GENERATE_QUESTIONS_WEBHOOK_URL=http://localhost:5678/webhook/generate-questions
+N8N_DETECT_BIASES_WEBHOOK_URL=http://localhost:5678/webhook/detect-biases
+N8N_ACTIVITY_ASSIGNED_WEBHOOK_URL=http://localhost:5678/webhook/activity-assigned
+```
+
+Ver `src/backend/.env.example` para la lista completa.
+
+### Endpoints de automatización
+
+Base: `/api/automation` — requieren header `x-n8n-api-key`
+
+| Método | Ruta | Descripción |
+|--------|------|-------------|
+| GET | `/pending-activities` | Actividades pendientes / por vencer |
+| POST | `/workflow-log` | Registrar ejecución de workflow |
+| GET | `/teacher-weekly-summary` | Resumen semanal para docentes |
+| POST | `/test-webhook` | Verificar configuración |
+
+### Probar conexión
+
+```bash
+curl -X POST http://localhost:3000/api/automation/test-webhook \
+  -H "x-n8n-api-key: tu_clave_secreta"
+```
+
+### Principio de diseño
+
+Si n8n no está configurado o falla, el backend **sigue funcionando** con Ollama directo. Los logs en `WorkflowLog` evidencian las automatizaciones para evaluación académica (ICACIT).
 
 ---
 

@@ -1,0 +1,104 @@
+{
+  "name": "Weekly Teacher Report",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [{ "field": "cronExpression", "expression": "0 9 * * 1" }]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 0],
+      "id": "cron-weekly-monday",
+      "name": "Weekly Monday 9am"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "http://localhost:3000/api/automation/teacher-weekly-summary",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "x-n8n-api-key", "value": "={{$env.N8N_INTERNAL_API_KEY}}" }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [240, 0],
+      "id": "fetch-weekly-summary",
+      "name": "Fetch Weekly Summary"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "summaries",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [480, 0],
+      "id": "split-teachers",
+      "name": "Split Teachers"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "name": "reportText",
+              "value": "=Resumen semanal para {{ $json.teacherName }}: {{ $json.activitiesAssigned }} actividades, {{ $json.submitted }} entregadas, {{ $json.pending }} pendientes, {{ $json.overdue }} vencidas. Comprensión promedio: {{ $json.avgComprehension ?? 'sin datos' }}%. Habilidad más baja: {{ $json.weakestSkill || 'N/A' }}. Estudiantes en riesgo: {{ ($json.atRiskStudents || []).length }}.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [720, 0],
+      "id": "format-report",
+      "name": "Format Report Text"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:3000/api/automation/workflow-log",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "x-n8n-api-key", "value": "={{$env.N8N_INTERNAL_API_KEY}}" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ workflowName: 'weekly-teacher-report', eventType: 'weekly_report', status: 'success', teacherId: $json.teacherId, payload: { reportText: $json.reportText, teacherEmail: $json.teacherEmail }, response: { channel: 'log', summary: $json } }) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [960, 0],
+      "id": "log-weekly-report",
+      "name": "Log Weekly Report"
+    }
+  ],
+  "connections": {
+    "Weekly Monday 9am": {
+      "main": [[{ "node": "Fetch Weekly Summary", "type": "main", "index": 0 }]]
+    },
+    "Fetch Weekly Summary": {
+      "main": [[{ "node": "Split Teachers", "type": "main", "index": 0 }]]
+    },
+    "Split Teachers": {
+      "main": [[{ "node": "Format Report Text", "type": "main", "index": 0 }]]
+    },
+    "Format Report Text": {
+      "main": [[{ "node": "Log Weekly Report", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "meta": { "instanceId": "tutor-virtual-n8n" },
+  "tags": [{ "name": "tutor-virtual" }, { "name": "reports" }]
+}

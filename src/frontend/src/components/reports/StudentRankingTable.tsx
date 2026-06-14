@@ -2,9 +2,12 @@ import type { StudentRankingRow } from '../../types/reports';
 import { studentStatusColor } from '../../utils/reportFormatters';
 import EmptyReportState from './EmptyReportState';
 
-type Props = { students: StudentRankingRow[] };
+type Props = {
+  students: StudentRankingRow[];
+  onSelectStudent?: (studentId: string) => void;
+};
 
-export default function StudentRankingTable({ students }: Props) {
+export default function StudentRankingTable({ students, onSelectStudent }: Props) {
   if (!students.length) {
     return <EmptyReportState message="Aún no hay estudiantes asignados para generar análisis del grupo." />;
   }
@@ -31,7 +34,17 @@ export default function StudentRankingTable({ students }: Props) {
             {students.map((s) => (
               <tr key={s.studentId} className="border-t border-slate-50 dark:border-slate-800/80">
                 <td className="px-2 py-2 font-medium text-slate-800 dark:text-slate-100">
-                  {s.nombres} {s.apellidos}
+                  {onSelectStudent ? (
+                    <button
+                      type="button"
+                      onClick={() => onSelectStudent(s.studentId)}
+                      className="text-left text-indigo-600 hover:underline dark:text-indigo-400"
+                    >
+                      {s.nombres} {s.apellidos}
+                    </button>
+                  ) : (
+                    <>{s.nombres} {s.apellidos}</>
+                  )}
                 </td>
                 <td className="px-2 py-2">{s.completed}/{s.total}</td>
                 <td className="px-2 py-2">{s.avgProgress}%</td>

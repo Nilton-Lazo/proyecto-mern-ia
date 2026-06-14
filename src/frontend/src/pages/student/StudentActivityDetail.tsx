@@ -40,7 +40,7 @@ export default function StudentActivityDetail() {
   const submitted = data?.status === 'submitted';
   const overdue = data?.displayStatus === 'vencida' && !submitted;
 
-  const { status: autoStatus, lastSavedAt, errorMsg, markDirty, saveNow } = useAutoSave({
+  const { status: autoStatus, lastSavedAt, errorMsg, markDirty, clearDirty, saveNow } = useAutoSave({
     activityId: id,
     token,
     answers,
@@ -154,8 +154,10 @@ export default function StudentActivityDetail() {
     if (!id) return;
     setSaving(true);
     setMsg(null);
+    setError(null);
     try {
       const res = await saveActivityDraft(id, answers, token, data?.currentStep);
+      clearDirty(res.lastSavedAt);
       setMsg(`Borrador guardado (${res.progressPercent}%)`);
       setData((prev) =>
         prev

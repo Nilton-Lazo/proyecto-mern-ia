@@ -14,6 +14,7 @@ const {
   buildPedagogicalAlerts,
   buildTeacherRecommendations,
   buildTeacherEvidence,
+  formatReportFilterLabel,
   aggregateSkillScores,
   submissionsToCsv,
 } = require('../utils/reportHelpers');
@@ -189,13 +190,33 @@ router.get('/export-pdf', async (req, res) => {
     const skillScores = aggregateSkillScores(subs.filter((s) => s.status === 'submitted'));
     const ranking = buildTeacherStudentRanking(activities, subs, students);
     const difficulty = buildActivityDifficulty(activities, subs);
+    const areas = buildTeacherAreaTopicReport(activities, subs);
+    const recentAnswers = buildRecentAnswers(subs, 10);
+    const alerts = buildPedagogicalAlerts(
+      summary,
+      skillScores,
+      areas,
+      ranking
+    );
+
+    const selectedStudent = filters.studentId
+      ? students.find((s) => String(s._id) === String(filters.studentId))
+      : null;
+
     generateTeacherReportPdf(res, {
       teacher: req.user,
       summary,
       skills: buildTeacherSkillMap(skillScores),
       students: ranking,
       difficulty,
+      areas,
+      alerts,
+      recentAnswers,
       recommendations: buildTeacherRecommendations(summary, skillScores, difficulty, ranking),
+      selectedStudent: selectedStudent
+        ? { nombres: selectedStudent.nombres, apellidos: selectedStudent.apellidos, email: selectedStudent.email }
+        : null,
+      filterLabel: formatReportFilterLabel(req.query, selectedStudent),
     });
   } catch (err) {
     console.error('teacher reports/export-pdf:', err);

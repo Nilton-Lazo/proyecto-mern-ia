@@ -48,8 +48,8 @@ describe('TeacherReports', () => {
         <TeacherReports />
       </MemoryRouter>
     );
-    expect(await screen.findByText(/Reportes del grupo/i)).toBeInTheDocument();
-    expect(await screen.findByText(/Alertas de seguimiento/i)).toBeInTheDocument();
+    expect(await screen.findByText(/Reportes pedagógicos del grupo/i)).toBeInTheDocument();
+    expect(await screen.findByText(/Evidencia para certificación ICACIT/i)).toBeInTheDocument();
     expect(await screen.findByText(/inferencial está por debajo/i)).toBeInTheDocument();
   });
 });

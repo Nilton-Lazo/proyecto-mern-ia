@@ -3,6 +3,7 @@ type Card = {
   value: string | number;
   accent?: string;
   small?: boolean;
+  hint?: string;
 };
 
 type Props = { cards: Card[] };
@@ -19,6 +20,9 @@ export default function SummaryCards({ cards }: Props) {
           >
             {c.value}
           </p>
+          {c.hint && (
+            <p className="mt-1 text-[10px] leading-snug text-slate-400 dark:text-slate-500">{c.hint}</p>
+          )}
         </div>
       ))}
     </div>

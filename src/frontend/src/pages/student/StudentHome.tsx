@@ -10,6 +10,7 @@ import { STATUS_LABELS, STATUS_STYLES } from '../../utils/statusHelpers';
 import { formatDate } from '../../utils/formatDate';
 import Badge from '../../components/ui/Badge';
 import PageHeader from '../../components/ui/PageHeader';
+import { NotificationListPanel } from '../../components/NotificationBell';
 
 export default function StudentHome() {
   const { user, token } = useAuth();
@@ -47,6 +48,16 @@ export default function StudentHome() {
       {error && (
         <p className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700 dark:bg-red-950/50 dark:text-red-300">{error}</p>
       )}
+
+      <section className="mt-8">
+        <div className="mb-4">
+          <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Notificaciones recientes</h2>
+          <p className="text-xs text-slate-500 dark:text-slate-400">
+            Avisos automáticos cuando un docente te asigna actividades
+          </p>
+        </div>
+        <NotificationListPanel limit={5} />
+      </section>
 
       {data && !loading && (
         <>

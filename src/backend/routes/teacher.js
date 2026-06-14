@@ -7,6 +7,8 @@ const authRequired = require('../middlewares/auth');
 const requireRole = require('../middlewares/roles');
 const { isValidArea, DEFAULT_AREA } = require('../constants/curricularAreas');
 const { extractTextFromPdf, MAX_PDF_BYTES } = require('../services/pdfService');
+const n8nService = require('../services/n8n.service');
+const notificationService = require('../services/notification.service');
 
 const teacherReportsRouter = require('./teacherReports');
 
@@ -114,7 +116,80 @@ router.post('/activities', authRequired, requireRole('teacher', 'admin'), async 
       await Submission.insertMany(docs, { ordered: false }).catch(() => {});
     }
 
-    res.status(201).json({ ok: true, activityId: act._id });
+    // Notificación vía n8n — después de guardar; no bloquea si falla
+    let automation = {
+      n8nTriggered: false,
+      message: 'La actividad fue creada, pero no se pudo notificar a n8n',
+    };
+
+    try {
+      const students = await User.find({ _id: { $in: assignees } })
+        .select('_id nombres apellidos email')
+        .lean();
+
+      const studentPayload = students.map((s) => ({
+        id: String(s._id),
+        name: `${s.nombres || ''} ${s.apellidos || ''}`.trim(),
+        email: s.email,
+      }));
+
+      const n8nResult = await n8nService.triggerActivityAssigned({
+        activityId: String(act._id),
+        title: act.title,
+        area: act.area,
+        topic: act.topic,
+        dueDate: act.dueAt ? act.dueAt.toISOString().slice(0, 10) : null,
+        teacherName: `${req.user.nombres || ''} ${req.user.apellidos || ''}`.trim(),
+        teacherId: String(req.user._id),
+        students: studentPayload,
+      });
+
+      automation = {
+        n8nTriggered: n8nResult.success,
+        message: n8nResult.success
+          ? n8nResult.message
+          : 'La actividad fue creada, pero no se pudo notificar a n8n',
+      };
+      if (!n8nResult.success) {
+        console.warn('n8n activity-assigned:', n8nResult.error);
+      }
+
+      // Fallback: garantiza notificaciones in-app aunque n8n no llame a /bulk
+      try {
+        const created = await notificationService.createBulkNotifications({
+          event: 'activity_assigned',
+          activityId: String(act._id),
+          title: `Nueva actividad asignada: ${act.title}`,
+          message: `Área: ${act.area} | Fecha límite: ${
+            act.dueAt ? act.dueAt.toISOString().slice(0, 10) : 'por confirmar'
+          }`,
+          students: studentPayload,
+        });
+        if (created.length) {
+          console.log(`Notificaciones in-app creadas para ${created.length} estudiante(s)`);
+        }
+      } catch (notifErr) {
+        console.warn('No se pudieron crear notificaciones in-app:', notifErr.message);
+      }
+    } catch (err) {
+      console.warn('n8n activity-assigned:', err.message);
+    }
+
+    res.status(201).json({
+      success: true,
+      ok: true,
+      message: 'Actividad asignada correctamente',
+      activityId: act._id,
+      activity: {
+        _id: act._id,
+        title: act.title,
+        area: act.area,
+        topic: act.topic,
+        dueAt: act.dueAt,
+        assignees,
+      },
+      automation,
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: err.message });

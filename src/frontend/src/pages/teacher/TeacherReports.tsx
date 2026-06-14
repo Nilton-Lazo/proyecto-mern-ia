@@ -1,8 +1,10 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import PageHeader from '../../components/ui/PageHeader';
 import LoadingState from '../../components/ui/LoadingState';
 import ReportFilters from '../../components/reports/ReportFilters';
+import ReportContextPanel from '../../components/reports/ReportContextPanel';
+import ReportScopeBar from '../../components/reports/ReportScopeBar';
 import SummaryCards from '../../components/reports/SummaryCards';
 import SkillMap from '../../components/reports/SkillMap';
 import StudentRankingTable from '../../components/reports/StudentRankingTable';
@@ -43,6 +45,7 @@ import type {
 export default function TeacherReports() {
   const { user, token } = useAuth();
   const [filters, setFilters] = useState<ReportFilterState>({ period: 'all', area: 'todas', status: 'all' });
+  const [allStudents, setAllStudents] = useState<StudentRankingRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [summary, setSummary] = useState<TeacherReportSummary | null>(null);
@@ -54,6 +57,20 @@ export default function TeacherReports() {
   const [alerts, setAlerts] = useState<PedagogicalAlert[]>([]);
   const [recommendations, setRecommendations] = useState<string[]>([]);
   const [evidence, setEvidence] = useState<EvidenceItem[]>([]);
+
+  const loadStudents = useCallback(async () => {
+    const st = await fetchTeacherReportStudents(token, {
+      period: filters.period,
+      area: filters.area,
+      status: 'all',
+      topic: filters.topic,
+    });
+    setAllStudents(st.students);
+  }, [token, filters.period, filters.area, filters.topic]);
+
+  useEffect(() => {
+    loadStudents();
+  }, [loadStudents]);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -89,39 +106,67 @@ export default function TeacherReports() {
     load();
   }, [load]);
 
-  const teacherName = user ? `${user.nombres}` : '';
+  const selectedStudent = useMemo(
+    () => students.find((s) => s.studentId === filters.studentId) || allStudents.find((s) => s.studentId === filters.studentId),
+    [students, allStudents, filters.studentId]
+  );
+
+  const isIndividual = !!filters.studentId;
+  const studentName = selectedStudent ? `${selectedStudent.nombres} ${selectedStudent.apellidos}` : undefined;
+  const teacherName = user ? `${user.nombres} ${user.apellidos}` : '';
+
+  const setScope = (studentId: string | undefined) => {
+    setFilters((prev) => ({ ...prev, studentId }));
+  };
 
   return (
     <div className="space-y-8">
       <PageHeader
-        badge="Seguimiento pedagógico"
-        title="Reportes del grupo"
-        subtitle="Analiza el avance de tus estudiantes, identifica dificultades y toma decisiones pedagógicas con apoyo de IA."
+        badge="Evidencia ICACIT"
+        title={isIndividual ? 'Informe individual' : 'Reportes pedagógicos del grupo'}
+        subtitle={
+          isIndividual
+            ? `Seguimiento detallado de ${studentName} con evaluación IA y trazabilidad de aprendizaje.`
+            : 'Analiza el avance del grupo, identifica dificultades y genera informes formales con apoyo de IA.'
+        }
         crumbs={[
           { label: 'Inicio', to: '/teacher/dashboard' },
           { label: 'Reportes' },
         ]}
         action={
           <ExportButtons
+            pdfLabel={isIndividual ? 'PDF del estudiante' : 'PDF del grupo'}
+            csvLabel="Exportar ranking CSV"
             onPdf={() => downloadTeacherReportPdf(token, filters)}
             onCsv={() => downloadTeacherReportCsv(token, filters)}
           />
         }
       />
 
+      <ReportContextPanel isIndividual={isIndividual} studentName={studentName} />
+
       <div className="rounded-xl border border-slate-100 bg-white/60 px-4 py-3 text-sm dark:border-slate-800 dark:bg-slate-900/40">
         <span className="font-medium text-slate-800 dark:text-slate-100">{teacherName}</span>
         <span className="text-slate-500 dark:text-slate-400"> · Docente · </span>
-        <span className="text-slate-500 dark:text-slate-400">
-          {formatReportPeriod(filters.period || 'all')}
-        </span>
+        <span className="text-slate-500 dark:text-slate-400">{formatReportPeriod(filters.period || 'all')}</span>
+        {filters.area && filters.area !== 'todas' && (
+          <span className="text-slate-500 dark:text-slate-400"> · {filters.area}</span>
+        )}
       </div>
+
+      {allStudents.length > 0 && (
+        <ReportScopeBar
+          studentId={filters.studentId}
+          students={allStudents}
+          onChange={setScope}
+        />
+      )}
 
       <ReportFilters
         filters={filters}
         onChange={setFilters}
         role="teacher"
-        students={students}
+        students={allStudents}
       />
 
       {loading && <LoadingState />}
@@ -132,7 +177,7 @@ export default function TeacherReports() {
       )}
 
       {!loading && !error && summary && !summary.hasData && (
-        <EmptyReportState message="Aún no hay entregas suficientes para generar análisis del grupo." />
+        <EmptyReportState message="Aún no hay entregas suficientes para generar análisis. Asigna actividades y espera las primeras entregas evaluadas por IA." />
       )}
 
       {!loading && !error && summary?.hasData && (
@@ -140,17 +185,22 @@ export default function TeacherReports() {
           <SummaryCards cards={summaryCardItemsTeacher(summary)} />
           <SkillMap
             skills={skills}
-            title="Mapa grupal de habilidades lectoras"
-            subtitle="Promedio del grupo en cada habilidad lectora evaluada por IA"
+            title={isIndividual ? 'Habilidades lectoras del estudiante' : 'Mapa grupal de habilidades lectoras'}
+            subtitle="Promedio en comprensión literal, inferencial, pensamiento crítico, vocabulario e idea principal"
           />
           <PedagogicalAlerts alerts={alerts} />
-          <StudentRankingTable students={students} />
+          {!isIndividual && (
+            <StudentRankingTable
+              students={students}
+              onSelectStudent={setScope}
+            />
+          )}
           <TeacherAreaTopicTable areas={areas} />
           <ActivityDifficultyTable activities={difficulty} />
           <TeacherAnswersTable answers={answers} />
           <RecommendationsPanel
             recommendations={recommendations}
-            emptyMessage="Las recomendaciones pedagógicas aparecerán cuando haya más evidencias del grupo."
+            emptyMessage="Las recomendaciones pedagógicas aparecerán cuando haya más evidencias evaluadas por IA."
           />
           <LearningEvidencePanel evidence={evidence} role="teacher" />
         </>

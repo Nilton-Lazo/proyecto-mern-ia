@@ -1,0 +1,95 @@
+{
+  "name": "Generate Questions Backend",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "generate-questions",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 0],
+      "id": "webhook-generate-questions",
+      "name": "Webhook Generate Questions",
+      "webhookId": "generate-questions-backend"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:3000/api/ai/practice",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ text: $json.body.text || $json.text }) }}",
+        "options": { "timeout": 120000 }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [240, 0],
+      "id": "http-call-ai-practice",
+      "name": "Call Backend AI Practice"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $('Webhook Generate Questions').first().json.body || $('Webhook Generate Questions').first().json;\nconst ai = $input.first().json;\nconst raw = ai.questions || [];\nconst questions = raw.map((q, i) => {\n  if (typeof q === 'string') {\n    return { text: q, type: 'literal', skill: 'comprension_literal', difficulty: 'medium' };\n  }\n  return {\n    text: q.questionText || q.text || '',\n    type: q.type || 'literal',\n    skill: q.type || 'comprension_literal',\n    expectedAnswer: q.expectedAnswer || '',\n    difficulty: q.difficulty || 'medium'\n  };\n}).filter(q => q.text);\n\nif (questions.length < 5) {\n  throw new Error('La IA no generó al menos 5 preguntas');\n}\n\nreturn [{ json: { ok: true, activityId: input.activityId, questions } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [480, 0],
+      "id": "format-questions-response",
+      "name": "Format Questions Response"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:3000/api/automation/workflow-log",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "x-n8n-api-key", "value": "={{$env.N8N_INTERNAL_API_KEY}}" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ workflowName: 'generate-questions-backend', eventType: 'ai_generation', status: 'success', payload: $('Webhook Generate Questions').first().json, response: $json }) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [720, 0],
+      "id": "log-success",
+      "name": "Log Success"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $('Format Questions Response').first().json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [960, 0],
+      "id": "respond-webhook",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "connections": {
+    "Webhook Generate Questions": {
+      "main": [[{ "node": "Call Backend AI Practice", "type": "main", "index": 0 }]]
+    },
+    "Call Backend AI Practice": {
+      "main": [[{ "node": "Format Questions Response", "type": "main", "index": 0 }]]
+    },
+    "Format Questions Response": {
+      "main": [[{ "node": "Log Success", "type": "main", "index": 0 }]]
+    },
+    "Log Success": {
+      "main": [[{ "node": "Respond to Webhook", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "meta": { "instanceId": "tutor-virtual-n8n" },
+  "tags": [{ "name": "tutor-virtual" }, { "name": "ia" }]
+}

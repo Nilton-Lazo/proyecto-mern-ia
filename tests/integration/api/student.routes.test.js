@@ -31,6 +31,7 @@ jest.mock('../../../src/backend/models/Submission', () => ({
   find: jest.fn(),
   findOne: jest.fn(),
   findOneAndUpdate: jest.fn(),
+  create: jest.fn(),
 }));
 
 // IMPORTS DESPUÉS DE LOS MOCKS
@@ -171,13 +172,19 @@ describe('Rutas /api/student', () => {
     });
 
     const mockSub = {
+      _id: 'sub1',
       status: 'draft',
       questions: [{ questionText: 'Q1', type: 'literal' }],
       questionAnswers: [{ questionIndex: 0, answer: 'parcial' }],
       progressPercent: 0,
-      save: jest.fn().mockResolvedValue(true),
+      currentStep: 4,
     };
     Submission.findOne.mockResolvedValue(mockSub);
+    Submission.findOneAndUpdate.mockResolvedValue({
+      ...mockSub,
+      progressPercent: 10,
+      lastSavedAt: new Date('2026-06-09T19:53:00Z'),
+    });
 
     const res = await request(app)
       .post('/api/student/activities/a1/autosave')
@@ -190,7 +197,7 @@ describe('Rutas /api/student', () => {
     expect(res.body).toEqual(
       expect.objectContaining({ ok: true, progressPercent: expect.any(Number) })
     );
-    expect(mockSub.save).toHaveBeenCalled();
+    expect(Submission.findOneAndUpdate).toHaveBeenCalled();
   });
 
   test('GET /activities filtra por área', async () => {

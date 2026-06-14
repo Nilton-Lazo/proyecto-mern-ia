@@ -4,6 +4,7 @@ const Submission = require('../models/Submission');
 const authRequired = require('../middlewares/auth');
 const requireRole = require('../middlewares/roles');
 const aiService = require('../services/aiService');
+const n8nService = require('../services/n8n.service');
 const {
   displayStatus,
   calcProgress,
@@ -11,6 +12,7 @@ const {
   filterActivityRows,
   groupByArea,
   persistDraft,
+  findOrCreateDraftSubmission,
   computeSkillScores,
   aggregateSkillScores,
   getSkillRecommendations,
@@ -150,10 +152,24 @@ router.post('/activities/:id/generate-questions', authRequired, requireRole('stu
       return res.status(400).json({ error: 'La actividad no tiene texto para analizar' });
     }
 
-    const [questions, aiAnalysis] = await Promise.all([
-      aiService.generateTypedQuestions(act.text),
+    const [genResult, aiAnalysis] = await Promise.all([
+      n8nService.generateQuestionsWithFallback({
+        activityId: String(act._id),
+        text: act.text,
+        area: act.area || 'Comunicación',
+        topic: act.topic || '',
+        level: 'primaria',
+      }),
       aiService.analyzeText(act.text),
     ]);
+
+    if (!genResult.ok || !genResult.questions?.length) {
+      return res.status(500).json({
+        error: genResult.error || 'No fue posible generar preguntas con IA. Intenta más tarde.',
+      });
+    }
+
+    const questions = genResult.questions;
 
     sub.questions = questions;
     sub.questionsGenerated = true;
@@ -210,17 +226,19 @@ router.post('/activities/:id/save-draft', authRequired, requireRole('student', '
     const denied = assertAssigned(act, req.user._id);
     if (denied) return res.status(denied.code).json({ error: denied.error });
 
-    let sub = await Submission.findOne({ activity: act._id, student: req.user._id });
-    if (!sub) sub = await Submission.create({ activity: act._id, student: req.user._id });
+    const sub = await findOrCreateDraftSubmission(act._id, req.user._id);
     if (sub.status === 'submitted') {
       return res.status(400).json({ error: 'La actividad ya fue entregada' });
     }
 
-    await persistDraft(sub, { answers, answer, currentStep });
-    res.json({ ok: true, progressPercent: sub.progressPercent, lastSavedAt: sub.lastSavedAt });
+    const updated = await persistDraft(sub, { answers, answer, currentStep });
+    res.json({ ok: true, progressPercent: updated.progressPercent, lastSavedAt: updated.lastSavedAt });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: err.message });
+    console.error('save-draft:', err);
+    const status = err.statusCode || 500;
+    res.status(status).json({
+      error: status === 500 ? 'No se pudo guardar el borrador. Intenta nuevamente.' : err.message,
+    });
   }
 });
 
@@ -232,22 +250,24 @@ router.post('/activities/:id/autosave', authRequired, requireRole('student', 'ad
     const denied = assertAssigned(act, req.user._id);
     if (denied) return res.status(denied.code).json({ error: denied.error });
 
-    let sub = await Submission.findOne({ activity: act._id, student: req.user._id });
-    if (!sub) sub = await Submission.create({ activity: act._id, student: req.user._id });
+    const sub = await findOrCreateDraftSubmission(act._id, req.user._id);
     if (sub.status === 'submitted') {
       return res.status(400).json({ error: 'La actividad ya fue entregada' });
     }
 
-    await persistDraft(sub, { answers, answer, currentStep });
+    const updated = await persistDraft(sub, { answers, answer, currentStep });
     res.json({
       ok: true,
-      progressPercent: sub.progressPercent,
-      lastSavedAt: sub.lastSavedAt,
-      currentStep: sub.currentStep,
+      progressPercent: updated.progressPercent,
+      lastSavedAt: updated.lastSavedAt,
+      currentStep: updated.currentStep,
     });
   } catch (err) {
     console.error('autosave:', err);
-    res.status(500).json({ error: err.message });
+    const status = err.statusCode || 500;
+    res.status(status).json({
+      error: status === 500 ? 'No se pudo guardar el borrador. Intenta nuevamente.' : err.message,
+    });
   }
 });
 

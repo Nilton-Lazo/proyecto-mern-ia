@@ -37,9 +37,9 @@ export default function LearningEvidencePanel({ evidence, role }: Props) {
         {evidence.map((e, i) => (
           <article key={i} className="rounded-xl border border-indigo-100/80 p-4 dark:border-indigo-900/40">
             <div className="flex flex-wrap gap-2 text-xs text-slate-500">
-              {'studentName' in e && (e as { studentName?: string }).studentName && (
+              {e.studentName && (
                 <span className="font-medium text-slate-700 dark:text-slate-200">
-                  {(e as { studentName: string }).studentName}
+                  {e.studentName}
                 </span>
               )}
               <span className="text-indigo-600 dark:text-indigo-400">{e.skill}</span>

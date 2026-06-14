@@ -36,6 +36,7 @@ export function summaryCardItemsStudent(summary: {
 export function summaryCardItemsTeacher(summary: {
   totalStudents: number;
   activitiesAssigned: number;
+  totalAssignments: number;
   submitted: number;
   pending: number;
   overdue: number;
@@ -45,15 +46,26 @@ export function summaryCardItemsTeacher(summary: {
 }) {
   return [
     { label: 'Estudiantes', value: summary.totalStudents },
-    { label: 'Actividades asignadas', value: summary.activitiesAssigned },
-    { label: 'Entregadas', value: summary.submitted, accent: 'text-emerald-600' },
+    { label: 'Actividades creadas', value: summary.activitiesAssigned },
+    { label: 'Asignaciones totales', value: summary.totalAssignments },
+    { label: 'Entregas completadas', value: summary.submitted, accent: 'text-emerald-600' },
     { label: 'Pendientes', value: summary.pending, accent: 'text-amber-600' },
     { label: 'Vencidas', value: summary.overdue, accent: 'text-rose-600' },
     {
       label: 'Comprensión promedio',
       value: summary.avgComprehension != null ? `${summary.avgComprehension}%` : '—',
+      hint: 'Promedio de entregas evaluadas por IA',
     },
-    { label: 'Participación', value: `${summary.participation}%` },
-    { label: 'En seguimiento', value: summary.studentsAtRisk, accent: 'text-violet-600' },
+    {
+      label: 'Participación',
+      value: `${summary.participation}%`,
+      hint: 'Estudiantes con al menos una entrega',
+    },
+    {
+      label: 'Requieren acompañamiento',
+      value: summary.studentsAtRisk,
+      accent: 'text-rose-600',
+      hint: 'Progreso bajo o sin actividad',
+    },
   ];
 }

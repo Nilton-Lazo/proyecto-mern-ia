@@ -1,3 +1,4 @@
+const Submission = require('../models/Submission');
 const { computeSkillScores, aggregateSkillScores, getSkillRecommendations } = require('../utils/skillScoring');
 
 function displayStatus(sub, dueAt) {
@@ -87,22 +88,69 @@ function groupByArea(rows) {
   return Object.values(groups).sort((a, b) => a.area.localeCompare(b.area, 'es'));
 }
 
-async function persistDraft(sub, { answers, answer, currentStep }) {
+function buildDraftUpdate(sub, { answers, answer, currentStep }) {
+  let questionAnswers = sub.questionAnswers;
   if (Array.isArray(answers) && answers.length > 0) {
-    sub.questionAnswers = answers.map((a, i) => ({
+    questionAnswers = answers.map((a, i) => ({
       questionIndex: a.questionIndex ?? i,
       answer: a.answer ?? '',
       feedback: sub.questionAnswers?.[i]?.feedback || a.feedback || '',
       isCorrect: sub.questionAnswers?.[i]?.isCorrect || a.isCorrect || '',
     }));
   }
-  if (answer) sub.answer = answer;
-  if (currentStep != null) sub.currentStep = Math.max(1, Math.min(5, Number(currentStep) || 1));
-  sub.progressPercent = calcProgress(sub);
-  sub.status = 'draft';
-  sub.lastSavedAt = new Date();
-  await sub.save();
-  return sub;
+
+  const nextStep =
+    currentStep != null
+      ? Math.max(1, Math.min(5, Number(currentStep) || 1))
+      : sub.currentStep ?? 1;
+
+  const draftView = {
+    ...(typeof sub.toObject === 'function' ? sub.toObject() : sub),
+    questionAnswers,
+    answer: answer || sub.answer,
+    currentStep: nextStep,
+    status: 'draft',
+  };
+
+  const update = {
+    questionAnswers,
+    currentStep: nextStep,
+    progressPercent: calcProgress(draftView),
+    status: 'draft',
+    lastSavedAt: new Date(),
+  };
+  if (answer) update.answer = answer;
+  return update;
+}
+
+/** Evita duplicados si save-draft y autosave corren a la vez al crear el submission */
+async function findOrCreateDraftSubmission(activityId, studentId) {
+  let sub = await Submission.findOne({ activity: activityId, student: studentId });
+  if (sub) return sub;
+  try {
+    return await Submission.create({ activity: activityId, student: studentId });
+  } catch (err) {
+    if (err?.code === 11000) {
+      return Submission.findOne({ activity: activityId, student: studentId });
+    }
+    throw err;
+  }
+}
+
+/** Actualización atómica — evita VersionError por guardado manual + autosave simultáneo */
+async function persistDraft(sub, { answers, answer, currentStep }) {
+  const update = buildDraftUpdate(sub, { answers, answer, currentStep });
+  const updated = await Submission.findOneAndUpdate(
+    { _id: sub._id, status: { $ne: 'submitted' } },
+    { $set: update },
+    { new: true }
+  );
+  if (!updated) {
+    const err = new Error('La actividad ya fue entregada.');
+    err.statusCode = 400;
+    throw err;
+  }
+  return updated;
 }
 
 module.exports = {
@@ -112,6 +160,7 @@ module.exports = {
   filterActivityRows,
   groupByArea,
   persistDraft,
+  findOrCreateDraftSubmission,
   computeSkillScores,
   aggregateSkillScores,
   getSkillRecommendations,

@@ -88,6 +88,7 @@ export type EvidenceItem = {
   recommendation: string;
   evaluation: string;
   fecha: string;
+  studentName?: string;
 };
 
 export type TeacherReportSummary = {

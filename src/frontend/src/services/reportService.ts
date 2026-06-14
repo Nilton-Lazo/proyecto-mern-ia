@@ -155,10 +155,13 @@ export async function downloadTeacherReportPdf(token: string | null, filters?: R
     throw new Error(data.error || 'No se pudo generar el PDF.');
   }
   const blob = await res.blob();
+  const disposition = res.headers.get('Content-Disposition') || '';
+  const match = disposition.match(/filename="([^"]+)"/);
+  const filename = match?.[1] || (filters?.studentId ? 'informe-estudiante.pdf' : 'reporte-grupo-docente.pdf');
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'reporte-grupo.pdf';
+  a.download = filename;
   a.click();
   URL.revokeObjectURL(url);
 }

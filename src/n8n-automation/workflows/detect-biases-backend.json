@@ -1,0 +1,95 @@
+{
+  "name": "Detect Biases Backend",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "detect-biases",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 0],
+      "id": "webhook-detect-biases",
+      "name": "Webhook Detect Biases",
+      "webhookId": "detect-biases-backend"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:3000/api/ai/biases",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ text: $json.body.text || $json.text, activityId: $json.body.activityId || $json.activityId }) }}",
+        "options": { "timeout": 60000 }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [240, 0],
+      "id": "http-call-biases",
+      "name": "Call Backend Biases API"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $('Webhook Detect Biases').first().json.body || $('Webhook Detect Biases').first().json;\nconst ai = $input.first().json;\nconst tags = ai.tags || [];\nconst biases = tags.map(t => ({\n  label: typeof t === 'string' ? t : t.label,\n  fragment: input.text ? input.text.slice(0, 120) : '',\n  explanation: 'Detectado por el servicio de IA del Tutor Virtual'\n}));\nreturn [{ json: { ok: true, activityId: input.activityId, biases, tags } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [480, 0],
+      "id": "format-biases-response",
+      "name": "Format Biases Response"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:3000/api/automation/workflow-log",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "x-n8n-api-key", "value": "={{$env.N8N_INTERNAL_API_KEY}}" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ workflowName: 'detect-biases-backend', eventType: 'bias_detection', status: 'success', payload: $('Webhook Detect Biases').first().json, response: $json }) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [720, 0],
+      "id": "log-success",
+      "name": "Log Success"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $('Format Biases Response').first().json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [960, 0],
+      "id": "respond-webhook",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "connections": {
+    "Webhook Detect Biases": {
+      "main": [[{ "node": "Call Backend Biases API", "type": "main", "index": 0 }]]
+    },
+    "Call Backend Biases API": {
+      "main": [[{ "node": "Format Biases Response", "type": "main", "index": 0 }]]
+    },
+    "Format Biases Response": {
+      "main": [[{ "node": "Log Success", "type": "main", "index": 0 }]]
+    },
+    "Log Success": {
+      "main": [[{ "node": "Respond to Webhook", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "meta": { "instanceId": "tutor-virtual-n8n" },
+  "tags": [{ "name": "tutor-virtual" }, { "name": "ia" }]
+}

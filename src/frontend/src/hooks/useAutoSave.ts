@@ -101,7 +101,14 @@ export function useAutoSave({
     return () => window.removeEventListener('beforeunload', handler);
   }, [enabled, persistLocal]);
 
-  return { status, lastSavedAt, errorMsg, markDirty, saveNow: () => save(true) };
+  const clearDirty = useCallback((savedAt?: string | Date) => {
+    dirtyRef.current = false;
+    setErrorMsg(null);
+    if (savedAt) setLastSavedAt(savedAt instanceof Date ? savedAt : new Date(savedAt));
+    setStatus('saved');
+  }, []);
+
+  return { status, lastSavedAt, errorMsg, markDirty, clearDirty, saveNow: () => save(true) };
 }
 
 export function loadLocalDraft(activityId: string): QuestionAnswer[] | null {

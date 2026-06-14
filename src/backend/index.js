@@ -1,11 +1,20 @@
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '.env') });
+
+console.log(
+  'N8N_ACTIVITY_ASSIGNED_WEBHOOK_URL:',
+  process.env.N8N_ACTIVITY_ASSIGNED_WEBHOOK_URL ? 'configurada' : 'NO configurada'
+);
+
 const express = require('express');
 const mongoose = require('mongoose');
+const cors = require('cors');
 const aiRouter = require('./routes/ai');
 const authRouter = require('./routes/auth');
 const teacherRoutes = require('./routes/teacher');
 const studentRoutes = require('./routes/student');
-const cors = require('cors');
-require('dotenv').config();
+const automationRoutes = require('./routes/automation.routes');
+const notificationsRoutes = require('./routes/notifications.routes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -37,6 +46,8 @@ app.use('/api/ai', aiRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/teacher', teacherRoutes);
 app.use('/api/student', studentRoutes);
+app.use('/api/automation', automationRoutes);
+app.use('/api/notifications', notificationsRoutes);
 
 async function start() {
   console.log('Conectando a MongoDB en:', mongoUri);

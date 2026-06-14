@@ -2,6 +2,7 @@ import { NavLink, Link, Outlet, useLocation } from 'react-router-dom';
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import ThemeToggle from './ThemeToggle';
+import NotificationBell from './NotificationBell';
 import {
   getNavRole,
   getHomePath,
@@ -99,6 +100,7 @@ export default function Layout() {
             {/* Acciones derecha — desktop */}
             <div className="hidden shrink-0 items-center gap-2 md:flex">
               <ThemeToggle compact />
+              {isStudent && user && <NotificationBell compact />}
 
               {!user ? (
                 <>
@@ -163,6 +165,7 @@ export default function Layout() {
 
             {/* Móvil */}
             <div className="flex shrink-0 items-center gap-2 md:hidden">
+              {isStudent && user && <NotificationBell compact />}
               <ThemeToggle compact />
               <button
                 className="inline-flex items-center justify-center rounded-xl p-2 text-slate-600 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800"

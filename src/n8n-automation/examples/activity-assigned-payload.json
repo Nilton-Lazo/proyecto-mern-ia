@@ -1,0 +1,22 @@
+{
+  "event": "activity_assigned",
+  "activityId": "674a1b2c3d4e5f6789012345",
+  "title": "Lectura sobre cambio climático",
+  "area": "Ciencia y Tecnología",
+  "topic": "Cambio climático",
+  "dueDate": "2026-06-20",
+  "teacherName": "Luis Mateo",
+  "students": [
+    {
+      "id": "674a00000000000000000001",
+      "name": "Joel Lazo Maravi",
+      "email": "joel@gmail.com"
+    },
+    {
+      "id": "674a00000000000000000002",
+      "name": "Jose Mancilla",
+      "email": "jose@gmail.com"
+    }
+  ],
+  "timestamp": "2026-06-14T12:00:00.000Z"
+}

@@ -1,0 +1,107 @@
+{
+  "name": "Activity Assigned Notification",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "activity-assigned",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 0],
+      "id": "webhook-activity-assigned",
+      "name": "Webhook",
+      "webhookId": "activity-assigned-notification"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "name": "event",
+              "value": "activity_assigned",
+              "type": "string"
+            },
+            {
+              "name": "activityId",
+              "value": "={{ $json.body?.activityId || $json.activityId }}",
+              "type": "string"
+            },
+            {
+              "name": "title",
+              "value": "=Nueva actividad asignada: {{ $json.body?.title || $json.title }}",
+              "type": "string"
+            },
+            {
+              "name": "message",
+              "value": "=Área: {{ $json.body?.area || $json.area }} | Fecha límite: {{ $json.body?.dueDate || $json.dueDate || 'por confirmar' }}",
+              "type": "string"
+            },
+            {
+              "name": "students",
+              "value": "={{ $json.body?.students || $json.students }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [280, 0],
+      "id": "edit-fields",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:3000/api/notifications/bulk",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Content-Type", "value": "application/json" },
+            { "name": "x-n8n-api-key", "value": "change_me" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ event: $json.event, activityId: $json.activityId, title: $json.title, message: $json.message, students: $json.students }) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [560, 0],
+      "id": "create-notifications",
+      "name": "Create In-App Notifications"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { ok: true, workflow: 'activity-assigned-notification', notificationsCreated: $json.created || 0, backend: $json } }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [840, 0],
+      "id": "respond-webhook",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [[{ "node": "Edit Fields", "type": "main", "index": 0 }]]
+    },
+    "Edit Fields": {
+      "main": [[{ "node": "Create In-App Notifications", "type": "main", "index": 0 }]]
+    },
+    "Create In-App Notifications": {
+      "main": [[{ "node": "Respond to Webhook", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "meta": { "instanceId": "tutor-virtual-n8n" },
+  "tags": [{ "name": "tutor-virtual" }, { "name": "notifications" }]
+}

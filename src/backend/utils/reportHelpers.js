@@ -552,6 +552,8 @@ function buildRecentAnswers(subs, limit = 15) {
           answer: ans.answer,
           evaluation: ans.isCorrect || 'sin_evaluar',
           feedback: ans.feedback || '',
+          skill: q?.type || 'literal',
+          skillLabel: SKILL_LABELS[q?.type] || SKILL_LABELS.literal,
           fecha: s.updatedAt,
         });
       });
@@ -629,7 +631,7 @@ function buildTeacherEvidence(subs, limit = 6) {
   return buildRecentAnswers(subs, limit).map((a) => ({
     studentName: a.studentName,
     activityTitle: a.activityTitle,
-    skill: a.area,
+    skill: a.skillLabel,
     answer: a.answer,
     feedback: a.feedback,
     evaluation: a.evaluation,
@@ -638,10 +640,40 @@ function buildTeacherEvidence(subs, limit = 6) {
   }));
 }
 
+function formatReportFilterLabel(query = {}, selectedStudent = null) {
+  const parts = [];
+  const periodMap = {
+    all: 'Todo el periodo',
+    week: 'Última semana',
+    month: 'Último mes',
+    semester: 'Último semestre',
+  };
+  const period = query.period || 'all';
+  parts.push(periodMap[period] || period);
+
+  if (query.area && query.area !== 'todas' && query.area !== 'all') parts.push(`Área: ${query.area}`);
+  if (query.status && query.status !== 'all' && query.status !== 'todas') parts.push(`Estado: ${query.status}`);
+  if (query.topic?.trim()) parts.push(`Tema: ${query.topic.trim()}`);
+  if (selectedStudent) {
+    parts.push(`Estudiante: ${selectedStudent.nombres} ${selectedStudent.apellidos}`);
+  } else if (query.studentId || query.student) {
+    parts.push('Estudiante seleccionado');
+  }
+  return parts.join(' · ');
+}
+
 function submissionsToCsv(rows) {
-  const header = 'Estudiante,Actividad,Área,Progreso,Comprensión,Estado\n';
+  const header = 'Estudiante,Correo,Entregas,Progreso,Comprensión,Habilidad más baja,Estado\n';
   const lines = rows.map((r) =>
-    `"${r.nombres} ${r.apellidos}","${r.completed}/${r.total}","","","${r.avgComprehension ?? ''}","${r.statusLabel}"`
+    [
+      `"${r.nombres} ${r.apellidos}"`,
+      `"${r.email || ''}"`,
+      `"${r.completed}/${r.total}"`,
+      `"${r.avgProgress}%"`,
+      `"${r.avgComprehension ?? ''}"`,
+      `"${r.weakestSkill || ''}"`,
+      `"${r.statusLabel}"`,
+    ].join(',')
   );
   return header + lines.join('\n');
 }
@@ -668,6 +700,7 @@ module.exports = {
   buildPedagogicalAlerts,
   buildTeacherRecommendations,
   buildTeacherEvidence,
+  formatReportFilterLabel,
   aggregateSkillScores,
   getSkillRecommendations,
   submissionsToCsv,
